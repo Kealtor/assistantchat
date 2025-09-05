@@ -7,10 +7,52 @@ import { MessageSquare, BookOpen, Settings } from "lucide-react";
 
 type ViewMode = "chat" | "journal" | "settings";
 
+type ChatSession = {
+  id: string;
+  title: string;
+  workflow: string;
+  messages: Array<{
+    id: string;
+    role: "user" | "assistant";
+    content: string;
+    timestamp: Date;
+  }>;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export const ChatLayout = () => {
   const [currentView, setCurrentView] = useState<ViewMode>("chat");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState("assistant");
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+
+  const createNewChat = () => {
+    const newChat: ChatSession = {
+      id: Date.now().toString(),
+      title: "New Chat",
+      workflow: activeWorkflow,
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    setChatSessions(prev => [newChat, ...prev]);
+    setActiveChatId(newChat.id);
+  };
+
+  const updateChatSession = (chatId: string, updates: Partial<ChatSession>) => {
+    setChatSessions(prev =>
+      prev.map(chat =>
+        chat.id === chatId ? { ...chat, ...updates } : chat
+      )
+    );
+  };
+
+  const selectChat = (chatId: string) => {
+    setActiveChatId(chatId);
+  };
 
   const workflows = [
     { id: "assistant", name: "Assistant", emoji: "🤖", color: "bg-primary" },
@@ -34,6 +76,10 @@ export const ChatLayout = () => {
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           currentView={currentView}
           onViewChange={setCurrentView}
+          chatSessions={chatSessions}
+          activeChatId={activeChatId}
+          onCreateNewChat={createNewChat}
+          onSelectChat={selectChat}
         />
       </div>
 
@@ -84,7 +130,11 @@ export const ChatLayout = () => {
         {/* Content */}
         <div className="flex-1 overflow-hidden">
           {currentView === "chat" && (
-            <ChatArea workflow={activeWorkflow} />
+            <ChatArea 
+              workflow={activeWorkflow}
+              chatSession={activeChatId ? chatSessions.find(chat => chat.id === activeChatId) || null : null}
+              onUpdateChat={updateChatSession}
+            />
           )}
           {currentView === "journal" && (
             <JournalArea />

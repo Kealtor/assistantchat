@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageSquare } from "lucide-react";
 
 type Message = {
   id: string;
@@ -10,20 +11,25 @@ type Message = {
   timestamp: Date;
 };
 
+type ChatSession = {
+  id: string;
+  title: string;
+  workflow: string;
+  messages: Message[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 interface ChatAreaProps {
   workflow: string;
+  chatSession: ChatSession | null;
+  onUpdateChat: (chatId: string, updates: Partial<ChatSession>) => void;
 }
 
-export const ChatArea = ({ workflow }: ChatAreaProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: "Hello! I'm your AI assistant. How can I help you today?",
-      timestamp: new Date(),
-    },
-  ]);
+export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  
+  const messages = chatSession?.messages || [];
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -40,6 +46,8 @@ export const ChatArea = ({ workflow }: ChatAreaProps) => {
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
+    if (!chatSession) return;
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -47,7 +55,13 @@ export const ChatArea = ({ workflow }: ChatAreaProps) => {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    onUpdateChat(chatSession.id, { 
+      messages: updatedMessages,
+      title: updatedMessages.length === 1 ? content.slice(0, 50) + (content.length > 50 ? '...' : '') : chatSession.title,
+      updatedAt: new Date()
+    });
+    
     setIsLoading(true);
 
     // Simulate AI response
@@ -59,7 +73,11 @@ export const ChatArea = ({ workflow }: ChatAreaProps) => {
         timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const finalMessages = [...updatedMessages, assistantMessage];
+      onUpdateChat(chatSession.id, { 
+        messages: finalMessages,
+        updatedAt: new Date()
+      });
       setIsLoading(false);
     }, 1000 + Math.random() * 2000);
   };
@@ -97,11 +115,30 @@ export const ChatArea = ({ workflow }: ChatAreaProps) => {
     return workflowResponses[Math.floor(Math.random() * workflowResponses.length)];
   };
 
+  if (!chatSession) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No chat selected</h3>
+          <p className="text-muted-foreground">Start a new conversation to begin</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Messages Area */}
       <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 py-4">
         <div className="space-y-6 max-w-4xl mx-auto">
+          {messages.length === 0 && (
+            <div className="flex justify-start">
+              <div className="bg-chat-assistant rounded-md p-4 max-w-xs">
+                <p className="text-sm">Hello! I'm your AI assistant. How can I help you today?</p>
+              </div>
+            </div>
+          )}
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}

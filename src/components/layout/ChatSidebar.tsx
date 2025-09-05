@@ -23,6 +23,20 @@ type Workflow = {
 
 type ViewMode = "chat" | "journal" | "settings";
 
+type ChatSession = {
+  id: string;
+  title: string;
+  workflow: string;
+  messages: Array<{
+    id: string;
+    role: "user" | "assistant";
+    content: string;
+    timestamp: Date;
+  }>;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 interface ChatSidebarProps {
   workflows: Workflow[];
   activeWorkflow: string;
@@ -31,6 +45,10 @@ interface ChatSidebarProps {
   onToggleCollapse: () => void;
   currentView: ViewMode;
   onViewChange: (view: ViewMode) => void;
+  chatSessions: ChatSession[];
+  activeChatId: string | null;
+  onCreateNewChat: () => void;
+  onSelectChat: (chatId: string) => void;
 }
 
 export const ChatSidebar = ({
@@ -41,19 +59,24 @@ export const ChatSidebar = ({
   onToggleCollapse,
   currentView,
   onViewChange,
+  chatSessions,
+  activeChatId,
+  onCreateNewChat,
+  onSelectChat,
 }: ChatSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Mock chat history
-  const chatHistory = [
-    { id: "1", title: "Project Planning Discussion", timestamp: "2 hours ago", workflow: "assistant" },
-    { id: "2", title: "Meeting Notes Review", timestamp: "Yesterday", workflow: "notes" },
-    { id: "3", title: "Weekly Schedule Planning", timestamp: "Yesterday", workflow: "calendar" },
-    { id: "4", title: "Task Prioritization", timestamp: "2 days ago", workflow: "tasks" },
-    { id: "5", title: "Research on AI Tools", timestamp: "3 days ago", workflow: "search" },
-  ];
+  const formatTimestamp = (date: Date) => {
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInHours < 48) return "Yesterday";
+    return `${Math.floor(diffInHours / 24)} days ago`;
+  };
 
-  const filteredHistory = chatHistory.filter(chat =>
+  const filteredHistory = chatSessions.filter(chat =>
     chat.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
     chat.workflow === activeWorkflow
   );
@@ -136,7 +159,7 @@ export const ChatSidebar = ({
         </div>
 
         {/* New Chat Button */}
-        <Button className="w-full mb-4" size="sm">
+        <Button className="w-full mb-4" size="sm" onClick={onCreateNewChat}>
           <Plus className="h-4 w-4 mr-2" />
           New Chat
         </Button>
@@ -187,11 +210,14 @@ export const ChatSidebar = ({
               filteredHistory.map((chat) => (
                 <div
                   key={chat.id}
-                  className="group flex items-center justify-between p-3 hover:bg-accent rounded-md cursor-pointer transition-colors"
+                  onClick={() => onSelectChat(chat.id)}
+                  className={`group flex items-center justify-between p-3 hover:bg-accent rounded-md cursor-pointer transition-colors ${
+                    activeChatId === chat.id ? 'bg-accent' : ''
+                  }`}
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{chat.title}</p>
-                    <p className="text-xs text-muted-foreground">{chat.timestamp}</p>
+                    <p className="text-xs text-muted-foreground">{formatTimestamp(chat.updatedAt)}</p>
                   </div>
                   <Button
                     variant="ghost"
