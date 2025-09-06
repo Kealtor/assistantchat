@@ -40,6 +40,7 @@ export const ChatLayout = () => {
     
     setChatSessions(prev => [newChat, ...prev]);
     setActiveChatId(newChat.id);
+    setCurrentView("chat"); // Switch to chat view
   };
 
   const updateChatSession = (chatId: string, updates: Partial<ChatSession>) => {
@@ -52,6 +53,7 @@ export const ChatLayout = () => {
 
   const selectChat = (chatId: string) => {
     setActiveChatId(chatId);
+    setCurrentView("chat"); // Switch to chat view
   };
 
   const workflows = [

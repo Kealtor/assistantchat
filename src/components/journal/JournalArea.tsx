@@ -56,86 +56,90 @@ export const JournalArea = () => {
   );
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full max-h-screen overflow-hidden">
       {/* Left Panel - Calendar & Mood Tracker */}
-      <div className="w-80 border-r border-border bg-surface p-6 space-y-6">
-        {/* Calendar */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center">
-              <CalendarDays className="h-4 w-4 mr-2" />
-              Calendar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className="rounded-md border-0"
-            />
-          </CardContent>
-        </Card>
+      <div className="w-80 border-r border-border bg-surface">
+        <ScrollArea className="h-full">
+          <div className="p-6 space-y-6">
+            {/* Calendar */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center">
+                  <CalendarDays className="h-4 w-4 mr-2" />
+                  Calendar
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  className="rounded-md border-0 w-full"
+                />
+              </CardContent>
+            </Card>
 
-        {/* Mood Tracker */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center">
-              <Heart className="h-4 w-4 mr-2" />
-              Mood Tracker
-            </CardTitle>
-            <CardDescription>How are you feeling today?</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-2">
-              {moodEmojis.map((mood) => (
-                <Button
-                  key={mood.value}
-                  variant={selectedMood === mood.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedMood(mood.value)}
-                  className="h-12 flex flex-col items-center justify-center p-1"
-                >
-                  <span className="text-lg mb-1">{mood.emoji}</span>
-                  <span className="text-xs">{mood.label}</span>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+            {/* Mood Tracker */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Mood Tracker
+                </CardTitle>
+                <CardDescription>How are you feeling today?</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-5 gap-2">
+                  {moodEmojis.map((mood) => (
+                    <Button
+                      key={mood.value}
+                      variant={selectedMood === mood.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedMood(mood.value)}
+                      className="h-12 flex flex-col items-center justify-center p-1"
+                    >
+                      <span className="text-lg mb-1">{mood.emoji}</span>
+                      <span className="text-xs">{mood.label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Quick Stats */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              This Week
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Entries</span>
-              <Badge variant="secondary">5 / 7</Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Avg Mood</span>
-              <div className="flex items-center space-x-1">
-                <span className="text-lg">😊</span>
-                <span className="text-sm font-medium">4.2</span>
-              </div>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Streak</span>
-              <Badge variant="default">12 days</Badge>
-            </div>
-          </CardContent>
-        </Card>
+            {/* Quick Stats */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center">
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  This Week
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Entries</span>
+                  <Badge variant="secondary">5 / 7</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Avg Mood</span>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-lg">😊</span>
+                    <span className="text-sm font-medium">4.2</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Streak</span>
+                  <Badge variant="default">12 days</Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </ScrollArea>
       </div>
 
       {/* Right Panel - Journal Editor & History */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         <Tabs defaultValue="write" className="h-full flex flex-col">
-          <div className="border-b border-border bg-card p-4">
+          <div className="border-b border-border bg-card p-4 flex-shrink-0">
             <TabsList>
               <TabsTrigger value="write" className="flex items-center">
                 <BookOpen className="h-4 w-4 mr-2" />
@@ -148,80 +152,82 @@ export const JournalArea = () => {
             </TabsList>
           </div>
 
-          <TabsContent value="write" className="flex-1 p-6 space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold mb-2">
-                {format(selectedDate, "EEEE, MMMM do, yyyy")}
-              </h2>
-              <p className="text-muted-foreground">
-                What's on your mind today? Take a moment to reflect and capture your thoughts.
-              </p>
-            </div>
-
-            {currentEntry ? (
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">Today's Entry</CardTitle>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">
-                        {moodEmojis.find(m => m.value === currentEntry.mood)?.emoji}
-                      </span>
-                      <Badge variant="secondary">
-                        {moodEmojis.find(m => m.value === currentEntry.mood)?.label}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm leading-relaxed mb-4">{currentEntry.entry}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {currentEntry.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                <Textarea
-                  value={journalEntry}
-                  onChange={(e) => setJournalEntry(e.target.value)}
-                  placeholder="Write about your day, your thoughts, goals, or anything that comes to mind..."
-                  className="min-h-64 resize-none"
-                />
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {selectedMood && (
-                      <div className="flex items-center space-x-2">
-                        <span>Mood:</span>
-                        <span className="text-lg">
-                          {moodEmojis.find(m => m.value === selectedMood)?.emoji}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {moodEmojis.find(m => m.value === selectedMood)?.label}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <Button 
-                    onClick={handleSaveEntry}
-                    disabled={!journalEntry.trim()}
-                  >
-                    Save Entry
-                  </Button>
-                </div>
+          <TabsContent value="write" className="flex-1 min-h-0 overflow-auto">
+            <div className="p-6 space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold mb-2">
+                  {format(selectedDate, "EEEE, MMMM do, yyyy")}
+                </h2>
+                <p className="text-muted-foreground">
+                  What's on your mind today? Take a moment to reflect and capture your thoughts.
+                </p>
               </div>
-            )}
+
+              {currentEntry ? (
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Today's Entry</CardTitle>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg">
+                          {moodEmojis.find(m => m.value === currentEntry.mood)?.emoji}
+                        </span>
+                        <Badge variant="secondary">
+                          {moodEmojis.find(m => m.value === currentEntry.mood)?.label}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm leading-relaxed mb-4">{currentEntry.entry}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {currentEntry.tags.map((tag) => (
+                        <Badge key={tag} variant="outline" className="text-xs">
+                          #{tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  <Textarea
+                    value={journalEntry}
+                    onChange={(e) => setJournalEntry(e.target.value)}
+                    placeholder="Write about your day, your thoughts, goals, or anything that comes to mind..."
+                    className="min-h-64 resize-none"
+                  />
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      {selectedMood && (
+                        <div className="flex items-center space-x-2">
+                          <span>Mood:</span>
+                          <span className="text-lg">
+                            {moodEmojis.find(m => m.value === selectedMood)?.emoji}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {moodEmojis.find(m => m.value === selectedMood)?.label}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <Button 
+                      onClick={handleSaveEntry}
+                      disabled={!journalEntry.trim()}
+                    >
+                      Save Entry
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </TabsContent>
 
-          <TabsContent value="history" className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full p-6">
-              <div className="space-y-6">
+          <TabsContent value="history" className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-6 space-y-6">
                 <h2 className="text-xl font-semibold">Journal History</h2>
                 
                 <div className="space-y-4">
