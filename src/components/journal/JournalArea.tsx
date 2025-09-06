@@ -20,7 +20,19 @@ const moodEmojis = [
 export const JournalArea = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [journalEntry, setJournalEntry] = useState("");
-  const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [moodsByDate, setMoodsByDate] = useState<Map<string, number>>(new Map());
+
+  // Helper functions for mood management
+  const getCurrentDateKey = (date: Date) => format(date, "yyyy-MM-dd");
+  
+  const getCurrentMood = (date: Date) => {
+    return moodsByDate.get(getCurrentDateKey(date)) || null;
+  };
+  
+  const setMoodForDate = (date: Date, mood: number) => {
+    const dateKey = getCurrentDateKey(date);
+    setMoodsByDate(prev => new Map(prev.set(dateKey, mood)));
+  };
 
   // Mock journal entries
   const journalEntries = [
@@ -44,10 +56,9 @@ export const JournalArea = () => {
       console.log("Saving entry:", {
         date: selectedDate,
         entry: journalEntry,
-        mood: selectedMood,
+        mood: getCurrentMood(selectedDate),
       });
       setJournalEntry("");
-      setSelectedMood(null);
     }
   };
 
@@ -60,16 +71,16 @@ export const JournalArea = () => {
       {/* Left Panel - Calendar & Mood Tracker */}
       <div className="w-80 border-r border-border bg-surface">
         <ScrollArea className="h-full">
-          <div className="p-6 space-y-6">
+          <div className="p-4 space-y-4">
             {/* Calendar */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 px-4">
                 <CardTitle className="text-base flex items-center">
                   <CalendarDays className="h-4 w-4 mr-2" />
                   Calendar
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-3">
+              <CardContent className="px-4 pb-4">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
@@ -81,21 +92,21 @@ export const JournalArea = () => {
 
             {/* Mood Tracker */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 px-4">
                 <CardTitle className="text-base flex items-center">
                   <Heart className="h-4 w-4 mr-2" />
                   Mood Tracker
                 </CardTitle>
-                <CardDescription>How are you feeling today?</CardDescription>
+                <CardDescription className="px-0">How are you feeling today?</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 pb-4">
                 <div className="grid grid-cols-5 gap-2">
                   {moodEmojis.map((mood) => (
                     <Button
                       key={mood.value}
-                      variant={selectedMood === mood.value ? "default" : "outline"}
+                      variant={getCurrentMood(selectedDate) === mood.value ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setSelectedMood(mood.value)}
+                      onClick={() => setMoodForDate(selectedDate, mood.value)}
                       className="h-12 flex flex-col items-center justify-center p-1"
                     >
                       <span className="text-lg mb-1">{mood.emoji}</span>
@@ -108,13 +119,13 @@ export const JournalArea = () => {
 
             {/* Quick Stats */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 px-4">
                 <CardTitle className="text-base flex items-center">
                   <TrendingUp className="h-4 w-4 mr-2" />
                   This Week
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 px-4 pb-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Entries</span>
                   <Badge variant="secondary">5 / 7</Badge>
@@ -200,14 +211,14 @@ export const JournalArea = () => {
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      {selectedMood && (
+                      {getCurrentMood(selectedDate) && (
                         <div className="flex items-center space-x-2">
                           <span>Mood:</span>
                           <span className="text-lg">
-                            {moodEmojis.find(m => m.value === selectedMood)?.emoji}
+                            {moodEmojis.find(m => m.value === getCurrentMood(selectedDate))?.emoji}
                           </span>
                           <span className="text-sm text-muted-foreground">
-                            {moodEmojis.find(m => m.value === selectedMood)?.label}
+                            {moodEmojis.find(m => m.value === getCurrentMood(selectedDate))?.label}
                           </span>
                         </div>
                       )}
