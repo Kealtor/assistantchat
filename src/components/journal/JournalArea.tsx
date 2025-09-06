@@ -69,7 +69,7 @@ export const JournalArea = () => {
   return (
     <div className="flex h-full max-h-screen overflow-hidden">
       {/* Left Panel - Calendar & Mood Tracker */}
-      <div className="w-80 border-r border-border bg-surface">
+      <div className="w-80 border-r border-border bg-surface mr-6">
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             {/* Calendar */}
