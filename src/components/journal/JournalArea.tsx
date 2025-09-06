@@ -80,12 +80,12 @@ export const JournalArea = () => {
                   Calendar
                 </CardTitle>
               </CardHeader>
-              <CardContent className="px-4 pb-4">
+              <CardContent className="px-2 pb-4">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
                   onSelect={(date) => date && setSelectedDate(date)}
-                  className="rounded-md border-0 w-full"
+                  className="rounded-md border-0 max-w-full mx-auto"
                 />
               </CardContent>
             </Card>
