@@ -204,7 +204,7 @@ export const ChatSidebar = ({
             Recent Chats
           </h3>
         </div>
-        <ScrollArea className="flex-1 px-4">
+        <ScrollArea className="h-full px-4">
           <div className="space-y-1 pb-4">
             {filteredHistory.length > 0 ? (
               filteredHistory.map((chat) => (
