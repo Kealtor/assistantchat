@@ -1,60 +1,104 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatArea } from "../chat/ChatArea";
 import { JournalArea } from "../journal/JournalArea";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, BookOpen, Settings } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { chatService, ChatSession as ServiceChatSession } from "@/services/chatService";
 
 type ViewMode = "chat" | "journal" | "settings";
 
-type ChatSession = {
-  id: string;
-  title: string;
-  workflow: string;
-  messages: Array<{
-    id: string;
-    role: "user" | "assistant";
-    content: string;
-    timestamp: Date;
-  }>;
+type ChatSession = ServiceChatSession & {
   createdAt: Date;
   updatedAt: Date;
 };
 
 export const ChatLayout = () => {
+  const { user, loading } = useAuth();
   const [currentView, setCurrentView] = useState<ViewMode>("chat");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState("assistant");
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
-  const createNewChat = () => {
-    const newChat: ChatSession = {
-      id: Date.now().toString(),
-      title: "New Chat",
-      workflow: activeWorkflow,
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  // Load user's chats when user is authenticated
+  useEffect(() => {
+    if (user) {
+      loadUserChats();
+    }
+  }, [user]);
+
+  const loadUserChats = async () => {
+    if (!user) return;
     
-    setChatSessions(prev => [newChat, ...prev]);
-    setActiveChatId(newChat.id);
-    setCurrentView("chat"); // Switch to chat view
+    const chats = await chatService.getUserChats(user.id);
+    setChatSessions(chats.map(chat => ({
+      ...chat,
+      createdAt: chat.created_at,
+      updatedAt: chat.updated_at
+    })));
   };
 
-  const updateChatSession = (chatId: string, updates: Partial<ChatSession>) => {
-    setChatSessions(prev =>
-      prev.map(chat =>
-        chat.id === chatId ? { ...chat, ...updates } : chat
-      )
-    );
+  const createNewChat = async () => {
+    if (!user) return;
+
+    const newChat = await chatService.createChat({
+      title: "New Chat",
+      workflow: activeWorkflow,
+      chat_type: activeWorkflow,
+      user_id: user.id
+    });
+    
+    if (newChat) {
+      const mappedChat = {
+        ...newChat,
+        createdAt: newChat.created_at,
+        updatedAt: newChat.updated_at
+      };
+      setChatSessions(prev => [mappedChat, ...prev]);
+      setActiveChatId(newChat.id);
+      setCurrentView("chat");
+    }
+  };
+
+  const updateChatSession = async (chatId: string, updates: { messages?: any[], title?: string }) => {
+    if (!user) return;
+
+    const updatedChat = await chatService.updateChat(chatId, updates);
+    if (updatedChat) {
+      const mappedChat = {
+        ...updatedChat,
+        createdAt: updatedChat.created_at,
+        updatedAt: updatedChat.updated_at
+      };
+      setChatSessions(prev =>
+        prev.map(chat =>
+          chat.id === chatId ? mappedChat : chat
+        )
+      );
+    }
   };
 
   const selectChat = (chatId: string) => {
     setActiveChatId(chatId);
-    setCurrentView("chat"); // Switch to chat view
+    setCurrentView("chat");
   };
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Please sign in to continue</h1>
+          <p className="text-muted-foreground">You need to be authenticated to access the chat system.</p>
+        </div>
+      </div>
+    );
+  }
 
   const workflows = [
     { id: "assistant", name: "Assistant", emoji: "🤖", color: "bg-primary" },

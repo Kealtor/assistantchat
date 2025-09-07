@@ -3,27 +3,12 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageSquare } from "lucide-react";
-
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-};
-
-type ChatSession = {
-  id: string;
-  title: string;
-  workflow: string;
-  messages: Message[];
-  createdAt: Date;
-  updatedAt: Date;
-};
+import { Message, ChatSession } from "@/services/chatService";
 
 interface ChatAreaProps {
   workflow: string;
   chatSession: ChatSession | null;
-  onUpdateChat: (chatId: string, updates: Partial<ChatSession>) => void;
+  onUpdateChat: (chatId: string, updates: { messages?: Message[], title?: string }) => void;
 }
 
 export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
@@ -56,10 +41,11 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
     };
 
     const updatedMessages = [...messages, userMessage];
+    const newTitle = updatedMessages.length === 1 ? content.slice(0, 50) + (content.length > 50 ? '...' : '') : chatSession.title;
+    
     onUpdateChat(chatSession.id, { 
       messages: updatedMessages,
-      title: updatedMessages.length === 1 ? content.slice(0, 50) + (content.length > 50 ? '...' : '') : chatSession.title,
-      updatedAt: new Date()
+      title: newTitle
     });
     
     setIsLoading(true);
@@ -75,8 +61,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
 
       const finalMessages = [...updatedMessages, assistantMessage];
       onUpdateChat(chatSession.id, { 
-        messages: finalMessages,
-        updatedAt: new Date()
+        messages: finalMessages
       });
       setIsLoading(false);
     }, 1000 + Math.random() * 2000);
