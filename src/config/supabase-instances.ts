@@ -20,21 +20,21 @@ export interface SupabaseInstance {
 export const SUPABASE_INSTANCES: Record<string, SupabaseInstance> = {
   // Current production instance
   current: {
-    name: "Current Instance",
+    name: "lovable",
     url: "https://paodisbyfnmiljjognxl.supabase.co",
     anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhb2Rpc2J5Zm5taWxqam9nbnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyMTQ1MzUsImV4cCI6MjA3Mjc5MDUzNX0.j5yXfiLajabCg0VazWl3r8HMSP9xtiZD0BuxEc9G31E",
     description: "Current production instance"
   },
   
   // Example additional instances (uncomment and configure as needed)
-  /*
+  
   development: {
     name: "Development",
-    url: "https://your-dev-project.supabase.co",
-    anonKey: "your-dev-anon-key",
+    url: "https://studio.kealtor.de",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE",
     description: "Development environment"
   },
-  
+  /*
   staging: {
     name: "Staging", 
     url: "https://your-staging-project.supabase.co",
@@ -57,7 +57,7 @@ export const SUPABASE_INSTANCES: Record<string, SupabaseInstance> = {
  * CHANGE THIS to switch between different Supabase instances
  * Use any key from SUPABASE_INSTANCES above
  */
-export const ACTIVE_INSTANCE = 'current';
+export const ACTIVE_INSTANCE = 'development';
 
 /**
  * Get the currently active Supabase instance configuration
