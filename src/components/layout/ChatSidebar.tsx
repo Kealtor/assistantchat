@@ -4,6 +4,12 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
   Plus, 
   Search, 
   ChevronLeft, 
@@ -11,7 +17,9 @@ import {
   MessageSquare,
   BookOpen,
   Settings,
-  MoreVertical 
+  MoreVertical,
+  Pin,
+  Trash2 
 } from "lucide-react";
 
 type Workflow = {
@@ -35,6 +43,7 @@ type ChatSession = {
   }>;
   createdAt: Date;
   updatedAt: Date;
+  pinned?: boolean;
 };
 
 interface ChatSidebarProps {
@@ -49,6 +58,8 @@ interface ChatSidebarProps {
   activeChatId: string | null;
   onCreateNewChat: () => void;
   onSelectChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
+  onTogglePinChat: (chatId: string) => void;
 }
 
 export const ChatSidebar = ({
@@ -63,6 +74,8 @@ export const ChatSidebar = ({
   activeChatId,
   onCreateNewChat,
   onSelectChat,
+  onDeleteChat,
+  onTogglePinChat,
 }: ChatSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -76,10 +89,23 @@ export const ChatSidebar = ({
     return `${Math.floor(diffInHours / 24)} days ago`;
   };
 
-  const filteredHistory = chatSessions.filter(chat =>
-    chat.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    chat.workflow === activeWorkflow
-  );
+  const filteredHistory = chatSessions
+    .filter(chat =>
+      chat.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      chat.workflow === activeWorkflow
+    )
+    .sort((a, b) => {
+      // Sort by pinned first, then by updatedAt
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+
+  const getLastMessage = (chat: ChatSession) => {
+    if (!chat.messages || chat.messages.length === 0) return "No messages yet";
+    const lastMessage = chat.messages[chat.messages.length - 1];
+    return lastMessage.content.slice(0, 50) + (lastMessage.content.length > 50 ? "..." : "");
+  };
 
   if (collapsed) {
     return (
@@ -198,34 +224,66 @@ export const ChatSidebar = ({
       </div>
 
       {/* Chat History */}
-      <div className="flex-1 overflow-hidden">
-        <div className="p-4 pb-2">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="p-4 pb-2 flex-shrink-0">
           <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
             Recent Chats
           </h3>
         </div>
-        <ScrollArea className="h-full px-4">
+        <div className="flex-1 overflow-y-auto px-4">
           <div className="space-y-1 pb-4">
             {filteredHistory.length > 0 ? (
               filteredHistory.map((chat) => (
                 <div
                   key={chat.id}
-                  onClick={() => onSelectChat(chat.id)}
-                  className={`group flex items-center justify-between p-3 hover:bg-accent rounded-md cursor-pointer transition-colors ${
+                  onClick={(e) => {
+                    if (!e.target.closest('.chat-menu')) {
+                      onSelectChat(chat.id);
+                    }
+                  }}
+                  className={`group flex items-start p-3 hover:bg-accent rounded-md cursor-pointer transition-colors ${
                     activeChatId === chat.id ? 'bg-accent' : ''
                   }`}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{chat.title}</p>
-                    <p className="text-xs text-muted-foreground">{formatTimestamp(chat.updatedAt)}</p>
+                  <div className="flex-1 min-w-0 mr-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1">
+                        {chat.pinned && <Pin className="h-3 w-3 text-primary" />}
+                        <p className="text-sm font-medium truncate">{chat.title}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground flex-shrink-0">
+                        {formatTimestamp(chat.updatedAt)}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {getLastMessage(chat)}
+                    </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0"
-                  >
-                    <MoreVertical className="h-3 w-3" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 chat-menu"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onTogglePinChat(chat.id)}>
+                        <Pin className="h-4 w-4 mr-2" />
+                        {chat.pinned ? "Unpin" : "Pin"} Chat
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => onDeleteChat(chat.id)}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Chat
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ))
             ) : (
@@ -236,7 +294,7 @@ export const ChatSidebar = ({
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );

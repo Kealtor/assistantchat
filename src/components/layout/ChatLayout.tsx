@@ -85,6 +85,42 @@ export const ChatLayout = () => {
     setCurrentView("chat");
   };
 
+  const deleteChat = async (chatId: string) => {
+    if (!user) return;
+    
+    const success = await chatService.deleteChat(chatId);
+    if (success) {
+      setChatSessions(prev => prev.filter(chat => chat.id !== chatId));
+      if (activeChatId === chatId) {
+        setActiveChatId(null);
+      }
+    }
+  };
+
+  const togglePinChat = async (chatId: string) => {
+    if (!user) return;
+    
+    const chat = chatSessions.find(c => c.id === chatId);
+    if (!chat) return;
+    
+    const updatedChat = await chatService.updateChat(chatId, { 
+      pinned: !chat.pinned 
+    });
+    
+    if (updatedChat) {
+      const mappedChat = {
+        ...updatedChat,
+        createdAt: updatedChat.created_at,
+        updatedAt: updatedChat.updated_at
+      };
+      setChatSessions(prev =>
+        prev.map(chat =>
+          chat.id === chatId ? mappedChat : chat
+        )
+      );
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
@@ -126,6 +162,8 @@ export const ChatLayout = () => {
           activeChatId={activeChatId}
           onCreateNewChat={createNewChat}
           onSelectChat={selectChat}
+          onDeleteChat={deleteChat}
+          onTogglePinChat={togglePinChat}
         />
       </div>
 
@@ -168,7 +206,19 @@ export const ChatLayout = () => {
               onClick={() => setCurrentView("settings")}
               className="h-9"
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-4 w-4 mr-2" />
+              User
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={async () => {
+                await chatService.signOut();
+                window.location.href = '/auth';
+              }}
+              className="h-9"
+            >
+              Sign Out
             </Button>
           </div>
         </header>
