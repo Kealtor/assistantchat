@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           id: string
           messages: Json
+          pinned: boolean | null
           title: string
           updated_at: string
           user_id: string
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           id?: string
           messages?: Json
+          pinned?: boolean | null
           title: string
           updated_at?: string
           user_id: string
@@ -40,6 +42,7 @@ export type Database = {
           created_at?: string
           id?: string
           messages?: Json
+          pinned?: boolean | null
           title?: string
           updated_at?: string
           user_id?: string

@@ -16,6 +16,7 @@ export type ChatSession = {
   created_at: Date;
   updated_at: Date;
   user_id: string;
+  pinned?: boolean;
 };
 
 export type CreateChatData = {
@@ -28,6 +29,7 @@ export type CreateChatData = {
 export type UpdateChatData = {
   title?: string;
   messages?: Message[];
+  pinned?: boolean;
 };
 
 export const chatService = {
@@ -59,7 +61,8 @@ export const chatService = {
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
-        user_id: chat.user_id
+        user_id: chat.user_id,
+        pinned: chat.pinned || false
       };
     } catch (error) {
       console.error('Error creating chat:', error);
@@ -89,7 +92,8 @@ export const chatService = {
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
-        user_id: chat.user_id
+        user_id: chat.user_id,
+        pinned: chat.pinned || false
       }));
     } catch (error) {
       console.error('Error fetching chats:', error);
@@ -108,6 +112,10 @@ export const chatService = {
       
       if (updates.messages !== undefined) {
         updateData.messages = updates.messages;
+      }
+
+      if (updates.pinned !== undefined) {
+        updateData.pinned = updates.pinned;
       }
 
       const { data: chat, error } = await supabase
@@ -130,7 +138,8 @@ export const chatService = {
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
-        user_id: chat.user_id
+        user_id: chat.user_id,
+        pinned: chat.pinned || false
       };
     } catch (error) {
       console.error('Error updating chat:', error);
@@ -180,11 +189,21 @@ export const chatService = {
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
-        user_id: chat.user_id
+        user_id: chat.user_id,
+        pinned: chat.pinned || false
       };
     } catch (error) {
       console.error('Error fetching chat:', error);
       return null;
+    }
+  },
+
+  // Sign out user
+  async signOut(): Promise<void> {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
   }
 };

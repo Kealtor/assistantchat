@@ -1,18 +1,11 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { ChatLayout } from "@/components/layout/ChatLayout";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setLocation("/auth");
-  };
 
   if (loading) {
     return (
@@ -46,18 +39,7 @@ const Index = () => {
   }
 
   return (
-    <div className="relative h-screen">
-      <div className="absolute top-4 right-4 z-50">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleSignOut}
-          className="flex items-center gap-2"
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </Button>
-      </div>
+    <div className="h-screen">
       <ChatLayout />
     </div>
   );

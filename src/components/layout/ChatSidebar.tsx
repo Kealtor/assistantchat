@@ -237,7 +237,8 @@ export const ChatSidebar = ({
                 <div
                   key={chat.id}
                   onClick={(e) => {
-                    if (!e.target.closest('.chat-menu')) {
+                    const target = e.target as HTMLElement;
+                    if (!target.closest('.chat-menu')) {
                       onSelectChat(chat.id);
                     }
                   }}
