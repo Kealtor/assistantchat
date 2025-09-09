@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CalendarDays, BookOpen, TrendingUp, Smile, Frown, Meh, Heart, Zap } from "lucide-react";
+import { CalendarDays, BookOpen, TrendingUp, Heart } from "lucide-react";
 import { format } from "date-fns";
+import { useAuth } from "@/hooks/useAuth";
+import { journalService, JournalEntry } from "@/services/journalService";
+import { useToast } from "@/hooks/use-toast";
 
 const moodEmojis = [
   { value: 1, emoji: "😢", label: "Very Bad", color: "text-red-500" },
@@ -18,53 +21,114 @@ const moodEmojis = [
 ];
 
 export const JournalArea = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [journalEntry, setJournalEntry] = useState("");
-  const [moodsByDate, setMoodsByDate] = useState<Map<string, number>>(new Map());
+  const [currentEntry, setCurrentEntry] = useState<JournalEntry | null>(null);
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [weeklyStats, setWeeklyStats] = useState({
+    entriesThisWeek: 0,
+    averageMood: 0,
+    streak: 0
+  });
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  // Helper functions for mood management
-  const getCurrentDateKey = (date: Date) => format(date, "yyyy-MM-dd");
-  
-  const getCurrentMood = (date: Date) => {
-    return moodsByDate.get(getCurrentDateKey(date)) || null;
+  useEffect(() => {
+    if (user) {
+      loadUserEntries();
+      loadWeeklyStats();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadEntryForDate(selectedDate);
+    }
+  }, [selectedDate, user]);
+
+  const loadUserEntries = async () => {
+    if (!user) return;
+    
+    const entries = await journalService.getUserEntries(user.id);
+    setJournalEntries(entries);
   };
-  
-  const setMoodForDate = (date: Date, mood: number) => {
-    const dateKey = getCurrentDateKey(date);
-    setMoodsByDate(prev => new Map(prev.set(dateKey, mood)));
-  };
 
-  // Mock journal entries
-  const journalEntries = [
-    {
-      date: new Date(),
-      entry: "Had a productive day working on the new project. Feeling energized about the progress we've made.",
-      mood: 4,
-      tags: ["work", "productivity", "energy"],
-    },
-    {
-      date: new Date(Date.now() - 86400000),
-      entry: "Spent time reflecting on goals for the quarter. Need to focus more on personal development.",
-      mood: 3,
-      tags: ["reflection", "goals", "development"],
-    },
-  ];
-
-  const handleSaveEntry = () => {
-    if (journalEntry.trim()) {
-      // Here you would save the journal entry
-      console.log("Saving entry:", {
-        date: selectedDate,
-        entry: journalEntry,
-        mood: getCurrentMood(selectedDate),
-      });
+  const loadEntryForDate = async (date: Date) => {
+    if (!user) return;
+    
+    const dateStr = format(date, "yyyy-MM-dd");
+    const entry = await journalService.getEntryByDate(user.id, dateStr);
+    
+    if (entry) {
+      setCurrentEntry(entry);
+      setJournalEntry(entry.content);
+      setSelectedMood(entry.mood || null);
+    } else {
+      setCurrentEntry(null);
       setJournalEntry("");
+      setSelectedMood(null);
     }
   };
 
-  const currentEntry = journalEntries.find(
-    entry => format(entry.date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd")
-  );
+  const loadWeeklyStats = async () => {
+    if (!user) return;
+    
+    const stats = await journalService.getWeeklyStats(user.id);
+    setWeeklyStats(stats);
+  };
+
+  const handleSaveEntry = async () => {
+    if (!user || !journalEntry.trim()) return;
+    
+    setSaving(true);
+    const entryDate = format(selectedDate, "yyyy-MM-dd");
+    
+    const savedEntry = await journalService.saveEntry({
+      user_id: user.id,
+      entry_date: entryDate,
+      content: journalEntry.trim(),
+      mood: selectedMood || undefined,
+      tags: []
+    });
+    
+    if (savedEntry) {
+      setCurrentEntry(savedEntry);
+      toast({
+        title: "Entry saved",
+        description: "Your journal entry has been saved successfully.",
+      });
+      
+      // Refresh data
+      loadUserEntries();
+      loadWeeklyStats();
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to save entry. Please try again.",
+        variant: "destructive"
+      });
+    }
+    
+    setSaving(false);
+  };
+
+  const handleMoodChange = (mood: number) => {
+    setSelectedMood(mood);
+  };
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold mb-2">Authentication required</h3>
+          <p className="text-muted-foreground">Please sign in to access your journal</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full max-h-screen overflow-hidden">
@@ -104,13 +168,13 @@ export const JournalArea = () => {
                   {moodEmojis.map((mood) => (
                     <Button
                       key={mood.value}
-                      variant={getCurrentMood(selectedDate) === mood.value ? "default" : "outline"}
+                      variant={selectedMood === mood.value ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setMoodForDate(selectedDate, mood.value)}
-                      className="h-12 flex flex-col items-center justify-center p-1"
+                      onClick={() => handleMoodChange(mood.value)}
+                      className="h-16 flex flex-col items-center justify-center p-2"
                     >
-                      <span className="text-lg mb-1">{mood.emoji}</span>
-                      <span className="text-xs">{mood.label}</span>
+                      <span className="text-xl mb-1">{mood.emoji}</span>
+                      <span className="text-xs font-medium">{mood.label}</span>
                     </Button>
                   ))}
                 </div>
@@ -128,18 +192,27 @@ export const JournalArea = () => {
               <CardContent className="space-y-3 px-4 pb-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Entries</span>
-                  <Badge variant="secondary">5 / 7</Badge>
+                  <Badge variant="secondary">{weeklyStats.entriesThisWeek} / 7</Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Avg Mood</span>
                   <div className="flex items-center space-x-1">
-                    <span className="text-lg">😊</span>
-                    <span className="text-sm font-medium">4.2</span>
+                    <span className="text-lg">
+                      {weeklyStats.averageMood > 0 
+                        ? moodEmojis.find(m => m.value === Math.round(weeklyStats.averageMood))?.emoji || "😐"
+                        : "😐"
+                      }
+                    </span>
+                    <span className="text-sm font-medium">
+                      {weeklyStats.averageMood > 0 ? weeklyStats.averageMood.toFixed(1) : "0"}
+                    </span>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Streak</span>
-                  <Badge variant="default">12 days</Badge>
+                  <Badge variant={weeklyStats.streak > 0 ? "default" : "secondary"}>
+                    {weeklyStats.streak} days
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
@@ -190,7 +263,7 @@ export const JournalArea = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm leading-relaxed mb-4">{currentEntry.entry}</p>
+                    <p className="text-sm leading-relaxed mb-4">{currentEntry.content}</p>
                     <div className="flex flex-wrap gap-2">
                       {currentEntry.tags.map((tag) => (
                         <Badge key={tag} variant="outline" className="text-xs">
@@ -211,14 +284,14 @@ export const JournalArea = () => {
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      {getCurrentMood(selectedDate) && (
+                      {selectedMood && (
                         <div className="flex items-center space-x-2">
                           <span>Mood:</span>
                           <span className="text-lg">
-                            {moodEmojis.find(m => m.value === getCurrentMood(selectedDate))?.emoji}
+                            {moodEmojis.find(m => m.value === selectedMood)?.emoji}
                           </span>
                           <span className="text-sm text-muted-foreground">
-                            {moodEmojis.find(m => m.value === getCurrentMood(selectedDate))?.label}
+                            {moodEmojis.find(m => m.value === selectedMood)?.label}
                           </span>
                         </div>
                       )}
@@ -226,9 +299,9 @@ export const JournalArea = () => {
                     
                     <Button 
                       onClick={handleSaveEntry}
-                      disabled={!journalEntry.trim()}
+                      disabled={!journalEntry.trim() || saving}
                     >
-                      Save Entry
+                      {saving ? "Saving..." : currentEntry ? "Update Entry" : "Save Entry"}
                     </Button>
                   </div>
                 </div>
@@ -242,35 +315,47 @@ export const JournalArea = () => {
                 <h2 className="text-xl font-semibold">Journal History</h2>
                 
                 <div className="space-y-4">
-                  {journalEntries.map((entry, index) => (
-                    <Card key={index}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-base">
-                            {format(entry.date, "EEEE, MMMM do")}
-                          </CardTitle>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg">
-                              {moodEmojis.find(m => m.value === entry.mood)?.emoji}
-                            </span>
-                            <Badge variant="secondary" className="text-xs">
-                              {moodEmojis.find(m => m.value === entry.mood)?.label}
-                            </Badge>
+                  {journalEntries.length > 0 ? (
+                    journalEntries.map((entry) => (
+                      <Card key={entry.id}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-base">
+                              {format(new Date(entry.entry_date), "EEEE, MMMM do, yyyy")}
+                            </CardTitle>
+                            <div className="flex items-center space-x-2">
+                              {entry.mood && (
+                                <>
+                                  <span className="text-lg">
+                                    {moodEmojis.find(m => m.value === entry.mood)?.emoji}
+                                  </span>
+                                  <Badge variant="secondary" className="text-xs">
+                                    {moodEmojis.find(m => m.value === entry.mood)?.label}
+                                  </Badge>
+                                </>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm leading-relaxed mb-4">{entry.entry}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {entry.tags.map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              #{tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm leading-relaxed mb-4">{entry.content}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {entry.tags.map((tag) => (
+                              <Badge key={tag} variant="outline" className="text-xs">
+                                #{tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <BookOpen className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
+                      <p className="text-sm text-muted-foreground">No journal entries yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">Start writing to see your entries here</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </ScrollArea>

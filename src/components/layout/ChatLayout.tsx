@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatArea } from "../chat/ChatArea";
 import { JournalArea } from "../journal/JournalArea";
+import { UserSettings } from "../user/UserSettings";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, BookOpen, Settings } from "lucide-react";
+import { MessageSquare, BookOpen, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { chatService, ChatSession as ServiceChatSession } from "@/services/chatService";
+import { userService } from "@/services/userService";
 
-type ViewMode = "chat" | "journal" | "settings";
+type ViewMode = "chat" | "journal" | "user";
 
 type ChatSession = ServiceChatSession & {
   createdAt: Date;
@@ -201,12 +203,12 @@ export const ChatLayout = () => {
               Journal
             </Button>
             <Button
-              variant={currentView === "settings" ? "default" : "ghost"}
+              variant={currentView === "user" ? "default" : "ghost"}
               size="sm"
-              onClick={() => setCurrentView("settings")}
+              onClick={() => setCurrentView("user")}
               className="h-9"
             >
-              <Settings className="h-4 w-4 mr-2" />
+              <User className="h-4 w-4 mr-2" />
               User
             </Button>
             <Button 
@@ -218,6 +220,7 @@ export const ChatLayout = () => {
               }}
               className="h-9"
             >
+              <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </Button>
           </div>
@@ -235,14 +238,8 @@ export const ChatLayout = () => {
           {currentView === "journal" && (
             <JournalArea />
           )}
-          {currentView === "settings" && (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Settings</h3>
-                <p className="text-muted-foreground">Configure your workflows and preferences</p>
-              </div>
-            </div>
+          {currentView === "user" && (
+            <UserSettings />
           )}
         </div>
       </div>

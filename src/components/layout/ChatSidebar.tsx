@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
   Plus, 
   Search, 
   ChevronLeft, 
@@ -19,8 +26,11 @@ import {
   Settings,
   MoreVertical,
   Pin,
-  Trash2 
+  Trash2,
+  ChevronDown
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { userService, UserPermission } from "@/services/userService";
 
 type Workflow = {
   id: string;
@@ -29,7 +39,7 @@ type Workflow = {
   color: string;
 };
 
-type ViewMode = "chat" | "journal" | "settings";
+type ViewMode = "chat" | "journal" | "user";
 
 type ChatSession = {
   id: string;
@@ -77,7 +87,35 @@ export const ChatSidebar = ({
   onDeleteChat,
   onTogglePinChat,
 }: ChatSidebarProps) => {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [userPermissions, setUserPermissions] = useState<UserPermission[]>([]);
+  const [allowedWorkflows, setAllowedWorkflows] = useState<Workflow[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      loadUserPermissions();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    // Filter workflows based on permissions
+    const allowed = workflows.filter(workflow => {
+      // Assistant is always available
+      if (workflow.id === "assistant") return true;
+      
+      // Check if user has permission for this workflow
+      return userPermissions.some(perm => perm.workflow_id === workflow.id);
+    });
+    setAllowedWorkflows(allowed);
+  }, [workflows, userPermissions]);
+
+  const loadUserPermissions = async () => {
+    if (!user) return;
+    
+    const permissions = await userService.getUserPermissions(user.id);
+    setUserPermissions(permissions);
+  };
 
   const formatTimestamp = (date: Date) => {
     const now = new Date();
@@ -122,7 +160,7 @@ export const ChatSidebar = ({
 
         {/* Workflows */}
         <div className="space-y-2 mb-4">
-          {workflows.map((workflow) => (
+          {allowedWorkflows.map((workflow) => (
             <Button
               key={workflow.id}
               variant={activeWorkflow === workflow.id ? "default" : "ghost"}
@@ -156,9 +194,9 @@ export const ChatSidebar = ({
             <BookOpen className="h-4 w-4" />
           </Button>
           <Button
-            variant={currentView === "settings" ? "default" : "ghost"}
+            variant={currentView === "user" ? "default" : "ghost"}
             size="sm"
-            onClick={() => onViewChange("settings")}
+            onClick={() => onViewChange("user")}
             className="w-full h-10 p-0"
           >
             <Settings className="h-4 w-4" />
@@ -202,25 +240,39 @@ export const ChatSidebar = ({
         </div>
       </div>
 
-      {/* Workflows */}
+      {/* Workflow Selector */}
       <div className="p-4 border-b border-border">
         <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
           Workflows
         </h3>
-        <div className="space-y-1">
-          {workflows.map((workflow) => (
-            <Button
-              key={workflow.id}
-              variant={activeWorkflow === workflow.id ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => onWorkflowChange(workflow.id)}
-              className="w-full justify-start h-9"
-            >
-              <span className="mr-3 text-base">{workflow.emoji}</span>
-              {workflow.name}
-            </Button>
-          ))}
-        </div>
+        <Select value={activeWorkflow} onValueChange={onWorkflowChange}>
+          <SelectTrigger className="w-full">
+            <div className="flex items-center gap-3">
+              <span className="text-base">
+                {allowedWorkflows.find(w => w.id === activeWorkflow)?.emoji}
+              </span>
+              <SelectValue>
+                {allowedWorkflows.find(w => w.id === activeWorkflow)?.name}
+              </SelectValue>
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            {allowedWorkflows.map((workflow) => (
+              <SelectItem key={workflow.id} value={workflow.id}>
+                <div className="flex items-center gap-3">
+                  <span className="text-base">{workflow.emoji}</span>
+                  <span>{workflow.name}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        {allowedWorkflows.length < workflows.length && (
+          <p className="text-xs text-muted-foreground mt-2">
+            Contact admin to request access to additional workflows
+          </p>
+        )}
       </div>
 
       {/* Chat History */}
