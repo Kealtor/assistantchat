@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { configurableSupabase as supabase } from "@/lib/supabase-client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -15,11 +15,11 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   // Redirect if already logged in
   if (user) {
-    setLocation("/");
+    navigate("/");
     return null;
   }
 
@@ -82,7 +82,7 @@ export default function Auth() {
           title: "Success",
           description: "Successfully signed in!",
         });
-        setLocation("/");
+        navigate("/");
       }
     } catch (error) {
       toast({
