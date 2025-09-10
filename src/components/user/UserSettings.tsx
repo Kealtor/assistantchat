@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { userService, UserProfile } from "@/services/userService";
+import { WorkflowPermissions } from "../admin/WorkflowPermissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Calendar, Edit2, Save, X } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User, Mail, Shield, Edit2, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export const UserSettings = () => {
@@ -94,13 +96,27 @@ export const UserSettings = () => {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Account Settings</h1>
-          <p className="text-muted-foreground">Manage your account information and preferences</p>
+    <div className="p-6 max-w-4xl mx-auto">
+      <Tabs defaultValue="profile" className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Account Settings</h1>
+            <p className="text-muted-foreground">Manage your account information and preferences</p>
+          </div>
         </div>
-      </div>
+
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="profile" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Profile
+          </TabsTrigger>
+          <TabsTrigger value="admin" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Admin
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile" className="space-y-6">
 
       {/* Profile Information */}
       <Card>
@@ -237,8 +253,14 @@ export const UserSettings = () => {
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+         </CardContent>
+       </Card>
+        </TabsContent>
+
+        <TabsContent value="admin" className="space-y-6">
+          <WorkflowPermissions />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
