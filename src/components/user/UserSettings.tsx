@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { userService, UserProfile } from "@/services/userService";
 import { WorkflowPermissions } from "../admin/WorkflowPermissions";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export const UserSettings = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -105,15 +107,17 @@ export const UserSettings = () => {
           </div>
         </div>
 
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
+        <TabsList className={`grid w-full max-w-md ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Profile
           </TabsTrigger>
-          <TabsTrigger value="admin" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Admin
-          </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="admin" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Admin
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -257,9 +261,11 @@ export const UserSettings = () => {
        </Card>
         </TabsContent>
 
-        <TabsContent value="admin" className="space-y-6">
-          <WorkflowPermissions />
-        </TabsContent>
+        {isAdmin && (
+          <TabsContent value="admin" className="space-y-6">
+            <WorkflowPermissions />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

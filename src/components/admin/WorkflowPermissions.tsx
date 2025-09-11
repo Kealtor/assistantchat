@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { userService } from "@/services/userService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, Plus, Trash2, User, Search } from "lucide-react";
+import { AdminSetupInstructions } from "./AdminSetupInstructions";
 
 const AVAILABLE_WORKFLOWS = [
   { id: "assistant", name: "Assistant", emoji: "🤖" },
@@ -19,10 +21,34 @@ const AVAILABLE_WORKFLOWS = [
 
 export const WorkflowPermissions = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const { toast } = useToast();
   const [targetUserId, setTargetUserId] = useState("");
   const [selectedWorkflow, setSelectedWorkflow] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Show access denied if not admin
+  if (adminLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">
+            You need admin privileges to access this section.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleGrantPermission = async () => {
     if (!targetUserId || !selectedWorkflow) {
@@ -60,6 +86,8 @@ export const WorkflowPermissions = () => {
         <Shield className="h-6 w-6 text-primary" />
         <h1 className="text-2xl font-bold">Workflow Permissions</h1>
       </div>
+
+      <AdminSetupInstructions />
 
       <Card>
         <CardHeader>
