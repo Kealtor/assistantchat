@@ -1,11 +1,11 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ChatLayout } from "@/components/layout/ChatLayout";
 
 const Index = () => {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
 
   if (loading) {
     return (
