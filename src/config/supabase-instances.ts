@@ -57,7 +57,7 @@ export const SUPABASE_INSTANCES: Record<string, SupabaseInstance> = {
  * CHANGE THIS to switch between different Supabase instances
  * Use any key from SUPABASE_INSTANCES above
  */
-export const ACTIVE_INSTANCE = 'development';
+export const ACTIVE_INSTANCE = 'current';
 
 /**
  * Get the currently active Supabase instance configuration
