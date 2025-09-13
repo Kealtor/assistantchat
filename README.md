@@ -90,11 +90,43 @@ export const ACTIVE_INSTANCE = 'development'; // or 'staging', 'production', etc
 2. Navigate to **Settings** → **API**
 3. Copy the **Project URL** and **anon/public key**
 
-#### Step 4: Set Up Database Schema
-Your new Supabase instance needs the following table structure:
+#### Step 4: Set Up Complete Database Schema
+Your Supabase instance needs the following complete database structure. Run these SQL commands in your Supabase SQL Editor:
 
 ```sql
--- Create chats table
+-- ================================================
+-- 1. CREATE PROFILES TABLE (User management)
+-- ================================================
+CREATE TABLE public.profiles (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL UNIQUE,
+  display_name TEXT,
+  avatar_url TEXT,
+  bio TEXT,
+  is_admin BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+-- Enable RLS on profiles
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Profiles RLS policies
+CREATE POLICY "Profiles are viewable by everyone" 
+ON public.profiles FOR SELECT 
+USING (true);
+
+CREATE POLICY "Users can insert their own profile" 
+ON public.profiles FOR INSERT 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own profile" 
+ON public.profiles FOR UPDATE 
+USING (auth.uid() = user_id);
+
+-- ================================================
+-- 2. CREATE CHATS TABLE (Chat functionality)
+-- ================================================
 CREATE TABLE public.chats (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
@@ -107,10 +139,10 @@ CREATE TABLE public.chats (
   pinned BOOLEAN DEFAULT false
 );
 
--- Enable Row Level Security
+-- Enable RLS on chats
 ALTER TABLE public.chats ENABLE ROW LEVEL SECURITY;
 
--- Create RLS policies
+-- Chats RLS policies
 CREATE POLICY "Users can view their own chats" 
 ON public.chats FOR SELECT 
 USING (auth.uid() = user_id);
@@ -127,7 +159,60 @@ CREATE POLICY "Users can delete their own chats"
 ON public.chats FOR DELETE 
 USING (auth.uid() = user_id);
 
--- Create function to update timestamps
+-- ================================================
+-- 3. CREATE JOURNAL ENTRIES TABLE (Journaling feature)
+-- ================================================
+CREATE TABLE public.journal_entries (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL,
+  content TEXT NOT NULL,
+  entry_date DATE NOT NULL,
+  mood INTEGER,
+  tags TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+-- Enable RLS on journal entries
+ALTER TABLE public.journal_entries ENABLE ROW LEVEL SECURITY;
+
+-- Journal entries RLS policies
+CREATE POLICY "Users can view their own journal entries" 
+ON public.journal_entries FOR SELECT 
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can create their own journal entries" 
+ON public.journal_entries FOR INSERT 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own journal entries" 
+ON public.journal_entries FOR UPDATE 
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own journal entries" 
+ON public.journal_entries FOR DELETE 
+USING (auth.uid() = user_id);
+
+-- ================================================
+-- 4. CREATE USER PERMISSIONS TABLE (Admin workflow management)
+-- ================================================
+CREATE TABLE public.user_permissions (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL,
+  workflow_id TEXT NOT NULL,
+  granted_by UUID,
+  granted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  UNIQUE(user_id, workflow_id)
+);
+
+-- Enable RLS on user permissions
+ALTER TABLE public.user_permissions ENABLE ROW LEVEL SECURITY;
+
+-- ================================================
+-- 5. CREATE DATABASE FUNCTIONS
+-- ================================================
+
+-- Function to update timestamps automatically
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -136,20 +221,112 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SET search_path = public;
 
--- Create trigger for automatic timestamp updates
+-- Function to check if current user is admin (security definer to prevent RLS recursion)
+CREATE OR REPLACE FUNCTION public.is_current_user_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE user_id = auth.uid() AND is_admin = TRUE
+  );
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public;
+
+-- Function to handle new user permissions (grants assistant workflow by default)
+CREATE OR REPLACE FUNCTION public.handle_new_user_permissions()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Grant assistant workflow permission to new users
+  INSERT INTO public.user_permissions (user_id, workflow_id)
+  VALUES (NEW.id, 'assistant')
+  ON CONFLICT (user_id, workflow_id) DO NOTHING;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- ================================================
+-- 6. CREATE TRIGGERS
+-- ================================================
+
+-- Trigger to update timestamps on chats
 CREATE TRIGGER update_chats_updated_at
 BEFORE UPDATE ON public.chats
 FOR EACH ROW
 EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Trigger to update timestamps on profiles
+CREATE TRIGGER update_profiles_updated_at
+BEFORE UPDATE ON public.profiles
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Trigger to update timestamps on journal entries
+CREATE TRIGGER update_journal_entries_updated_at
+BEFORE UPDATE ON public.journal_entries
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Trigger to automatically grant permissions to new users
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_new_user_permissions();
+
+-- ================================================
+-- 7. USER PERMISSIONS RLS POLICIES (Admin-controlled)
+-- ================================================
+
+-- Users can view their own permissions
+CREATE POLICY "Users can view their own permissions" 
+ON public.user_permissions FOR SELECT 
+USING (auth.uid() = user_id);
+
+-- Admins can view all user permissions
+CREATE POLICY "Admins can view all user permissions" 
+ON public.user_permissions FOR SELECT 
+USING (is_current_user_admin());
+
+-- Admins can grant permissions
+CREATE POLICY "Admins can grant permissions" 
+ON public.user_permissions FOR INSERT 
+WITH CHECK (is_current_user_admin());
+
+-- Admins can revoke permissions
+CREATE POLICY "Admins can revoke permissions" 
+ON public.user_permissions FOR DELETE 
+USING (is_current_user_admin());
 ```
 
-#### Step 5: Configure Authentication
+#### Step 5: Set Up Admin Users
+After creating the database structure, you need to manually grant admin access to specific users:
+
+1. Go to your Supabase dashboard → **Authentication** → **Users**
+2. Find the user you want to make an admin and copy their **User ID**
+3. Go to **SQL Editor** and run:
+   ```sql
+   UPDATE public.profiles 
+   SET is_admin = TRUE 
+   WHERE user_id = 'PASTE_USER_ID_HERE';
+   ```
+4. The user will immediately have admin access to manage workflow permissions
+
+#### Key Database Features:
+- **User Profiles**: Extended user information with admin flags
+- **Chat System**: Persistent chat history with pinning support
+- **Journal Entries**: Personal journaling with mood tracking and tags
+- **Admin System**: Role-based access control for workflow permissions
+- **Automatic Permissions**: New users automatically get "assistant" workflow access
+- **Row Level Security**: All tables protected with appropriate RLS policies
+- **Audit Trail**: Automatic timestamp tracking for all data changes
+
+#### Step 6: Configure Authentication
 1. In your Supabase dashboard, go to **Authentication** → **Settings**
 2. Configure your **Site URL** to match your application URL
 3. Add any additional **Redirect URLs** if needed
 4. Configure email templates and providers as needed
 
-#### Step 6: Test the Connection
+#### Step 7: Test the Connection
 1. Save your changes
 2. Restart your development server
 3. Check the browser console for the connection confirmation message
