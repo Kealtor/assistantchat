@@ -91,12 +91,12 @@ export const journalService = {
     }
   },
 
-  // Create or update journal entry
-  async saveEntry(data: CreateJournalEntryData): Promise<JournalEntry | null> {
+  // Create new journal entry
+  async createEntry(data: CreateJournalEntryData): Promise<JournalEntry | null> {
     try {
       const { data: entry, error } = await supabase
         .from('journal_entries')
-        .upsert({
+        .insert({
           user_id: data.user_id,
           entry_date: data.entry_date,
           content: data.content,
@@ -107,7 +107,7 @@ export const journalService = {
         .single();
 
       if (error) {
-        console.error('Error saving journal entry:', error);
+        console.error('Error creating journal entry:', error);
         return null;
       }
 
@@ -122,7 +122,42 @@ export const journalService = {
         updated_at: new Date(entry.updated_at)
       };
     } catch (error) {
-      console.error('Error saving journal entry:', error);
+      console.error('Error creating journal entry:', error);
+      return null;
+    }
+  },
+
+  // Update existing journal entry
+  async updateEntry(entryId: string, data: UpdateJournalEntryData): Promise<JournalEntry | null> {
+    try {
+      const { data: entry, error } = await supabase
+        .from('journal_entries')
+        .update({
+          content: data.content,
+          mood: data.mood,
+          tags: data.tags || []
+        })
+        .eq('id', entryId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating journal entry:', error);
+        return null;
+      }
+
+      return {
+        id: entry.id,
+        user_id: entry.user_id,
+        entry_date: entry.entry_date,
+        content: entry.content,
+        mood: entry.mood || undefined,
+        tags: entry.tags || [],
+        created_at: new Date(entry.created_at),
+        updated_at: new Date(entry.updated_at)
+      };
+    } catch (error) {
+      console.error('Error updating journal entry:', error);
       return null;
     }
   },

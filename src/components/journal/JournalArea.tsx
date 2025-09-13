@@ -89,19 +89,31 @@ export const JournalArea = () => {
     setSaving(true);
     const entryDate = format(selectedDate, "yyyy-MM-dd");
     
-    const savedEntry = await journalService.saveEntry({
-      user_id: user.id,
-      entry_date: entryDate,
-      content: journalEntry.trim(),
-      mood: selectedMood || undefined,
-      tags: []
-    });
+    let savedEntry;
+    
+    if (currentEntry) {
+      // Update existing entry
+      savedEntry = await journalService.updateEntry(currentEntry.id, {
+        content: journalEntry.trim(),
+        mood: selectedMood || undefined,
+        tags: []
+      });
+    } else {
+      // Create new entry
+      savedEntry = await journalService.createEntry({
+        user_id: user.id,
+        entry_date: entryDate,
+        content: journalEntry.trim(),
+        mood: selectedMood || undefined,
+        tags: []
+      });
+    }
     
     if (savedEntry) {
       setCurrentEntry(savedEntry);
       toast({
-        title: "Entry saved",
-        description: "Your journal entry has been saved successfully.",
+        title: currentEntry ? "Entry updated" : "Entry saved",
+        description: `Your journal entry has been ${currentEntry ? "updated" : "saved"} successfully.`,
       });
       
       // Refresh data
