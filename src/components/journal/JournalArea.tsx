@@ -6,11 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CalendarDays, BookOpen, TrendingUp, Heart } from "lucide-react";
-import { format } from "date-fns";
+import { CalendarDays, BookOpen, TrendingUp, Heart, Edit2 } from "lucide-react";
+import { format, isToday, isSameDay } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 import { journalService, JournalEntry } from "@/services/journalService";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const moodEmojis = [
   { value: 1, emoji: "😢", label: "Very Bad", color: "text-red-500" },
@@ -35,6 +36,7 @@ export const JournalArea = () => {
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -71,6 +73,7 @@ export const JournalArea = () => {
       setJournalEntry("");
       setSelectedMood(null);
     }
+    setIsEditing(false);
   };
 
   const loadWeeklyStats = async () => {
@@ -113,10 +116,28 @@ export const JournalArea = () => {
     }
     
     setSaving(false);
+    setIsEditing(false);
   };
 
   const handleMoodChange = (mood: number) => {
     setSelectedMood(mood);
+  };
+
+  const handleEditEntry = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    if (currentEntry) {
+      setJournalEntry(currentEntry.content);
+      setSelectedMood(currentEntry.mood || null);
+    }
+    setIsEditing(false);
+  };
+
+  const hasEntryForDate = (date: Date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    return journalEntries.some(entry => entry.entry_date === dateStr);
   };
 
   if (!user) {
@@ -150,6 +171,15 @@ export const JournalArea = () => {
                   selected={selectedDate}
                   onSelect={(date) => date && setSelectedDate(date)}
                   className="rounded-md border-0 max-w-full mx-auto"
+                  modifiers={{
+                    hasEntry: (date) => hasEntryForDate(date),
+                    today: (date) => isToday(date),
+                  }}
+                  modifiersClassNames={{
+                    hasEntry: "relative after:absolute after:bottom-1 after:left-1/2 after:transform after:-translate-x-1/2 after:w-2 after:h-2 after:bg-primary after:rounded-full",
+                    today: "bg-accent text-accent-foreground font-bold ring-2 ring-primary ring-offset-2",
+                    selected: "bg-primary text-primary-foreground hover:bg-primary/90",
+                  }}
                 />
               </CardContent>
             </Card>
@@ -247,18 +277,32 @@ export const JournalArea = () => {
                 </p>
               </div>
 
-              {currentEntry ? (
+              {currentEntry && !isEditing ? (
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-base">Today's Entry</CardTitle>
+                      <CardTitle className="text-base">
+                        {format(selectedDate, "MMMM do, yyyy")} Entry
+                      </CardTitle>
                       <div className="flex items-center space-x-2">
-                        <span className="text-lg">
-                          {moodEmojis.find(m => m.value === currentEntry.mood)?.emoji}
-                        </span>
-                        <Badge variant="secondary">
-                          {moodEmojis.find(m => m.value === currentEntry.mood)?.label}
-                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleEditEntry}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        {currentEntry.mood && (
+                          <>
+                            <span className="text-lg">
+                              {moodEmojis.find(m => m.value === currentEntry.mood)?.emoji}
+                            </span>
+                            <Badge variant="secondary">
+                              {moodEmojis.find(m => m.value === currentEntry.mood)?.label}
+                            </Badge>
+                          </>
+                        )}
                       </div>
                     </div>
                   </CardHeader>
@@ -297,12 +341,23 @@ export const JournalArea = () => {
                       )}
                     </div>
                     
-                    <Button 
-                      onClick={handleSaveEntry}
-                      disabled={!journalEntry.trim() || saving}
-                    >
-                      {saving ? "Saving..." : currentEntry ? "Update Entry" : "Save Entry"}
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      {isEditing && (
+                        <Button 
+                          variant="outline"
+                          onClick={handleCancelEdit}
+                          disabled={saving}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                      <Button 
+                        onClick={handleSaveEntry}
+                        disabled={!journalEntry.trim() || saving}
+                      >
+                        {saving ? "Saving..." : currentEntry ? "Update Entry" : "Save Entry"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
