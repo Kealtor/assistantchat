@@ -100,7 +100,12 @@
   --font-size-xl: 1.25rem;   /* 20px */
   --font-size-2xl: 1.5rem;   /* 24px */
   --font-size-3xl: 1.875rem; /* 30px */
-}
+    /* Mobile touch targets */
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
 
 .dark {
   --background: 224 71% 4%;
