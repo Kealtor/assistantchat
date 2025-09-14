@@ -91,11 +91,14 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       
       console.log('Raw webhook response:', responseData);
       
-      // Handle the webhook response format: { success, message: { content, role, timestamp }, metadata }
+      // Handle the webhook response format: array with output.message.content
       let responseContent = 'No response received from workflow';
       
-      if (responseData.message && responseData.message.content) {
-        responseContent = responseData.message.content;
+      if (Array.isArray(responseData) && responseData.length > 0) {
+        const firstItem = responseData[0];
+        if (firstItem.output?.message?.content) {
+          responseContent = firstItem.output.message.content;
+        }
       }
       
       // Ensure it's a string
