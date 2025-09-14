@@ -44,7 +44,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
     };
 
     const updatedMessages = [...messages, userMessage];
-    const newTitle = updatedMessages.length === 1 ? content.slice(0, 50) + (content.length > 50 ? '...' : '') : chatSession.title;
+    const newTitle = updatedMessages.length === 1 ? String(content).slice(0, 50) + (String(content).length > 50 ? '...' : '') : chatSession.title;
     
     onUpdateChat(chatSession.id, { 
       messages: updatedMessages,
@@ -89,8 +89,19 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
 
       const responseData = await response.json();
       
-      // Extract the response message
-      const responseContent = responseData.message || responseData.response || 'No response received from workflow';
+      console.log('Raw webhook response:', responseData);
+      
+      // Handle the webhook response format: { success, message: { content, role, timestamp }, metadata }
+      let responseContent = 'No response received from workflow';
+      
+      if (responseData.message?.content) {
+        responseContent = responseData.message.content;
+      }
+      
+      // Ensure it's a string
+      responseContent = typeof responseContent === 'string' ? responseContent : JSON.stringify(responseContent);
+      
+      console.log('Final response content:', responseContent);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

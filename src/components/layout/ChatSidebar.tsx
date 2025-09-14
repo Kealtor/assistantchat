@@ -143,7 +143,8 @@ export const ChatSidebar = ({
   const getLastMessage = (chat: ChatSession) => {
     if (!chat.messages || chat.messages.length === 0) return "No messages yet";
     const lastMessage = chat.messages[chat.messages.length - 1];
-    return lastMessage.content.slice(0, 50) + (lastMessage.content.length > 50 ? "..." : "");
+    const contentStr = String(lastMessage.content);
+    return contentStr.slice(0, 50) + (contentStr.length > 50 ? "..." : "");
   };
 
   if (collapsed) {

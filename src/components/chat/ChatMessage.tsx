@@ -41,7 +41,9 @@ return (
               : "bg-chat-assistant text-chat-assistant-foreground mr-2 md:mr-4"
           }`}>
             <div className="prose prose-sm max-w-none">
-              <p className="whitespace-pre-wrap leading-relaxed text-sm md:text-base">{message.content}</p>
+              <p className="whitespace-pre-wrap leading-relaxed text-sm md:text-base">
+                {typeof message.content === 'string' ? message.content : JSON.stringify(message.content)}
+              </p>
             </div>
 
             {/* Message Actions - Only on desktop hover */}
