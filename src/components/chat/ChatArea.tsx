@@ -89,30 +89,20 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
 
       const responseData = await response.json();
       
-      // Extract the response message and ensure it's a string
-      let rawResponseContent = responseData.message || responseData.response || 'No response received from workflow';
-      
       console.log('Raw webhook response:', responseData);
-      console.log('Raw response content:', rawResponseContent);
       
-      // Handle deeply nested message object structures
-      if (typeof rawResponseContent === 'object' && rawResponseContent !== null) {
-        // If it's a message object with content property
-        if ('content' in rawResponseContent) {
-          rawResponseContent = rawResponseContent.content;
-        }
-        // If it's still an object, try to extract text content
-        if (typeof rawResponseContent === 'object' && rawResponseContent !== null) {
-          if ('text' in rawResponseContent) {
-            rawResponseContent = rawResponseContent.text;
-          } else if ('message' in rawResponseContent) {
-            rawResponseContent = rawResponseContent.message;
-          }
+      // Handle the specific webhook response format: array with output.message.content
+      let responseContent = 'No response received from workflow';
+      
+      if (Array.isArray(responseData) && responseData.length > 0) {
+        const firstItem = responseData[0];
+        if (firstItem.output && firstItem.output.message && firstItem.output.message.content) {
+          responseContent = firstItem.output.message.content;
         }
       }
       
-      // Final safety check - ensure it's definitely a string
-      const responseContent = typeof rawResponseContent === 'string' ? rawResponseContent : JSON.stringify(rawResponseContent);
+      // Ensure it's a string
+      responseContent = typeof responseContent === 'string' ? responseContent : JSON.stringify(responseContent);
       
       console.log('Final response content:', responseContent);
 
