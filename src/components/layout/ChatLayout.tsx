@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { chatService, ChatSession as ServiceChatSession } from "@/services/chatService";
 import { userService } from "@/services/userService";
+import { getUIWorkflows, getDefaultWorkflow } from "@/config/workflows.config";
 
 type ViewMode = "chat" | "journal" | "user";
 
@@ -24,7 +25,7 @@ export const ChatLayout = () => {
   const isMobile = useIsMobile();
   const [currentView, setCurrentView] = useState<ViewMode>("chat");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeWorkflow, setActiveWorkflow] = useState("assistant");
+  const [activeWorkflow, setActiveWorkflow] = useState(getDefaultWorkflow().workflowName);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
@@ -142,13 +143,7 @@ export const ChatLayout = () => {
     );
   }
 
-  const workflows = [
-    { id: "assistant", name: "Assistant", emoji: "🤖", color: "bg-primary" },
-    { id: "calendar", name: "Calendar", emoji: "📅", color: "bg-success" },
-    { id: "notes", name: "Notes", emoji: "📝", color: "bg-warning" },
-    { id: "tasks", name: "Tasks", emoji: "✅", color: "bg-error" },
-    { id: "search", name: "Search", emoji: "🔍", color: "bg-accent" },
-  ];
+  const workflows = getUIWorkflows();
 
   const currentWorkflow = workflows.find(w => w.id === activeWorkflow);
 

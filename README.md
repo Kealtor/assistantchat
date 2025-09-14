@@ -937,6 +937,386 @@ userService.grantPermission(userId: string, workflowId: string): Promise<boolean
 userService.getUserPermissions(userId: string): Promise<UserPermission[]>
 ```
 
+## 🔧 Workflow Configuration & Webhook Integration
+
+### Overview
+
+The application features a centralized workflow configuration system that allows you to define multiple AI workflows, each with its own webhook endpoint. This enables integration with various AI services, custom backends, or third-party APIs.
+
+### Workflow Configuration File
+
+All workflows are defined in a single configuration file: `src/config/workflows.config.ts`
+
+```typescript
+export interface WorkflowConfig {
+  workflowName: string;    // Unique identifier for the workflow
+  description: string;     // Human-readable description
+  webhookUrl: string;      // Endpoint URL for webhook calls
+  emoji: string;          // Display emoji for UI
+  color: string;          // Tailwind color class for theming
+}
+
+export const workflows: WorkflowConfig[] = [
+  {
+    workflowName: "assistant",
+    description: "General AI assistant for various tasks and conversations",
+    webhookUrl: "https://api.example.com/assistant-webhook",
+    emoji: "🤖",
+    color: "bg-primary"
+  },
+  {
+    workflowName: "customerSupport",
+    description: "Handles live customer support chat",
+    webhookUrl: "https://api.example.com/support-webhook",
+    emoji: "🎧",
+    color: "bg-success"
+  },
+  {
+    workflowName: "faqBot",
+    description: "Provides quick answers to FAQs",
+    webhookUrl: "https://api.example.com/faq-webhook",
+    emoji: "❓",
+    color: "bg-warning"
+  }
+];
+```
+
+### Permission System
+
+#### Default Access
+- The **first workflow** in the configuration array is automatically assigned to all new users
+- All other workflows require explicit permission grants from administrators
+
+#### Admin Permission Management
+Administrators can grant workflow access through:
+1. **Admin Dashboard**: Navigate to User Settings → Workflow Permissions
+2. **Permission Granting**: Enter user ID and select workflow to grant access
+3. **Permission Viewing**: View all available workflows and their current access levels
+
+### Webhook Integration
+
+#### Request Format
+
+When a user sends a message in a workflow-enabled chat, the system makes an HTTP POST request to the configured webhook URL:
+
+```typescript
+// Request sent to webhook
+POST https://api.example.com/your-webhook
+Content-Type: application/json
+
+{
+  "workflowName": "customerSupport",
+  "message": {
+    "id": "msg_123456789",
+    "role": "user",
+    "content": "I need help with my order",
+    "timestamp": "2025-01-14T10:30:00.000Z"
+  },
+  "chatSession": {
+    "id": "chat_987654321",
+    "title": "Customer Support Chat",
+    "workflow": "customerSupport", 
+    "user_id": "user_abc123",
+    "messages": [
+      {
+        "id": "msg_previous",
+        "role": "assistant", 
+        "content": "Hello! How can I help you today?",
+        "timestamp": "2025-01-14T10:29:00.000Z"
+      },
+      {
+        "id": "msg_123456789",
+        "role": "user",
+        "content": "I need help with my order",
+        "timestamp": "2025-01-14T10:30:00.000Z"
+      }
+    ]
+  },
+  "user": {
+    "id": "user_abc123",
+    "email": "user@example.com",
+    "profile": {
+      "display_name": "John Doe",
+      "avatar_url": "https://example.com/avatar.jpg"
+    }
+  },
+  "context": {
+    "timestamp": "2025-01-14T10:30:00.000Z",
+    "sessionId": "session_xyz789",
+    "workflow": "customerSupport"
+  }
+}
+```
+
+#### Expected Response Format
+
+Your webhook should return a JSON response with the AI-generated message:
+
+```typescript
+// Expected response from webhook
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "message": {
+    "role": "assistant",
+    "content": "I'd be happy to help you with your order! Could you please provide me with your order number so I can look up the details for you?",
+    "timestamp": "2025-01-14T10:30:05.000Z"
+  },
+  "metadata": {
+    "processingTime": 1200,
+    "model": "gpt-4o-mini",
+    "tokensUsed": 45
+  }
+}
+```
+
+#### Error Handling
+
+If your webhook returns an error, provide a structured error response:
+
+```typescript
+// Error response format
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "Unable to process the request. Please try again.",
+    "details": "Missing required field: order_number"
+  },
+  "retryable": true
+}
+```
+
+### Implementation Examples
+
+#### OpenAI Integration Example
+
+```typescript
+// webhook-handler.ts
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function handleWebhook(request: WebhookRequest): Promise<WebhookResponse> {
+  try {
+    const { message, chatSession, workflowName } = request;
+    
+    // Build conversation context
+    const messages = chatSession.messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    // Add system prompt based on workflow
+    const systemPrompt = getSystemPrompt(workflowName);
+    messages.unshift({ role: "system", content: systemPrompt });
+
+    // Call OpenAI API
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: messages,
+      max_tokens: 500,
+      temperature: 0.7,
+    });
+
+    return {
+      success: true,
+      message: {
+        role: "assistant",
+        content: completion.choices[0].message.content,
+        timestamp: new Date().toISOString()
+      },
+      metadata: {
+        model: "gpt-4o-mini",
+        tokensUsed: completion.usage?.total_tokens || 0
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "AI_ERROR",
+        message: "Sorry, I'm having trouble right now. Please try again.",
+        details: error.message
+      }
+    };
+  }
+}
+
+function getSystemPrompt(workflowName: string): string {
+  const prompts = {
+    customerSupport: "You are a helpful customer support agent. Be polite, professional, and focus on resolving customer issues.",
+    faqBot: "You are a FAQ bot. Provide concise, accurate answers based on common questions.",
+    assistant: "You are a helpful AI assistant. Provide helpful, accurate, and friendly responses."
+  };
+  
+  return prompts[workflowName] || prompts.assistant;
+}
+```
+
+#### Custom Backend Integration Example
+
+```python
+# flask_webhook.py
+from flask import Flask, request, jsonify
+import requests
+import os
+
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def handle_webhook():
+    try:
+        data = request.get_json()
+        workflow_name = data['workflowName']
+        message = data['message']['content']
+        
+        # Route to appropriate handler
+        if workflow_name == 'orderTracking':
+            response = handle_order_tracking(message, data['user'])
+        elif workflow_name == 'customerSupport':
+            response = handle_customer_support(message, data['chatSession'])
+        else:
+            response = handle_general_assistant(message)
+            
+        return jsonify({
+            'success': True,
+            'message': {
+                'role': 'assistant',
+                'content': response,
+                'timestamp': datetime.utcnow().isoformat() + 'Z'
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': {
+                'code': 'PROCESSING_ERROR',
+                'message': 'Unable to process your request right now.',
+                'details': str(e)
+            }
+        }), 500
+
+def handle_order_tracking(message, user):
+    # Extract order number and look up status
+    order_number = extract_order_number(message)
+    if order_number:
+        status = get_order_status(order_number, user['id'])
+        return f"Your order {order_number} is currently {status}"
+    return "Please provide a valid order number to track your order."
+```
+
+### Security Considerations
+
+#### Webhook Security
+- **HTTPS Only**: All webhook URLs must use HTTPS
+- **Authentication**: Implement API key or JWT authentication
+- **Rate Limiting**: Apply rate limiting to prevent abuse
+- **Input Validation**: Validate all incoming webhook data
+
+#### Example Secure Webhook
+
+```typescript
+// secure-webhook.ts
+import { verifyJWT, rateLimit } from './security';
+
+export async function secureWebhookHandler(request: Request) {
+  // Rate limiting
+  if (!rateLimit(request)) {
+    return new Response('Rate limit exceeded', { status: 429 });
+  }
+  
+  // Authentication
+  const authHeader = request.headers.get('authorization');
+  if (!verifyJWT(authHeader)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+  
+  // Input validation
+  const data = await request.json();
+  if (!validateWebhookData(data)) {
+    return new Response('Invalid data', { status: 400 });
+  }
+  
+  // Process webhook
+  return handleWebhook(data);
+}
+```
+
+### Testing Your Webhook
+
+#### Local Development
+```bash
+# Use ngrok for local testing
+ngrok http 3001
+# Update webhook URL in workflows.config.ts to ngrok URL
+```
+
+#### Webhook Testing Tool
+```typescript
+// webhook-tester.ts
+const testPayload = {
+  workflowName: "assistant",
+  message: {
+    id: "test_123",
+    role: "user",
+    content: "Hello, this is a test message",
+    timestamp: new Date().toISOString()
+  },
+  chatSession: {
+    id: "test_chat",
+    title: "Test Chat",
+    workflow: "assistant",
+    user_id: "test_user",
+    messages: []
+  },
+  user: {
+    id: "test_user",
+    email: "test@example.com"
+  }
+};
+
+// Test your webhook
+fetch('https://your-webhook-url.com/webhook', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(testPayload)
+})
+.then(res => res.json())
+.then(data => console.log('Webhook response:', data));
+```
+
+### Monitoring & Debugging
+
+#### Webhook Logs
+Monitor your webhook performance:
+- **Response Time**: Track webhook response times
+- **Error Rate**: Monitor failed webhook calls
+- **Success Rate**: Track successful message generation
+
+#### Frontend Integration
+The chat system automatically:
+- Shows loading states during webhook calls
+- Handles webhook errors gracefully
+- Retries failed requests with exponential backoff
+- Displays error messages to users when webhooks fail
+
+### Configuration Best Practices
+
+1. **Environment-Specific URLs**: Use different webhook URLs for development, staging, and production
+2. **Fallback Handling**: Implement fallback responses when webhooks are unavailable
+3. **Timeout Configuration**: Set appropriate timeout values (recommended: 30 seconds)
+4. **Error Messages**: Provide user-friendly error messages
+5. **Logging**: Log all webhook interactions for debugging
+
 ## 🤝 Contributing
 
 ### Development Setup

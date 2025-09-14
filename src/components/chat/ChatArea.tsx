@@ -4,6 +4,8 @@ import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageSquare } from "lucide-react";
 import { Message, ChatSession } from "@/services/chatService";
+import { getWorkflowByName } from "@/config/workflows.config";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ChatAreaProps {
   workflow: string;
@@ -13,6 +15,7 @@ interface ChatAreaProps {
 
 export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   
   const messages = chatSession?.messages || [];
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -50,12 +53,49 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
     
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Get the workflow configuration
+      const workflowConfig = getWorkflowByName(workflow);
+      if (!workflowConfig) {
+        throw new Error(`Workflow '${workflow}' not found in configuration`);
+      }
+
+      // Prepare the webhook payload
+      const payload = {
+        message: content,
+        workflow: workflow,
+        chatId: chatSession.id,
+        userId: chatSession.user_id,
+        timestamp: new Date().toISOString(),
+        messageHistory: messages.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp.toISOString()
+        }))
+      };
+
+      // Call the webhook
+      const response = await fetch(workflowConfig.webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook request failed: ${response.status} ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      
+      // Extract the response message
+      const responseContent = responseData.message || responseData.response || 'No response received from workflow';
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: generateMockResponse(content, workflow),
+        content: responseContent,
         timestamp: new Date(),
       };
 
@@ -63,42 +103,33 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       onUpdateChat(chatSession.id, { 
         messages: finalMessages
       });
+    } catch (error) {
+      console.error('Error calling workflow webhook:', error);
+      
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "Failed to get response from workflow. Please try again.",
+        variant: "destructive",
+      });
+
+      // Add error message to chat
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "I'm sorry, but I'm having trouble processing your request right now. Please try again in a moment.",
+        timestamp: new Date(),
+      };
+
+      const finalMessages = [...updatedMessages, errorMessage];
+      onUpdateChat(chatSession.id, { 
+        messages: finalMessages
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000 + Math.random() * 2000);
+    }
   };
 
-  const generateMockResponse = (userMessage: string, workflow: string): string => {
-    const responses = {
-      assistant: [
-        "I understand you're looking for help with that. Let me think about the best approach...",
-        "That's an interesting question! Here's what I think based on my knowledge...",
-        "I'd be happy to help you with that. Let me break this down for you...",
-      ],
-      calendar: [
-        "I've checked your calendar and here's what I found...",
-        "Based on your schedule, I recommend scheduling that for...",
-        "Your availability looks good for next week. Would you like me to...",
-      ],
-      notes: [
-        "I've reviewed your notes and here are the key points...",
-        "That's worth noting down. I'll help you organize this information...",
-        "Based on your previous notes, this connects to...",
-      ],
-      tasks: [
-        "I've added that to your task list with high priority...",
-        "Looking at your current tasks, I suggest tackling this next...",
-        "That task is now scheduled and I've set a reminder for...",
-      ],
-      search: [
-        "I found several relevant results for your query...",
-        "Here's what I discovered about that topic...",
-        "Based on my search, here are the most relevant findings...",
-      ],
-    };
-
-    const workflowResponses = responses[workflow as keyof typeof responses] || responses.assistant;
-    return workflowResponses[Math.floor(Math.random() * workflowResponses.length)];
-  };
 
   if (!chatSession) {
     return (
