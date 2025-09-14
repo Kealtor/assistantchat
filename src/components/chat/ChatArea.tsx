@@ -44,7 +44,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
     };
 
     const updatedMessages = [...messages, userMessage];
-    const newTitle = updatedMessages.length === 1 ? content.slice(0, 50) + (content.length > 50 ? '...' : '') : chatSession.title;
+    const newTitle = updatedMessages.length === 1 ? String(content).slice(0, 50) + (String(content).length > 50 ? '...' : '') : chatSession.title;
     
     onUpdateChat(chatSession.id, { 
       messages: updatedMessages,
@@ -89,8 +89,9 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
 
       const responseData = await response.json();
       
-      // Extract the response message
-      const responseContent = responseData.message || responseData.response || 'No response received from workflow';
+      // Extract the response message and ensure it's a string
+      const rawResponseContent = responseData.message || responseData.response || 'No response received from workflow';
+      const responseContent = typeof rawResponseContent === 'string' ? rawResponseContent : JSON.stringify(rawResponseContent);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
