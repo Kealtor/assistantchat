@@ -10,7 +10,7 @@ export const workflows: WorkflowConfig[] = [
   {
     workflowName: "assistant",
     description: "General AI assistant for various tasks and conversations",
-    webhookUrl: "https://api.example.com/assistant-webhook",
+    webhookUrl: "https://n8n.kealtor.de/webhook/assistant",
     emoji: "🤖",
     color: "bg-primary"
   },
