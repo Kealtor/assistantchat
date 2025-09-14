@@ -92,14 +92,29 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       // Extract the response message and ensure it's a string
       let rawResponseContent = responseData.message || responseData.response || 'No response received from workflow';
       
-      // Handle nested message object structure
+      console.log('Raw webhook response:', responseData);
+      console.log('Raw response content:', rawResponseContent);
+      
+      // Handle deeply nested message object structures
       if (typeof rawResponseContent === 'object' && rawResponseContent !== null) {
+        // If it's a message object with content property
         if ('content' in rawResponseContent) {
           rawResponseContent = rawResponseContent.content;
         }
+        // If it's still an object, try to extract text content
+        if (typeof rawResponseContent === 'object' && rawResponseContent !== null) {
+          if ('text' in rawResponseContent) {
+            rawResponseContent = rawResponseContent.text;
+          } else if ('message' in rawResponseContent) {
+            rawResponseContent = rawResponseContent.message;
+          }
+        }
       }
       
+      // Final safety check - ensure it's definitely a string
       const responseContent = typeof rawResponseContent === 'string' ? rawResponseContent : JSON.stringify(rawResponseContent);
+      
+      console.log('Final response content:', responseContent);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
