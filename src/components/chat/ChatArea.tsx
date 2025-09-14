@@ -90,7 +90,15 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       const responseData = await response.json();
       
       // Extract the response message and ensure it's a string
-      const rawResponseContent = responseData.message || responseData.response || 'No response received from workflow';
+      let rawResponseContent = responseData.message || responseData.response || 'No response received from workflow';
+      
+      // Handle nested message object structure
+      if (typeof rawResponseContent === 'object' && rawResponseContent !== null) {
+        if ('content' in rawResponseContent) {
+          rawResponseContent = rawResponseContent.content;
+        }
+      }
+      
       const responseContent = typeof rawResponseContent === 'string' ? rawResponseContent : JSON.stringify(rawResponseContent);
 
       const assistantMessage: Message = {
