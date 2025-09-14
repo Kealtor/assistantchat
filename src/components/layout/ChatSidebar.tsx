@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { userService, UserPermission } from "@/services/userService";
+import { getDefaultWorkflow } from "@/config/workflows.config";
 
 type Workflow = {
   id: string;
@@ -101,8 +102,8 @@ export const ChatSidebar = ({
   useEffect(() => {
     // Filter workflows based on permissions
     const allowed = workflows.filter(workflow => {
-      // Assistant is always available
-      if (workflow.id === "assistant") return true;
+      // Default workflow is always available
+      if (workflow.id === getDefaultWorkflow().workflowName) return true;
       
       // Check if user has permission for this workflow
       return userPermissions.some(perm => perm.workflow_id === workflow.id);

@@ -10,14 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Shield, Plus, Trash2, User, Search } from "lucide-react";
 import { AdminSetupInstructions } from "./AdminSetupInstructions";
+import { getUIWorkflows, getDefaultWorkflow } from "@/config/workflows.config";
 
-const AVAILABLE_WORKFLOWS = [
-  { id: "assistant", name: "Assistant", emoji: "🤖" },
-  { id: "calendar", name: "Calendar", emoji: "📅" },
-  { id: "notes", name: "Notes", emoji: "📝" },
-  { id: "tasks", name: "Tasks", emoji: "✅" },
-  { id: "search", name: "Search", emoji: "🔍" },
-];
+const AVAILABLE_WORKFLOWS = getUIWorkflows();
 
 export const WorkflowPermissions = () => {
   const { user } = useAuth();
@@ -124,7 +119,7 @@ export const WorkflowPermissions = () => {
                   <SelectValue placeholder="Select a workflow..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {AVAILABLE_WORKFLOWS.filter(w => w.id !== 'assistant').map((workflow) => (
+                  {AVAILABLE_WORKFLOWS.filter(w => w.id !== getDefaultWorkflow().workflowName).map((workflow) => (
                     <SelectItem key={workflow.id} value={workflow.id}>
                       <div className="flex items-center gap-2">
                         <span>{workflow.emoji}</span>
@@ -165,7 +160,7 @@ export const WorkflowPermissions = () => {
                     <p className="text-sm text-muted-foreground">{workflow.id}</p>
                   </div>
                 </div>
-                {workflow.id === 'assistant' && (
+                {workflow.id === getDefaultWorkflow().workflowName && (
                   <Badge variant="secondary" className="text-xs">
                     Default Access
                   </Badge>
@@ -195,7 +190,7 @@ export const WorkflowPermissions = () => {
           <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
             <h4 className="font-semibold mb-2">Notes:</h4>
             <ul className="list-disc list-inside space-y-1">
-              <li>All users automatically get Assistant workflow access</li>
+              <li>All users automatically get {getDefaultWorkflow().workflowName} workflow access</li>
               <li>Users will see only workflows they have permission for in their sidebar</li>
               <li>Permissions take effect immediately after granting</li>
               <li>You can revoke permissions using the Supabase dashboard</li>
