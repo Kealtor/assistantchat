@@ -35,15 +35,15 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
     }
   }, [message]);
 
-  return (
+return (
     <form onSubmit={handleSubmit} className="relative">
-      <div className="flex items-end space-x-3 p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
-        {/* Attachment Button */}
+      <div className="flex items-end space-x-2 md:space-x-3 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
+        {/* Attachment Button - Hidden on small screens */}
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="flex-shrink-0 h-8 w-8 p-0"
+          className="hidden sm:flex flex-shrink-0 h-8 w-8 p-0"
           disabled={disabled}
         >
           <Paperclip className="h-4 w-4" />
@@ -56,24 +56,24 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
+            placeholder="Type your message..."
             disabled={disabled}
-            className="min-h-[2.5rem] max-h-32 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent"
+            className="min-h-[2.5rem] max-h-32 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base"
             rows={1}
           />
           
-          {/* Markdown Hint */}
-          <div className="absolute bottom-1 right-2 text-xs text-muted-foreground">
+          {/* Markdown Hint - Only on desktop */}
+          <div className="hidden md:block absolute bottom-1 right-2 text-xs text-muted-foreground">
             Markdown supported
           </div>
         </div>
 
-        {/* Emoji Button */}
+        {/* Emoji Button - Hidden on small screens */}
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="flex-shrink-0 h-8 w-8 p-0"
+          className="hidden sm:flex flex-shrink-0 h-8 w-8 p-0"
           disabled={disabled}
         >
           <Smile className="h-4 w-4" />
@@ -84,14 +84,14 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
           type="submit"
           size="sm"
           disabled={!message.trim() || disabled}
-          className="flex-shrink-0 h-8 w-8 p-0"
+          className="flex-shrink-0 h-touch min-w-touch p-0"
         >
           <Send className="h-4 w-4" />
         </Button>
       </div>
 
-      {/* Input Tips */}
-      <div className="mt-2 text-xs text-muted-foreground">
+      {/* Input Tips - Only on desktop */}
+      <div className="hidden md:block mt-2 text-xs text-muted-foreground">
         <span className="inline-block mr-4">💡 Try: "Help me plan my day" or "Summarize this text"</span>
         <span>Press <kbd className="px-1 py-0.5 text-xs bg-muted rounded">⌘ + K</kbd> for quick commands</span>
       </div>

@@ -112,14 +112,14 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
     );
   }
 
-  return (
+return (
     <div className="flex flex-col h-full">
       {/* Messages Area */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 py-4">
-        <div className="space-y-6 max-w-4xl mx-auto">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 px-4 md:px-6 py-4">
+        <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto">
           {messages.length === 0 && (
             <div className="flex justify-start">
-              <div className="bg-chat-assistant rounded-md p-4 max-w-xs">
+              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs">
                 <p className="text-sm">Hello! I'm your AI assistant. How can I help you today?</p>
               </div>
             </div>
@@ -129,7 +129,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-chat-assistant rounded-md p-4 max-w-xs animate-pulse">
+              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs animate-pulse">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -142,7 +142,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="border-t border-border bg-card p-6">
+      <div className="border-t border-border bg-card p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
           <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
         </div>
