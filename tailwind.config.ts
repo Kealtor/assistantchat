@@ -99,6 +99,8 @@ export default {
 				'md': 'var(--spacing-md)',
 				'lg': 'var(--spacing-lg)',
 				'xl': 'var(--spacing-xl)',
+				'touch': 'var(--touch-target-min)',
+				'touch-comfortable': 'var(--touch-target-comfortable)',
 			},
 			transitionProperty: {
 				'smooth': 'var(--transition-smooth)',

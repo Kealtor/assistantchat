@@ -20,18 +20,22 @@ const Index = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
-        <div className="text-center space-y-6 p-8">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight">Welcome to Chat AI</h1>
-            <p className="text-xl text-muted-foreground">
-              Your intelligent chat assistant for various workflows
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={() => setLocation("/auth")} size="lg">
-              Get Started
-            </Button>
+      <div className="h-screen overflow-auto">
+        <div className="flex items-center justify-center p-4 md:p-8">
+          <div className="w-full max-w-4xl">
+            <div className="space-y-6 md:space-y-8">
+              <div className="text-center md:text-left">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Welcome to Chat AI</h1>
+                <p className="text-lg md:text-xl text-muted-foreground mt-2">
+                  Your intelligent chat assistant for various workflows
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Button onClick={() => setLocation("/auth")} size="lg" className="w-full sm:w-auto">
+                  Get Started
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

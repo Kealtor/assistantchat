@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { ChatSidebar } from "./ChatSidebar";
+import { MobileNavigation } from "./MobileNavigation";
+import { MobileChatHeader } from "./MobileChatHeader";
 import { ChatArea } from "../chat/ChatArea";
 import { JournalArea } from "../journal/JournalArea";
 import { UserSettings } from "../user/UserSettings";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, BookOpen, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { chatService, ChatSession as ServiceChatSession } from "@/services/chatService";
 import { userService } from "@/services/userService";
 
@@ -18,6 +21,7 @@ type ChatSession = ServiceChatSession & {
 
 export const ChatLayout = () => {
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
   const [currentView, setCurrentView] = useState<ViewMode>("chat");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState("assistant");
@@ -148,9 +152,62 @@ export const ChatLayout = () => {
 
   const currentWorkflow = workflows.find(w => w.id === activeWorkflow);
 
+  const handleSignOut = async () => {
+    await chatService.signOut();
+    window.location.href = '/auth';
+  };
+
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-screen bg-background font-inter">
+        {/* Mobile Header - only show for chat view */}
+        {currentView === "chat" && (
+          <MobileChatHeader
+            workflows={workflows}
+            activeWorkflow={activeWorkflow}
+            onWorkflowChange={setActiveWorkflow}
+            chatSessions={chatSessions}
+            activeChatId={activeChatId}
+            onSelectChat={selectChat}
+            onDeleteChat={deleteChat}
+            onTogglePinChat={togglePinChat}
+            onSignOut={handleSignOut}
+          />
+        )}
+
+        {/* Mobile Content */}
+        <div className="flex-1 overflow-hidden pb-16">
+          {currentView === "chat" && (
+            <ChatArea 
+              workflow={activeWorkflow}
+              chatSession={activeChatId ? chatSessions.find(chat => chat.id === activeChatId) || null : null}
+              onUpdateChat={updateChatSession}
+            />
+          )}
+          {currentView === "journal" && (
+            <JournalArea />
+          )}
+          {currentView === "user" && (
+            <UserSettings />
+          )}
+        </div>
+
+        {/* Mobile Bottom Navigation */}
+        <MobileNavigation
+          currentView={currentView}
+          onViewChange={setCurrentView}
+          onCreateNewChat={createNewChat}
+          chatCount={chatSessions.length}
+        />
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
     <div className="flex h-screen bg-background font-inter">
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <div className={`transition-all duration-200 ${sidebarCollapsed ? 'w-16' : 'w-80'} border-r border-border bg-surface`}>
         <ChatSidebar
           workflows={workflows}
@@ -169,9 +226,9 @@ export const ChatLayout = () => {
         />
       </div>
 
-      {/* Main Content Area */}
+      {/* Desktop Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
+        {/* Desktop Header */}
         <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className={`w-8 h-8 rounded-lg ${currentWorkflow?.color} flex items-center justify-center text-white text-sm font-medium`}>
@@ -214,10 +271,7 @@ export const ChatLayout = () => {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={async () => {
-                await chatService.signOut();
-                window.location.href = '/auth';
-              }}
+              onClick={handleSignOut}
               className="h-9"
             >
               <LogOut className="h-4 w-4 mr-2" />
@@ -226,7 +280,7 @@ export const ChatLayout = () => {
           </div>
         </header>
 
-        {/* Content */}
+        {/* Desktop Content */}
         <div className="flex-1 overflow-hidden">
           {currentView === "chat" && (
             <ChatArea 
