@@ -13,34 +13,6 @@ export const workflows: WorkflowConfig[] = [
     webhookUrl: "https://n8n.kealtor.de/webhook/assistant",
     emoji: "🤖",
     color: "bg-primary"
-  },
-  {
-    workflowName: "customerSupport",
-    description: "Handles live customer support chat",
-    webhookUrl: "https://api.example.com/support-webhook",
-    emoji: "🎧",
-    color: "bg-success"
-  },
-  {
-    workflowName: "faqBot",
-    description: "Provides quick answers to FAQs",
-    webhookUrl: "https://api.example.com/faq-webhook",
-    emoji: "❓",
-    color: "bg-warning"
-  },
-  {
-    workflowName: "orderTracking",
-    description: "Tracks customer orders and shipping information",
-    webhookUrl: "https://api.example.com/order-tracking-webhook",
-    emoji: "📦",
-    color: "bg-info"
-  },
-  {
-    workflowName: "calendar",
-    description: "Calendar management and scheduling assistant",
-    webhookUrl: "https://api.example.com/calendar-webhook",
-    emoji: "📅",
-    color: "bg-secondary"
   }
 ];
 
