@@ -65,6 +65,14 @@
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-fast: all 0.15s ease-out;
   
+  /* Habit Rating Colors */
+  --habit-unrated: 210 40% 96%;
+  --habit-rating-1: 0 84% 60%;
+  --habit-rating-2: 25 95% 53%;
+  --habit-rating-3: 45 93% 58%;
+  --habit-rating-4: 84 81% 44%;
+  --habit-rating-5: 142 76% 36%;
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
   --gradient-surface: linear-gradient(180deg, hsl(210 40% 98%), hsl(0 0% 100%));
@@ -159,6 +167,14 @@
   --sidebar-border: 215 28% 17%;
   --sidebar-ring: 217 91% 60%;
   
+  /* Habit Rating Colors - Dark Mode */
+  --habit-unrated: 215 25% 15%;
+  --habit-rating-1: 0 84% 60%;
+  --habit-rating-2: 25 95% 53%;
+  --habit-rating-3: 45 93% 58%;
+  --habit-rating-4: 84 81% 44%;
+  --habit-rating-5: 142 76% 36%;
+
   /* Dark mode gradients */
   --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 50%));
   --gradient-surface: linear-gradient(180deg, hsl(224 71% 4%), hsl(215 25% 10%));

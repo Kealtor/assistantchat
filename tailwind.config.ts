@@ -78,6 +78,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				habit: {
+					unrated: 'hsl(var(--habit-unrated))',
+					'rating-1': 'hsl(var(--habit-rating-1))',
+					'rating-2': 'hsl(var(--habit-rating-2))',
+					'rating-3': 'hsl(var(--habit-rating-3))',
+					'rating-4': 'hsl(var(--habit-rating-4))',
+					'rating-5': 'hsl(var(--habit-rating-5))'
 				}
 			},
 			borderRadius: {

@@ -35,12 +35,12 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDail
   };
 
   const getRatingColor = (rating: number): string => {
-    if (rating === 1) return "bg-red-500 hover:bg-red-600";
-    if (rating === 2) return "bg-orange-500 hover:bg-orange-600";
-    if (rating === 3) return "bg-yellow-500 hover:bg-yellow-600";
-    if (rating === 4) return "bg-lime-500 hover:bg-lime-600";
-    if (rating === 5) return "bg-green-500 hover:bg-green-600";
-    return "bg-muted hover:bg-muted/80";
+    if (rating === 1) return "bg-habit-rating-1 hover:bg-habit-rating-1/80";
+    if (rating === 2) return "bg-habit-rating-2 hover:bg-habit-rating-2/80";
+    if (rating === 3) return "bg-habit-rating-3 hover:bg-habit-rating-3/80";
+    if (rating === 4) return "bg-habit-rating-4 hover:bg-habit-rating-4/80";
+    if (rating === 5) return "bg-habit-rating-5 hover:bg-habit-rating-5/80";
+    return "bg-habit-unrated hover:bg-habit-unrated/80";
   };
 
   const handleRatingClick = (habitId: string, rating: number) => {
@@ -90,7 +90,7 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDail
                       "w-8 h-8 rounded text-xs font-bold text-white transition-all transform hover:scale-105 active:scale-95",
                       currentRating === rating 
                         ? getRatingColor(rating)
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                        : "bg-habit-unrated hover:bg-habit-unrated/80 text-muted-foreground"
                     )}
                     title={`Rate ${habit.name}: ${rating}/5`}
                   >
@@ -100,11 +100,11 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDail
               </div>
               
               {/* Progress Bar */}
-              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-habit-unrated rounded-full h-2 overflow-hidden">
                 <div 
                   className={cn(
                     "h-full transition-all duration-500",
-                    currentRating > 0 ? getRatingColor(currentRating).split(' ')[0] : "bg-muted"
+                    currentRating > 0 ? getRatingColor(currentRating).split(' ')[0] : "bg-habit-unrated"
                   )}
                   style={{ width: `${(currentRating / 5) * 100}%` }}
                 />

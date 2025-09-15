@@ -13,13 +13,13 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
   const days = Array.from({ length: 14 }, (_, i) => subDays(new Date(), 13 - i));
   
   const getRatingColor = (rating: number): string => {
-    if (rating === 0) return "bg-muted";
-    if (rating === 1) return "bg-red-500";
-    if (rating === 2) return "bg-orange-500";
-    if (rating === 3) return "bg-yellow-500";
-    if (rating === 4) return "bg-lime-500";
-    if (rating === 5) return "bg-green-500";
-    return "bg-muted";
+    if (rating === 0) return "bg-habit-unrated";
+    if (rating === 1) return "bg-habit-rating-1";
+    if (rating === 2) return "bg-habit-rating-2";
+    if (rating === 3) return "bg-habit-rating-3";
+    if (rating === 4) return "bg-habit-rating-4";
+    if (rating === 5) return "bg-habit-rating-5";
+    return "bg-habit-unrated";
   };
 
   const getEntryForHabitAndDate = (habitId: string, date: Date): HabitEntry | null => {
@@ -85,27 +85,27 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
           <div className="flex items-center gap-4 pt-4 border-t text-xs text-muted-foreground">
             <span>Rating:</span>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-muted border"></div>
+              <div className="w-4 h-4 rounded bg-habit-unrated border"></div>
               <span>0</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-red-500"></div>
+              <div className="w-4 h-4 rounded bg-habit-rating-1"></div>
               <span>1</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-orange-500"></div>
+              <div className="w-4 h-4 rounded bg-habit-rating-2"></div>
               <span>2</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-yellow-500"></div>
+              <div className="w-4 h-4 rounded bg-habit-rating-3"></div>
               <span>3</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-lime-500"></div>
+              <div className="w-4 h-4 rounded bg-habit-rating-4"></div>
               <span>4</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-500"></div>
+              <div className="w-4 h-4 rounded bg-habit-rating-5"></div>
               <span>5</span>
             </div>
           </div>
