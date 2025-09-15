@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { HabitProgressTracker } from "./HabitProgressTracker";
 import { HabitDailyTracker } from "./HabitDailyTracker";
 import { HabitSettings } from "./HabitSettings";
@@ -15,37 +15,76 @@ export const HabitsArea = () => {
   const [entries, setEntries] = useState<HabitEntry[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
+  const loadingTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Check for date changes every minute
+  useEffect(() => {
+    const checkDateChange = () => {
+      const newDate = format(new Date(), 'yyyy-MM-dd');
+      if (newDate !== currentDate) {
+        setCurrentDate(newDate);
+      }
+    };
+
+    const interval = setInterval(checkDateChange, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [currentDate]);
 
   useEffect(() => {
     if (user) {
       loadHabitsData();
     }
-  }, [user]);
+  }, [user, currentDate]);
 
   const loadHabitsData = async () => {
     if (!user) return;
     
     setLoading(true);
     
-    // Load habits
-    let userHabits = await habitService.getUserHabits(user.id);
-    
-    // Initialize default habits if none exist
-    if (userHabits.length === 0) {
-      await habitService.initializeDefaultHabits(user.id);
-      userHabits = await habitService.getUserHabits(user.id);
+    // Clear any existing timeout
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
     }
     
-    setHabits(userHabits);
+    // Set a timeout to prevent infinite loading
+    loadingTimeoutRef.current = setTimeout(() => {
+      console.warn('Loading took too long, stopping...');
+      setLoading(false);
+    }, 10000); // 10 second timeout
     
-    // Load entries for last 14 days
-    const endDate = format(new Date(), 'yyyy-MM-dd');
-    const startDate = format(subDays(new Date(), 13), 'yyyy-MM-dd');
-    
-    const habitEntries = await habitService.getHabitEntries(user.id, startDate, endDate);
-    setEntries(habitEntries);
-    
-    setLoading(false);
+    try {
+      // Load habits
+      let userHabits = await habitService.getUserHabits(user.id);
+      
+      // Initialize default habits if none exist
+      if (userHabits.length === 0) {
+        await habitService.initializeDefaultHabits(user.id);
+        userHabits = await habitService.getUserHabits(user.id);
+      }
+      
+      setHabits(userHabits);
+      
+      // Load entries for last 14 days
+      const endDate = format(new Date(), 'yyyy-MM-dd');
+      const startDate = format(subDays(new Date(), 13), 'yyyy-MM-dd');
+      
+      const habitEntries = await habitService.getHabitEntries(user.id, startDate, endDate);
+      setEntries(habitEntries);
+      
+      // Clear the timeout since loading completed successfully
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading habits data:', error);
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      setLoading(false);
+    }
   };
 
   const handleRatingUpdate = async (habitId: string, date: string, rating: number) => {
@@ -164,6 +203,7 @@ export const HabitsArea = () => {
           <HabitProgressTracker 
             habits={habits} 
             entries={entries}
+            currentDate={new Date()}
           />
         </div>
       </div>

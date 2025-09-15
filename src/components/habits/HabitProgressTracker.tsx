@@ -7,13 +7,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface HabitProgressTrackerProps {
   habits: Habit[];
   entries: HabitEntry[];
+  currentDate?: Date;
 }
 
-export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerProps) => {
+export const HabitProgressTracker = ({ habits, entries, currentDate }: HabitProgressTrackerProps) => {
   const isMobile = useIsMobile();
   // Generate days based on device: 7 for mobile, 14 for desktop
   const daysCount = isMobile ? 7 : 14;
-  const days = Array.from({ length: daysCount }, (_, i) => subDays(new Date(), i));
+  const baseDate = currentDate || new Date();
+  const days = Array.from({ length: daysCount }, (_, i) => subDays(baseDate, i));
   
   const getRatingColor = (rating: number): string => {
     if (rating === 0) return "bg-habit-unrated";
@@ -75,7 +77,7 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
                         className={cn(
                           "h-10 w-full rounded border border-border transition-colors aspect-square",
                           getRatingColor(rating),
-                          isSameDay(day, new Date()) && "ring-2 ring-primary ring-offset-1"
+                           isSameDay(day, baseDate) && "ring-2 ring-primary ring-offset-1"
                         )}
                         title={`${habit.name} on ${format(day, 'MMM dd')}: ${rating}/5`}
                       />
@@ -92,7 +94,7 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
                     className={cn(
                       "h-8 w-full rounded border border-border transition-colors aspect-square",
                       getRatingColor(rating),
-                      isSameDay(day, new Date()) && "ring-2 ring-primary ring-offset-1"
+                      isSameDay(day, baseDate) && "ring-2 ring-primary ring-offset-1"
                     )}
                     title={`${habit.name} on ${format(day, 'MMM dd')}: ${rating}/5`}
                   />
