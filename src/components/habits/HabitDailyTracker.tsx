@@ -111,7 +111,7 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                       )}
                     </div>
                     {/* Streak data on far right for mobile */}
-                    <div className="ml-auto flex flex-col text-xs text-muted-foreground text-right">
+                    <div className="ml-auto flex gap-2 text-xs text-muted-foreground">
                       <span>🔥 {streak}d</span>
                       <span>📊 {average.toFixed(1)}</span>
                     </div>
