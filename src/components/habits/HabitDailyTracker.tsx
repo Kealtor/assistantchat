@@ -64,50 +64,73 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDail
           const average = get7DayAverage(habit.id);
           
           return (
-            <div key={habit.id} className="space-y-3">
-              {/* Habit Header */}
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{habit.icon}</span>
-                <div className="flex-1">
-                  <h3 className="font-medium">{habit.name}</h3>
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Flame className="h-3 w-3" />
-                      <span>Streak: {streak}</span>
+            <div key={habit.id} className="space-y-4 p-4 rounded-lg border border-border bg-card/50">
+              {/* Block 1: Header with habit info + streak data + rating buttons */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{habit.icon}</span>
+                  <div>
+                    <h3 className="font-medium">{habit.name}</h3>
+                    <div className="flex gap-4 text-sm text-muted-foreground">
+                      <span>🔥 {streak} days</span>
+                      <span>📊 {average.toFixed(1)}/5 avg</span>
                     </div>
-                    <span>7-day avg: {average.toFixed(1)}</span>
                   </div>
                 </div>
+                
+                {/* Rating buttons inline */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium mr-2">Today:</span>
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <button
+                      key={rating}
+                      onClick={() => handleRatingClick(habit.id, rating)}
+                      className={cn(
+                        "w-8 h-8 rounded-full border-2 text-sm font-medium transition-all hover:scale-110",
+                        currentRating === rating
+                          ? `${getRatingColor(rating)} border-ring text-white`
+                          : "border-border bg-background hover:border-ring"
+                      )}
+                    >
+                      {rating}
+                    </button>
+                  ))}
+                </div>
               </div>
-              
-              {/* Rating Buttons */}
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((rating) => (
-                  <button
-                    key={rating}
-                    onClick={() => handleRatingClick(habit.id, rating)}
-                    className={cn(
-                      "w-8 h-8 rounded text-xs font-bold text-white transition-all transform hover:scale-105 active:scale-95",
-                      currentRating === rating 
-                        ? getRatingColor(rating)
-                        : "bg-habit-unrated hover:bg-habit-unrated/80 text-muted-foreground"
-                    )}
-                    title={`Rate ${habit.name}: ${rating}/5`}
-                  >
-                    {rating}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Progress Bar */}
-              <div className="w-full bg-habit-unrated rounded-full h-2 overflow-hidden">
-                <div 
-                  className={cn(
-                    "h-full transition-all duration-500",
-                    currentRating > 0 ? getRatingColor(currentRating).split(' ')[0] : "bg-habit-unrated"
-                  )}
-                  style={{ width: `${(currentRating / 5) * 100}%` }}
-                />
+
+              {/* Block 2: Acceptance Criteria */}
+              {habit.acceptance_criteria && (
+                <div className="p-3 rounded-md bg-muted/50 border border-border">
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Acceptance Criteria</div>
+                  <div className="text-sm">{habit.acceptance_criteria}</div>
+                </div>
+              )}
+
+              {/* Block 3: Notes and Progress bar */}
+              <div className="space-y-3">
+                {habit.notes && (
+                  <div className="p-3 rounded-md bg-secondary/50 border border-border">
+                    <div className="text-sm font-medium text-muted-foreground mb-1">Notes</div>
+                    <div className="text-sm">{habit.notes}</div>
+                  </div>
+                )}
+                
+                {/* Progress bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Progress</span>
+                    <span>{currentRating}/5</span>
+                  </div>
+                  <div className="w-full bg-habit-unrated rounded-full h-2">
+                    <div
+                      className={cn(
+                        "h-2 rounded-full transition-all duration-300",
+                        currentRating > 0 ? getRatingColor(currentRating).split(' ')[0] : "bg-habit-unrated"
+                      )}
+                      style={{ width: `${(currentRating / 5) * 100}%` }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           );

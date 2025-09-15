@@ -7,6 +7,8 @@ export interface Habit {
   color: string;
   icon: string;
   position: number;
+  acceptance_criteria?: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }
@@ -26,6 +28,8 @@ export interface CreateHabitData {
   color?: string;
   icon?: string;
   position: number;
+  acceptance_criteria?: string;
+  notes?: string;
   user_id: string;
 }
 
@@ -34,6 +38,8 @@ export interface UpdateHabitData {
   color?: string;
   icon?: string;
   position?: number;
+  acceptance_criteria?: string;
+  notes?: string;
 }
 
 export interface CreateHabitEntryData {

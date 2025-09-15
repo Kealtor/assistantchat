@@ -90,31 +90,37 @@ export type Database = {
       }
       habits: {
         Row: {
+          acceptance_criteria: string | null
           color: string
           created_at: string
           icon: string
           id: string
           name: string
+          notes: string | null
           position: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          acceptance_criteria?: string | null
           color?: string
           created_at?: string
           icon?: string
           id?: string
           name: string
+          notes?: string | null
           position?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          acceptance_criteria?: string | null
           color?: string
           created_at?: string
           icon?: string
           id?: string
           name?: string
+          notes?: string | null
           position?: number
           updated_at?: string
           user_id?: string
