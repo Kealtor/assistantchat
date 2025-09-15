@@ -203,6 +203,7 @@ export const HabitsArea = () => {
           <HabitProgressTracker 
             habits={habits} 
             entries={entries}
+            currentDate={new Date()}
           />
         </div>
       </div>
