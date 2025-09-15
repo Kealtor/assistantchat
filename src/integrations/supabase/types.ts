@@ -50,6 +50,83 @@ export type Database = {
         }
         Relationships: []
       }
+      habit_entries: {
+        Row: {
+          created_at: string
+          entry_date: string
+          habit_id: string
+          id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_date: string
+          habit_id: string
+          id?: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_date?: string
+          habit_id?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "habit_entries_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      habits: {
+        Row: {
+          acceptance_criteria: string | null
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          notes: string | null
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          acceptance_criteria?: string | null
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name: string
+          notes?: string | null
+          position?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          acceptance_criteria?: string | null
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           content: string

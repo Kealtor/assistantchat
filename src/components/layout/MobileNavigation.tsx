@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, BookOpen, User, Plus } from "lucide-react";
+import { MessageSquare, BookOpen, User, Plus, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type ViewMode = "chat" | "journal" | "user";
+type ViewMode = "chat" | "journal" | "habits" | "user";
 
 interface MobileNavigationProps {
   currentView: ViewMode;
@@ -37,6 +37,12 @@ export const MobileNavigation = ({
       label: "Journal",
       icon: BookOpen,
       action: () => onViewChange("journal"),
+    },
+    {
+      id: "habits" as const,
+      label: "Habits",
+      icon: Target,
+      action: () => onViewChange("habits"),
     },
     {
       id: "user" as const,

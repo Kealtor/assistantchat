@@ -4,16 +4,17 @@ import { MobileNavigation } from "./MobileNavigation";
 import { MobileChatHeader } from "./MobileChatHeader";
 import { ChatArea } from "../chat/ChatArea";
 import { JournalArea } from "../journal/JournalArea";
+import { HabitsArea } from "../habits/HabitsArea";
 import { UserSettings } from "../user/UserSettings";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, BookOpen, User, LogOut } from "lucide-react";
+import { MessageSquare, BookOpen, User, LogOut, Target } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { chatService, ChatSession as ServiceChatSession } from "@/services/chatService";
 import { userService } from "@/services/userService";
 import { getUIWorkflows, getDefaultWorkflow } from "@/config/workflows.config";
 
-type ViewMode = "chat" | "journal" | "user";
+type ViewMode = "chat" | "journal" | "habits" | "user";
 
 type ChatSession = ServiceChatSession & {
   createdAt: Date;
@@ -183,6 +184,9 @@ export const ChatLayout = () => {
           {currentView === "journal" && (
             <JournalArea />
           )}
+          {currentView === "habits" && (
+            <HabitsArea />
+          )}
           {currentView === "user" && (
             <UserSettings />
           )}
@@ -255,6 +259,15 @@ export const ChatLayout = () => {
               Journal
             </Button>
             <Button
+              variant={currentView === "habits" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setCurrentView("habits")}
+              className="h-9"
+            >
+              <Target className="h-4 w-4 mr-2" />
+              Habits
+            </Button>
+            <Button
               variant={currentView === "user" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("user")}
@@ -286,6 +299,9 @@ export const ChatLayout = () => {
           )}
           {currentView === "journal" && (
             <JournalArea />
+          )}
+          {currentView === "habits" && (
+            <HabitsArea />
           )}
           {currentView === "user" && (
             <UserSettings />

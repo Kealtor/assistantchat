@@ -23,6 +23,7 @@ import {
   ChevronRight,
   MessageSquare,
   BookOpen,
+  Target,
   Settings,
   MoreVertical,
   Pin,
@@ -40,7 +41,7 @@ type Workflow = {
   color: string;
 };
 
-type ViewMode = "chat" | "journal" | "user";
+type ViewMode = "chat" | "journal" | "habits" | "user";
 
 type ChatSession = {
   id: string;
@@ -194,6 +195,14 @@ export const ChatSidebar = ({
             className="w-full h-10 p-0"
           >
             <BookOpen className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={currentView === "habits" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => onViewChange("habits")}
+            className="w-full h-10 p-0"
+          >
+            <Target className="h-4 w-4" />
           </Button>
           <Button
             variant={currentView === "user" ? "default" : "ghost"}
