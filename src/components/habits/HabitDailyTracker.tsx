@@ -98,38 +98,45 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDail
                 </div>
               </div>
 
-              {/* Block 2: Acceptance Criteria */}
-              {habit.acceptance_criteria && (
-                <div className="p-3 rounded-md bg-muted/50 border border-border">
-                  <div className="text-sm font-medium text-muted-foreground mb-1">Acceptance Criteria</div>
-                  <div className="text-sm">{habit.acceptance_criteria}</div>
+              {/* Block 2: Acceptance Criteria and Notes side by side */}
+              {(habit.acceptance_criteria || habit.notes) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Acceptance Criteria */}
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">Acceptance Criteria</div>
+                    <div className="p-3 rounded-md bg-muted/50 border border-border min-h-[60px]">
+                      <div className="text-sm whitespace-pre-wrap">
+                        {habit.acceptance_criteria || "No acceptance criteria set"}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Notes */}
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">Notes</div>
+                    <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px]">
+                      <div className="text-sm whitespace-pre-wrap">
+                        {habit.notes || "Additional notes or reminders"}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Block 3: Notes and Progress bar */}
-              <div className="space-y-3">
-                {habit.notes && (
-                  <div className="p-3 rounded-md bg-secondary/50 border border-border">
-                    <div className="text-sm font-medium text-muted-foreground mb-1">Notes</div>
-                    <div className="text-sm">{habit.notes}</div>
-                  </div>
-                )}
-                
-                {/* Progress bar */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Progress</span>
-                    <span>{currentRating}/5</span>
-                  </div>
-                  <div className="w-full bg-habit-unrated rounded-full h-2">
-                    <div
-                      className={cn(
-                        "h-2 rounded-full transition-all duration-300",
-                        currentRating > 0 ? getRatingColor(currentRating).split(' ')[0] : "bg-habit-unrated"
-                      )}
-                      style={{ width: `${(currentRating / 5) * 100}%` }}
-                    />
-                  </div>
+              {/* Block 3: Progress bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>{currentRating}/5</span>
+                </div>
+                <div className="w-full bg-habit-unrated rounded-full h-2">
+                  <div
+                    className={cn(
+                      "h-2 rounded-full transition-all duration-300",
+                      currentRating > 0 ? getRatingColor(currentRating).split(' ')[0] : "bg-habit-unrated"
+                    )}
+                    style={{ width: `${(currentRating / 5) * 100}%` }}
+                  />
                 </div>
               </div>
             </div>
