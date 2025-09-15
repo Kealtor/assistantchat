@@ -41,8 +41,8 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
       <CardContent>
         <div className="space-y-4">
           {/* Header Row - Days */}
-          <div className="grid grid-cols-15 gap-1 items-center text-xs text-muted-foreground">
-            <div className="w-20"></div> {/* Space for habit names */}
+          <div className="grid gap-1 items-center text-xs text-muted-foreground" style={{ gridTemplateColumns: 'auto repeat(14, 1fr)' }}>
+            <div className="w-24 text-left font-medium">Habits</div>
             {days.map((day, index) => (
               <div 
                 key={index} 
@@ -58,8 +58,8 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
           
           {/* Habit Rows */}
           {habits.map((habit) => (
-            <div key={habit.id} className="grid grid-cols-15 gap-1 items-center">
-              <div className="w-20 flex items-center gap-2 pr-2">
+            <div key={habit.id} className="grid gap-1 items-center" style={{ gridTemplateColumns: 'auto repeat(14, 1fr)' }}>
+              <div className="w-24 flex items-center gap-2 pr-2">
                 <span className="text-lg">{habit.icon}</span>
                 <span className="text-sm font-medium truncate">{habit.name}</span>
               </div>
@@ -70,7 +70,7 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
                   <div
                     key={dayIndex}
                     className={cn(
-                      "h-8 w-full rounded border border-border transition-colors",
+                      "h-8 w-full rounded border border-border transition-colors aspect-square",
                       getRatingColor(rating),
                       isSameDay(day, new Date()) && "ring-2 ring-primary ring-offset-1"
                     )}
