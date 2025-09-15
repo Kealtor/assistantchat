@@ -9,8 +9,8 @@ interface HabitProgressTrackerProps {
 }
 
 export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerProps) => {
-  // Generate the last 14 days
-  const days = Array.from({ length: 14 }, (_, i) => subDays(new Date(), 13 - i));
+  // Generate the last 14 days - current day first (left), 14 days ago last (right)
+  const days = Array.from({ length: 14 }, (_, i) => subDays(new Date(), i));
   
   const getRatingColor = (rating: number): string => {
     if (rating === 0) return "bg-habit-unrated";
@@ -40,28 +40,13 @@ export const HabitProgressTracker = ({ habits, entries }: HabitProgressTrackerPr
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Header Row - Days */}
-          <div className="grid gap-1 items-center text-xs text-muted-foreground" style={{ gridTemplateColumns: 'auto repeat(14, 1fr)' }}>
-            <div className="w-24 text-left font-medium">Habits</div>
-            {days.map((day, index) => (
-              <div 
-                key={index} 
-                className={cn(
-                  "text-center font-medium py-1",
-                  isSameDay(day, new Date()) && "text-primary font-bold"
-                )}
-              >
-                {format(day, 'dd')}
-              </div>
-            ))}
-          </div>
           
           {/* Habit Rows */}
           {habits.map((habit) => (
-            <div key={habit.id} className="grid gap-1 items-center" style={{ gridTemplateColumns: 'auto repeat(14, 1fr)' }}>
-              <div className="w-24 flex items-center gap-2 pr-2">
-                <span className="text-lg">{habit.icon}</span>
-                <span className="text-sm font-medium truncate">{habit.name}</span>
+            <div key={habit.id} className="grid gap-1 items-center" style={{ gridTemplateColumns: '200px repeat(14, 1fr)' }}>
+              <div className="w-48 flex items-center gap-3 pr-4">
+                <span className="text-xl">{habit.icon}</span>
+                <span className="text-sm font-medium">{habit.name}</span>
               </div>
               
               {days.map((day, dayIndex) => {

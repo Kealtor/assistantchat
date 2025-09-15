@@ -150,24 +150,20 @@ export const HabitsArea = () => {
           </Card>
         )}
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Progress Tracker - Takes up 2 columns on large screens */}
-          <div className="xl:col-span-2">
-            <HabitProgressTracker 
-              habits={habits} 
-              entries={entries}
-            />
-          </div>
+        {/* Main Content - Stacked vertically */}
+        <div className="space-y-6">
+          {/* Daily Tracker - On top */}
+          <HabitDailyTracker 
+            habits={habits}
+            entries={entries}
+            onRatingUpdate={handleRatingUpdate}
+          />
           
-          {/* Daily Tracker - Takes up 1 column on large screens */}
-          <div>
-            <HabitDailyTracker 
-              habits={habits}
-              entries={entries}
-              onRatingUpdate={handleRatingUpdate}
-            />
-          </div>
+          {/* Progress Tracker - Below with full width */}
+          <HabitProgressTracker 
+            habits={habits} 
+            entries={entries}
+          />
         </div>
       </div>
     </div>
