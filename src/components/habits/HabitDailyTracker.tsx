@@ -2,16 +2,21 @@ import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Habit, HabitEntry, habitService } from "@/services/habitService";
 import { cn } from "@/lib/utils";
-import { Flame } from "lucide-react";
+import { Flame, Edit3, Check, X } from "lucide-react";
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface HabitDailyTrackerProps {
   habits: Habit[];
   entries: HabitEntry[];
   onRatingUpdate: (habitId: string, date: string, rating: number) => void;
+  onHabitUpdate: (habitId: string, updates: Partial<Habit>) => void;
 }
 
-export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDailyTrackerProps) => {
+export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpdate }: HabitDailyTrackerProps) => {
   const today = format(new Date(), 'yyyy-MM-dd');
+  const [editingNotes, setEditingNotes] = useState<string | null>(null);
+  const [tempNotes, setTempNotes] = useState<string>("");
   
   const getTodayRating = (habitId: string): number => {
     const entry = entries.find(e => e.habit_id === habitId && e.entry_date === today);
@@ -49,6 +54,22 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDail
     onRatingUpdate(habitId, today, newRating);
   };
 
+  const handleNotesEdit = (habitId: string, currentNotes: string) => {
+    setEditingNotes(habitId);
+    setTempNotes(currentNotes || "");
+  };
+
+  const handleNotesSave = async (habitId: string) => {
+    await onHabitUpdate(habitId, { notes: tempNotes });
+    setEditingNotes(null);
+    setTempNotes("");
+  };
+
+  const handleNotesCancel = () => {
+    setEditingNotes(null);
+    setTempNotes("");
+  };
+
   return (
     <Card className="animate-fade-in">
       <CardHeader>
@@ -65,63 +86,98 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate }: HabitDail
           
           return (
             <div key={habit.id} className="space-y-4 p-4 rounded-lg border border-border bg-card/50">
-              {/* Block 1: Header with habit info + streak data + rating buttons */}
+              {/* Block 1: Header with habit name, rating buttons, and streak data */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <span className="text-2xl">{habit.icon}</span>
-                  <div>
-                    <h3 className="font-medium">{habit.name}</h3>
-                    <div className="flex gap-4 text-sm text-muted-foreground">
-                      <span>🔥 {streak} days</span>
-                      <span>📊 {average.toFixed(1)}/5 avg</span>
-                    </div>
+                  <h3 className="text-xl font-semibold">{habit.name}</h3>
+                  
+                  {/* Rating buttons right next to habit name */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium mr-2">Today:</span>
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        onClick={() => handleRatingClick(habit.id, rating)}
+                        className={cn(
+                          "w-8 h-8 rounded-full border-2 text-sm font-medium transition-all hover:scale-110",
+                          currentRating === rating
+                            ? `${getRatingColor(rating)} border-ring text-white`
+                            : "border-border bg-background hover:border-ring"
+                        )}
+                      >
+                        {rating}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 
-                {/* Rating buttons inline */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium mr-2">Today:</span>
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                    <button
-                      key={rating}
-                      onClick={() => handleRatingClick(habit.id, rating)}
-                      className={cn(
-                        "w-8 h-8 rounded-full border-2 text-sm font-medium transition-all hover:scale-110",
-                        currentRating === rating
-                          ? `${getRatingColor(rating)} border-ring text-white`
-                          : "border-border bg-background hover:border-ring"
-                      )}
-                    >
-                      {rating}
-                    </button>
-                  ))}
+                {/* Streak data on far right */}
+                <div className="flex gap-4 text-sm text-muted-foreground">
+                  <span>🔥 {streak} days</span>
+                  <span>📊 {average.toFixed(1)}/5 avg</span>
                 </div>
               </div>
 
               {/* Block 2: Acceptance Criteria and Notes side by side */}
-              {(habit.acceptance_criteria || habit.notes) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Acceptance Criteria */}
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Acceptance Criteria</div>
-                    <div className="p-3 rounded-md bg-muted/50 border border-border min-h-[60px]">
-                      <div className="text-sm whitespace-pre-wrap">
-                        {habit.acceptance_criteria || "No acceptance criteria set"}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Notes */}
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Notes</div>
-                    <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px]">
-                      <div className="text-sm whitespace-pre-wrap">
-                        {habit.notes || "Additional notes or reminders"}
-                      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Acceptance Criteria */}
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">Acceptance Criteria</div>
+                  <div className="p-3 rounded-md bg-muted/50 border border-border min-h-[60px]">
+                    <div className="text-sm whitespace-pre-wrap">
+                      {habit.acceptance_criteria || "No acceptance criteria set"}
                     </div>
                   </div>
                 </div>
-              )}
+                
+                {/* Notes - Editable */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm font-medium text-muted-foreground">Notes</div>
+                    {editingNotes !== habit.id && (
+                      <button
+                        onClick={() => handleNotesEdit(habit.id, habit.notes || "")}
+                        className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                  
+                  {editingNotes === habit.id ? (
+                    <div className="space-y-2">
+                      <Textarea
+                        value={tempNotes}
+                        onChange={(e) => setTempNotes(e.target.value)}
+                        className="min-h-[60px] text-sm"
+                        placeholder="Additional notes or reminders"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleNotesSave(habit.id)}
+                          className="p-1 hover:bg-green-100 rounded text-green-600 hover:text-green-700"
+                        >
+                          <Check className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={handleNotesCancel}
+                          className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-700"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
+                         onClick={() => handleNotesEdit(habit.id, habit.notes || "")}>
+                      <div className="text-sm whitespace-pre-wrap">
+                        {habit.notes || "Click to add notes..."}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
 
               {/* Block 3: Progress bar */}
               <div className="space-y-2">

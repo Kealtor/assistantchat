@@ -153,11 +153,12 @@ export const HabitsArea = () => {
         {/* Main Content - Stacked vertically */}
         <div className="space-y-6">
           {/* Daily Tracker - On top */}
-          <HabitDailyTracker 
-            habits={habits}
-            entries={entries}
-            onRatingUpdate={handleRatingUpdate}
-          />
+            <HabitDailyTracker 
+              habits={habits} 
+              entries={entries} 
+              onRatingUpdate={handleRatingUpdate}
+              onHabitUpdate={handleHabitUpdate}
+            />
           
           {/* Progress Tracker - Below with full width */}
           <HabitProgressTracker 
