@@ -8,15 +8,11 @@ type ViewMode = "chat" | "journal" | "habits" | "user";
 interface MobileNavigationProps {
   currentView: ViewMode;
   onViewChange: (view: ViewMode) => void;
-  onCreateNewChat: () => void;
-  chatCount?: number;
 }
 
 export const MobileNavigation = ({
   currentView,
   onViewChange,
-  onCreateNewChat,
-  chatCount = 0,
 }: MobileNavigationProps) => {
   const navItems = [
     {
@@ -24,13 +20,6 @@ export const MobileNavigation = ({
       label: "Chat",
       icon: MessageSquare,
       action: () => onViewChange("chat"),
-    },
-    {
-      id: "new" as const,
-      label: "New",
-      icon: Plus,
-      action: onCreateNewChat,
-      special: true,
     },
     {
       id: "journal" as const,
@@ -58,19 +47,6 @@ export const MobileNavigation = ({
         {navItems.map((item) => {
           const isActive = currentView === item.id;
           const Icon = item.icon;
-          
-          if (item.special) {
-            return (
-              <Button
-                key={item.id}
-                onClick={item.action}
-                size="sm"
-                className="h-touch-comfortable w-touch-comfortable rounded-full p-0"
-              >
-                <Icon className="h-5 w-5" />
-              </Button>
-            );
-          }
 
           return (
             <button
@@ -84,17 +60,7 @@ export const MobileNavigation = ({
                   : "text-muted-foreground hover:text-foreground hover:bg-accent"
               )}
             >
-              <div className="relative">
-                <Icon className="h-5 w-5 mb-1" />
-                {item.id === "chat" && chatCount > 0 && (
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs flex items-center justify-center"
-                  >
-                    {chatCount > 99 ? "99+" : chatCount}
-                  </Badge>
-                )}
-              </div>
+              <Icon className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">{item.label}</span>
             </button>
           );

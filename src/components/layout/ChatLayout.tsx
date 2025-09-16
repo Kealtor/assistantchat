@@ -196,8 +196,6 @@ export const ChatLayout = () => {
         <MobileNavigation
           currentView={currentView}
           onViewChange={setCurrentView}
-          onCreateNewChat={createNewChat}
-          chatCount={chatSessions.length}
         />
       </div>
     );

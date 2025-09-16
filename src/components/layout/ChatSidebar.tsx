@@ -233,11 +233,6 @@ export const ChatSidebar = ({
           </Button>
         </div>
 
-        {/* New Chat Button */}
-        <Button className="w-full mb-4" size="sm" onClick={onCreateNewChat}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Chat
-        </Button>
 
         {/* Search */}
         <div className="relative">
@@ -284,6 +279,12 @@ export const ChatSidebar = ({
             Contact admin to request access to additional workflows
           </p>
         )}
+        
+        {/* New Chat Button */}
+        <Button className="w-full mt-4" size="sm" onClick={onCreateNewChat}>
+          <Plus className="h-4 w-4 mr-2" />
+          New Chat
+        </Button>
       </div>
 
       {/* Chat History */}
