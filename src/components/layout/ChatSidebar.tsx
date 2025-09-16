@@ -279,9 +279,11 @@ export const ChatSidebar = ({
             Contact admin to request access to additional workflows
           </p>
         )}
-        
-        {/* New Chat Button */}
-        <Button className="w-full mt-4" size="sm" onClick={onCreateNewChat}>
+      </div>
+
+      {/* New Chat Section */}
+      <div className="p-4 border-b border-border">
+        <Button className="w-full" size="sm" onClick={onCreateNewChat}>
           <Plus className="h-4 w-4 mr-2" />
           New Chat
         </Button>
