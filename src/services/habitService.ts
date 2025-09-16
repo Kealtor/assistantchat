@@ -19,6 +19,7 @@ export interface HabitEntry {
   user_id: string;
   entry_date: string;
   rating: number;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +48,7 @@ export interface CreateHabitEntryData {
   user_id: string;
   entry_date: string;
   rating: number;
+  notes?: string;
 }
 
 export const habitService = {

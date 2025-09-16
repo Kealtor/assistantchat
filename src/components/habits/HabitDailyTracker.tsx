@@ -6,6 +6,7 @@ import { Flame, Edit3, Check, X, Info } from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface HabitDailyTrackerProps {
@@ -13,9 +14,10 @@ interface HabitDailyTrackerProps {
   entries: HabitEntry[];
   onRatingUpdate: (habitId: string, date: string, rating: number) => void;
   onHabitUpdate: (habitId: string, updates: Partial<Habit>) => void;
+  onNotesUpdate: (habitId: string, date: string, notes: string) => void;
 }
 
-export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpdate }: HabitDailyTrackerProps) => {
+export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpdate, onNotesUpdate }: HabitDailyTrackerProps) => {
   const today = format(new Date(), 'yyyy-MM-dd');
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [tempNotes, setTempNotes] = useState<string>("");
@@ -24,6 +26,11 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
   const getTodayRating = (habitId: string): number => {
     const entry = entries.find(e => e.habit_id === habitId && e.entry_date === today);
     return entry?.rating || 0;
+  };
+
+  const getTodayNotes = (habitId: string): string => {
+    const entry = entries.find(e => e.habit_id === habitId && e.entry_date === today);
+    return entry?.notes || "";
   };
 
   const getHabitEntries = (habitId: string): HabitEntry[] => {
@@ -63,7 +70,7 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
   };
 
   const handleNotesSave = async (habitId: string) => {
-    await onHabitUpdate(habitId, { notes: tempNotes });
+    await onNotesUpdate(habitId, today, tempNotes);
     setEditingNotes(null);
     setTempNotes("");
   };
@@ -92,22 +99,28 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
               // Mobile layout - vertical flow
               return (
                 <div key={habit.id} className="space-y-4 p-4 rounded-lg border border-border bg-card/50">
-                  {/* Mobile: Habit name with acceptance criteria tooltip */}
+                  {/* Mobile: Habit name with acceptance criteria info */}
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{habit.icon}</span>
                     <div className="flex items-center gap-2">
                       <h3 className="text-2xl font-semibold">{habit.name}</h3>
                       {habit.acceptance_criteria && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground">
-                              <Info className="h-4 w-4" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
+                        <>
+                          <InfoPopover side="bottom" align="start">
                             <p className="text-sm whitespace-pre-wrap">{habit.acceptance_criteria}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                          </InfoPopover>
+                          {/* Desktop tooltip fallback */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground hidden lg:block">
+                                <Info className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p className="text-sm whitespace-pre-wrap">{habit.acceptance_criteria}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </>
                       )}
                     </div>
                     {/* Streak data on far right for mobile */}
@@ -142,7 +155,7 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                       <div className="text-sm font-medium text-muted-foreground">Notes</div>
                       {editingNotes !== habit.id && (
                         <button
-                          onClick={() => handleNotesEdit(habit.id, habit.notes || "")}
+                          onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
                           className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
                         >
                           <Edit3 className="h-3 w-3" />
@@ -175,9 +188,9 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                       </div>
                     ) : (
                       <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
-                           onClick={() => handleNotesEdit(habit.id, habit.notes || "")}>
+                           onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
                         <div className="text-sm whitespace-pre-wrap">
-                          {habit.notes || "Click to add notes..."}
+                          {getTodayNotes(habit.id) || "Click to add notes for today..."}
                         </div>
                       </div>
                     )}
@@ -255,14 +268,14 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="text-sm font-medium text-muted-foreground">Notes</div>
-                      {editingNotes !== habit.id && (
-                        <button
-                          onClick={() => handleNotesEdit(habit.id, habit.notes || "")}
-                          className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
-                        >
-                          <Edit3 className="h-3 w-3" />
-                        </button>
-                      )}
+                    {editingNotes !== habit.id && (
+                      <button
+                        onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
+                        className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                      </button>
+                    )}
                     </div>
                     
                     {editingNotes === habit.id ? (
@@ -290,9 +303,9 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                       </div>
                     ) : (
                       <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
-                           onClick={() => handleNotesEdit(habit.id, habit.notes || "")}>
+                           onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
                         <div className="text-sm whitespace-pre-wrap">
-                          {habit.notes || "Click to add notes..."}
+                          {getTodayNotes(habit.id) || "Click to add notes for today..."}
                         </div>
                       </div>
                     )}
