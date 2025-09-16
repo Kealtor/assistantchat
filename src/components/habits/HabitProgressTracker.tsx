@@ -78,38 +78,39 @@ export const HabitProgressTracker = ({ habits, entries, currentDate }: HabitProg
                       const notes = entry?.notes || "";
                       const hasContent = rating > 0 || notes.trim().length > 0;
                       
-                      return (
-                        <div key={dayIndex} className="relative">
-                          <div
-                            className={cn(
-                              "h-10 w-full rounded border border-border transition-colors aspect-square",
-                              getRatingColor(rating),
-                              isSameDay(day, baseDate) && "ring-2 ring-primary ring-offset-1"
-                            )}
-                          />
-                          {hasContent && (
-                            <div className="absolute -top-1 -right-1">
-                              <InfoPopover 
-                                side="top" 
-                                align="center"
-                                className="h-4 w-4"
-                                iconClassName="h-2.5 w-2.5"
-                                contentClassName="w-64"
-                              >
-                                <div className="space-y-2">
-                                  <p className="font-medium">{habit.name}</p>
-                                  <p className="text-xs text-muted-foreground">{format(day, 'MMM d, yyyy')}</p>
-                                  <p className="text-sm">Rating: {rating}/5</p>
-                                  {notes && (
-                                    <div className="border-t pt-2 mt-2">
-                                      <p className="text-xs font-medium text-muted-foreground mb-1">Notes:</p>
-                                      <p className="text-sm whitespace-pre-wrap">{notes}</p>
-                                    </div>
-                                  )}
-                                </div>
-                              </InfoPopover>
-                            </div>
+                      const cellElement = (
+                        <div
+                          className={cn(
+                            "h-10 w-full rounded border border-border transition-colors aspect-square cursor-pointer",
+                            getRatingColor(rating),
+                            isSameDay(day, baseDate) && "ring-2 ring-primary ring-offset-1"
                           )}
+                        />
+                      );
+
+                      return hasContent ? (
+                        <InfoPopover 
+                          key={dayIndex}
+                          side="top" 
+                          align="center"
+                          contentClassName="w-64"
+                          trigger={cellElement}
+                        >
+                          <div className="space-y-2">
+                            <p className="font-medium">{habit.name}</p>
+                            <p className="text-xs text-muted-foreground">{format(day, 'MMM d, yyyy')}</p>
+                            <p className="text-sm">Rating: {rating}/5</p>
+                            {notes && (
+                              <div className="border-t pt-2 mt-2">
+                                <p className="text-xs font-medium text-muted-foreground mb-1">Notes:</p>
+                                <p className="text-sm whitespace-pre-wrap">{notes}</p>
+                              </div>
+                            )}
+                          </div>
+                        </InfoPopover>
+                      ) : (
+                        <div key={dayIndex}>
+                          {cellElement}
                         </div>
                       );
                     })}

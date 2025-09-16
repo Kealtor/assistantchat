@@ -12,6 +12,7 @@ interface InfoPopoverProps {
   contentClassName?: string;
   side?: "top" | "right" | "bottom" | "left";
   align?: "start" | "center" | "end";
+  trigger?: React.ReactNode; // New prop for custom trigger
 }
 
 export const InfoPopover = ({ 
@@ -20,35 +21,51 @@ export const InfoPopover = ({
   iconClassName,
   contentClassName,
   side = "top",
-  align = "center"
+  align = "center",
+  trigger
 }: InfoPopoverProps) => {
   const [open, setOpen] = React.useState(false);
   const isMobile = useIsMobile();
 
-  // For mobile, use popover. For desktop, keep existing behavior
-  if (!isMobile) {
-    return null; // Let existing tooltip behavior handle desktop
+  // For desktop, return null to let tooltips handle it
+  if (!isMobile && !trigger) {
+    return null;
   }
+
+  // If a custom trigger is provided, use it instead of the default info icon
+  const triggerElement = trigger ? (
+    <PopoverTrigger asChild>
+      <div onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(!open);
+      }}>
+        {trigger}
+      </div>
+    </PopoverTrigger>
+  ) : (
+    <PopoverTrigger asChild>
+      <Button
+        variant="ghost"
+        size="sm"
+        className={cn(
+          "h-5 w-5 p-0 hover:bg-accent/50 rounded-full inline-flex items-center justify-center",
+          className
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(!open);
+        }}
+      >
+        <Info className={cn("h-3 w-3 text-muted-foreground", iconClassName)} />
+      </Button>
+    </PopoverTrigger>
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn(
-            "h-5 w-5 p-0 hover:bg-accent/50 rounded-full inline-flex items-center justify-center",
-            className
-          )}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setOpen(!open);
-          }}
-        >
-          <Info className={cn("h-3 w-3 text-muted-foreground", iconClassName)} />
-        </Button>
-      </PopoverTrigger>
+      {triggerElement}
       <PopoverContent 
         side={side} 
         align={align}
