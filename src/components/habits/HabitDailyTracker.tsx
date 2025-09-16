@@ -6,6 +6,7 @@ import { Flame, Edit3, Check, X, Info } from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface HabitDailyTrackerProps {
@@ -98,22 +99,28 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
               // Mobile layout - vertical flow
               return (
                 <div key={habit.id} className="space-y-4 p-4 rounded-lg border border-border bg-card/50">
-                  {/* Mobile: Habit name with acceptance criteria tooltip */}
+                  {/* Mobile: Habit name with acceptance criteria info */}
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{habit.icon}</span>
                     <div className="flex items-center gap-2">
                       <h3 className="text-2xl font-semibold">{habit.name}</h3>
                       {habit.acceptance_criteria && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground">
-                              <Info className="h-4 w-4" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
+                        <>
+                          <InfoPopover side="bottom" align="start">
                             <p className="text-sm whitespace-pre-wrap">{habit.acceptance_criteria}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                          </InfoPopover>
+                          {/* Desktop tooltip fallback */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground hidden lg:block">
+                                <Info className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p className="text-sm whitespace-pre-wrap">{habit.acceptance_criteria}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </>
                       )}
                     </div>
                     {/* Streak data on far right for mobile */}
