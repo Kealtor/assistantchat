@@ -24,7 +24,8 @@ import {
   MoreVertical,
   Pin,
   Trash2,
-  MessageSquare
+  MessageSquare,
+  Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +57,7 @@ interface MobileChatHeaderProps {
   onWorkflowChange: (id: string) => void;
   chatSessions: ChatSession[];
   activeChatId: string | null;
+  onCreateNewChat: () => void;
   onSelectChat: (chatId: string) => void;
   onDeleteChat: (chatId: string) => void;
   onTogglePinChat: (chatId: string) => void;
@@ -68,6 +70,7 @@ export const MobileChatHeader = ({
   onWorkflowChange,
   chatSessions,
   activeChatId,
+  onCreateNewChat,
   onSelectChat,
   onDeleteChat,
   onTogglePinChat,
@@ -150,6 +153,12 @@ export const MobileChatHeader = ({
                     ))}
                   </SelectContent>
                 </Select>
+                
+                {/* New Chat Button */}
+                <Button className="w-full mt-4" size="sm" onClick={onCreateNewChat}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Chat
+                </Button>
               </div>
 
               {/* Chat History */}

@@ -165,6 +165,7 @@ export const ChatLayout = () => {
             onWorkflowChange={setActiveWorkflow}
             chatSessions={chatSessions}
             activeChatId={activeChatId}
+            onCreateNewChat={createNewChat}
             onSelectChat={selectChat}
             onDeleteChat={deleteChat}
             onTogglePinChat={togglePinChat}
