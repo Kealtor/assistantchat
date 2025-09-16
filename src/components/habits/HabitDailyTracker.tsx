@@ -13,9 +13,10 @@ interface HabitDailyTrackerProps {
   entries: HabitEntry[];
   onRatingUpdate: (habitId: string, date: string, rating: number) => void;
   onHabitUpdate: (habitId: string, updates: Partial<Habit>) => void;
+  onNotesUpdate: (habitId: string, date: string, notes: string) => void;
 }
 
-export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpdate }: HabitDailyTrackerProps) => {
+export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpdate, onNotesUpdate }: HabitDailyTrackerProps) => {
   const today = format(new Date(), 'yyyy-MM-dd');
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [tempNotes, setTempNotes] = useState<string>("");
@@ -24,6 +25,11 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
   const getTodayRating = (habitId: string): number => {
     const entry = entries.find(e => e.habit_id === habitId && e.entry_date === today);
     return entry?.rating || 0;
+  };
+
+  const getTodayNotes = (habitId: string): string => {
+    const entry = entries.find(e => e.habit_id === habitId && e.entry_date === today);
+    return entry?.notes || "";
   };
 
   const getHabitEntries = (habitId: string): HabitEntry[] => {
@@ -63,7 +69,7 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
   };
 
   const handleNotesSave = async (habitId: string) => {
-    await onHabitUpdate(habitId, { notes: tempNotes });
+    await onNotesUpdate(habitId, today, tempNotes);
     setEditingNotes(null);
     setTempNotes("");
   };
@@ -142,7 +148,7 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                       <div className="text-sm font-medium text-muted-foreground">Notes</div>
                       {editingNotes !== habit.id && (
                         <button
-                          onClick={() => handleNotesEdit(habit.id, habit.notes || "")}
+                          onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
                           className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
                         >
                           <Edit3 className="h-3 w-3" />
@@ -175,9 +181,9 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                       </div>
                     ) : (
                       <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
-                           onClick={() => handleNotesEdit(habit.id, habit.notes || "")}>
+                           onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
                         <div className="text-sm whitespace-pre-wrap">
-                          {habit.notes || "Click to add notes..."}
+                          {getTodayNotes(habit.id) || "Click to add notes for today..."}
                         </div>
                       </div>
                     )}
@@ -255,14 +261,14 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="text-sm font-medium text-muted-foreground">Notes</div>
-                      {editingNotes !== habit.id && (
-                        <button
-                          onClick={() => handleNotesEdit(habit.id, habit.notes || "")}
-                          className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
-                        >
-                          <Edit3 className="h-3 w-3" />
-                        </button>
-                      )}
+                    {editingNotes !== habit.id && (
+                      <button
+                        onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
+                        className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                      </button>
+                    )}
                     </div>
                     
                     {editingNotes === habit.id ? (
@@ -290,9 +296,9 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                       </div>
                     ) : (
                       <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
-                           onClick={() => handleNotesEdit(habit.id, habit.notes || "")}>
+                           onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
                         <div className="text-sm whitespace-pre-wrap">
-                          {habit.notes || "Click to add notes..."}
+                          {getTodayNotes(habit.id) || "Click to add notes for today..."}
                         </div>
                       </div>
                     )}

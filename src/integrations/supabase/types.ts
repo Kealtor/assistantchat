@@ -56,6 +56,7 @@ export type Database = {
           entry_date: string
           habit_id: string
           id: string
+          notes: string | null
           rating: number
           updated_at: string
           user_id: string
@@ -65,6 +66,7 @@ export type Database = {
           entry_date: string
           habit_id: string
           id?: string
+          notes?: string | null
           rating: number
           updated_at?: string
           user_id: string
@@ -74,6 +76,7 @@ export type Database = {
           entry_date?: string
           habit_id?: string
           id?: string
+          notes?: string | null
           rating?: number
           updated_at?: string
           user_id?: string

@@ -119,6 +119,42 @@ export const HabitsArea = () => {
     }
   };
 
+  const handleNotesUpdate = async (habitId: string, date: string, notes: string) => {
+    if (!user) return;
+    
+    const existingEntry = entries.find(e => e.habit_id === habitId && e.entry_date === date);
+    
+    if (existingEntry) {
+      // Update existing entry with notes
+      const entry = await habitService.upsertHabitEntry({
+        habit_id: habitId,
+        user_id: user.id,
+        entry_date: date,
+        rating: existingEntry.rating,
+        notes: notes
+      });
+      
+      if (entry) {
+        setEntries(prev => prev.map(e => 
+          e.habit_id === habitId && e.entry_date === date ? entry : e
+        ));
+      }
+    } else if (notes.trim()) {
+      // Create new entry with notes and rating 0
+      const entry = await habitService.upsertHabitEntry({
+        habit_id: habitId,
+        user_id: user.id,
+        entry_date: date,
+        rating: 0,
+        notes: notes
+      });
+      
+      if (entry) {
+        setEntries(prev => [...prev, entry]);
+      }
+    }
+  };
+
   const handleHabitCreate = async (habitData: any) => {
     if (!user) return;
     
@@ -197,6 +233,7 @@ export const HabitsArea = () => {
               entries={entries} 
               onRatingUpdate={handleRatingUpdate}
               onHabitUpdate={handleHabitUpdate}
+              onNotesUpdate={handleNotesUpdate}
             />
           
           {/* Progress Tracker - Below with full width */}
