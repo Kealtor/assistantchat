@@ -20,7 +20,7 @@ export const workflows: WorkflowConfig[] = [
     workflowName: "Duplicate",
     description: "General AI assistant for various tasks and conversations",
     webhookUrl: "https://n8n.kealtor.de/webhook/duplicate",
-    message:"Hey I'm your Duplicate. I'm going to repeat after you, but in an annoying way!",
+    message: "Hey I'm your Duplicate. I'm going to repeat after you, but in an annoying way!",
     emoji: "😘",
     color: "bg-primary"
   }
