@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from "react";
-import { ChatMessage } from "./ChatMessage";
-import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare } from "lucide-react";
-import { Message, ChatSession } from "@/services/chatService";
+import { ChatInput } from "./ChatInput";
+import { ChatMessage } from "./ChatMessage";
+import { Message, ChatSession, MediaAttachment } from "@/services/chatService";
+import { useState, useEffect, useRef } from "react";
 import { getWorkflowByName } from "@/config/workflows.config";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
+import { MessageSquare } from "lucide-react";
 
 interface ChatAreaProps {
   workflow: string;
@@ -15,7 +15,6 @@ interface ChatAreaProps {
 
 export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   
   const workflowConfig = getWorkflowByName(workflow);
   
@@ -35,7 +34,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, media?: MediaAttachment[]) => {
     if (!chatSession) return;
 
     const userMessage: Message = {
@@ -43,6 +42,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       role: "user",
       content,
       timestamp: new Date(),
+      media
     };
 
     const updatedMessages = [...messages, userMessage];
