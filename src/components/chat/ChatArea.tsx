@@ -64,7 +64,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
 
       // Prepare the webhook payload
       const payload = {
-        message: content,
+        message: content || " ",
         workflow: workflow,
         chatId: chatSession.id,
         userId: chatSession.user_id,
