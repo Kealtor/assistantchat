@@ -162,8 +162,8 @@ export const MobileChatHeader = ({
               </div>
 
               {/* Chat History */}
-              <div className="flex-1 overflow-hidden">
-                <div className="p-4 pb-2">
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="p-4 pb-2 flex-shrink-0">
                   <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
                     Recent Chats
                   </h3>
