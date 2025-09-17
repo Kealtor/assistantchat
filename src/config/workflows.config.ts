@@ -13,6 +13,13 @@ export const workflows: WorkflowConfig[] = [
     webhookUrl: "https://n8n.kealtor.de/webhook/assistant",
     emoji: "🤖",
     color: "bg-primary"
+  },
+  {
+    workflowName: "Duplicate",
+    description: "General AI assistant for various tasks and conversations",
+    webhookUrl: "https://n8n.kealtor.de/webhook/duplicate",
+    emoji: "😘",
+    color: "bg-primary"
   }
 ];
 
