@@ -234,7 +234,7 @@ export const ChatLayout = () => {
             </div>
             <div>
               <h1 className="font-semibold text-lg">{currentWorkflow?.name}</h1>
-              <p className="text-muted-foreground text-sm">AI-powered workflow assistant</p>
+              <p className="text-muted-foreground text-sm">{currentWorkflow?.description}</p>
             </div>
           </div>
           

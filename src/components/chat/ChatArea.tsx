@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from "react";
-import { ChatMessage } from "./ChatMessage";
-import { ChatInput } from "./ChatInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare } from "lucide-react";
-import { Message, ChatSession } from "@/services/chatService";
+import { ChatInput } from "./ChatInput";
+import { ChatMessage } from "./ChatMessage";
+import { Message, ChatSession, MediaAttachment } from "@/services/chatService";
+import { useState, useEffect, useRef } from "react";
 import { getWorkflowByName } from "@/config/workflows.config";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
+import { MessageSquare } from "lucide-react";
 
 interface ChatAreaProps {
   workflow: string;
@@ -15,7 +15,8 @@ interface ChatAreaProps {
 
 export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  
+  const workflowConfig = getWorkflowByName(workflow);
   
   const messages = chatSession?.messages || [];
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -33,7 +34,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, media?: MediaAttachment[]) => {
     if (!chatSession) return;
 
     const userMessage: Message = {
@@ -41,6 +42,7 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       role: "user",
       content,
       timestamp: new Date(),
+      media
     };
 
     const updatedMessages = [...messages, userMessage];
@@ -62,15 +64,17 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
 
       // Prepare the webhook payload
       const payload = {
-        message: content,
+        message: content || " ",
         workflow: workflow,
         chatId: chatSession.id,
         userId: chatSession.user_id,
         timestamp: new Date().toISOString(),
+        media: media || [],
         messageHistory: messages.map(msg => ({
           role: msg.role,
           content: msg.content,
-          timestamp: msg.timestamp.toISOString()
+          timestamp: msg.timestamp.toISOString(),
+          media: msg.media || []
         }))
       };
 
@@ -165,7 +169,9 @@ return (
           {messages.length === 0 && (
             <div className="flex justify-start">
               <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs">
-                <p className="text-sm">Hello! I'm your AI assistant. How can I help you today?</p>
+                <p className="text-sm whitespace-pre-line">
+                  {workflowConfig?.message || "Hello! I'm your AI assistant. How can I help you today?"}
+                </p>
               </div>
             </div>
           )}
