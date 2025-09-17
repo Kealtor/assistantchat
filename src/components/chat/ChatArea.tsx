@@ -69,10 +69,12 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
         chatId: chatSession.id,
         userId: chatSession.user_id,
         timestamp: new Date().toISOString(),
+        media: media || [],
         messageHistory: messages.map(msg => ({
           role: msg.role,
           content: msg.content,
-          timestamp: msg.timestamp.toISOString()
+          timestamp: msg.timestamp.toISOString(),
+          media: msg.media || []
         }))
       };
 
