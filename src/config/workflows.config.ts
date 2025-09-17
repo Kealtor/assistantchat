@@ -11,6 +11,7 @@ export const workflows: WorkflowConfig[] = [
     workflowName: "assistant",
     description: "General AI assistant for various tasks and conversations",
     webhookUrl: "https://n8n.kealtor.de/webhook/assistant",
+    message: "Hey there, I'm your helpful AI-Assistant. How can i help you? \n Heres a helpful prompting template \n Imagine you are a helpful [role] \n Your task is to [task] \n I expect am output like this: [Output] \n Here are some constraints: [constraints]\n
     emoji: "🤖",
     color: "bg-primary"
   },
