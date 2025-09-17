@@ -17,6 +17,8 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
+  const workflowConfig = getWorkflowByName(workflow);
+  
   const messages = chatSession?.messages || [];
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -165,7 +167,9 @@ return (
           {messages.length === 0 && (
             <div className="flex justify-start">
               <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs">
-                <p className="text-sm">Hello! I'm your AI assistant. How can I help you today?</p>
+                <p className="text-sm whitespace-pre-line">
+                  {workflowConfig?.message || "Hello! I'm your AI assistant. How can I help you today?"}
+                </p>
               </div>
             </div>
           )}

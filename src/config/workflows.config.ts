@@ -2,6 +2,7 @@ export interface WorkflowConfig {
   workflowName: string;
   description: string;
   webhookUrl: string;
+  message?: string;
   emoji: string;
   color: string;
 }
