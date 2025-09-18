@@ -5,6 +5,8 @@ import { Send, Paperclip, Smile, Upload, X } from "lucide-react";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { MediaAttachment } from "@/services/chatService";
 import { Progress } from "@/components/ui/progress";
+import { VoiceRecorder } from "./VoiceRecorder";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 
 interface ChatInputProps {
   onSendMessage: (content: string, media?: MediaAttachment[]) => void;
@@ -18,10 +20,11 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadFiles, uploading, uploadProgress } = useFileUpload();
+  const { isRecording } = useVoiceRecording();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((message.trim() || selectedFiles.length > 0) && !disabled && !uploading) {
+    if ((message.trim() || selectedFiles.length > 0) && !disabled && !uploading && !isRecording) {
       let media: MediaAttachment[] = [];
       
       // Upload files if any are selected
@@ -39,8 +42,12 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
     }
   };
 
+  const handleSendVoiceNote = (media: MediaAttachment) => {
+    onSendMessage("", [media]);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey && !uploading) {
+    if (e.key === "Enter" && !e.shiftKey && !uploading && !isRecording) {
       e.preventDefault();
       handleSubmit(e);
     }
@@ -147,6 +154,12 @@ return (
         </div>
       )}
 
+      {/* Voice Recorder */}
+      <VoiceRecorder 
+        onSendVoiceNote={handleSendVoiceNote}
+        disabled={disabled || uploading}
+      />
+
       <form onSubmit={handleSubmit} className="relative">
         <div className="flex items-end space-x-2 md:space-x-3 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
           {/* File Input */}
@@ -165,7 +178,7 @@ return (
             variant="ghost"
             size="sm"
             className="flex flex-shrink-0 h-8 w-8 p-0"
-            disabled={disabled || uploading}
+            disabled={disabled || uploading || isRecording}
             onClick={() => fileInputRef.current?.click()}
           >
             <Paperclip className="h-4 w-4" />
@@ -178,8 +191,8 @@ return (
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
-            disabled={disabled}
+            placeholder={isRecording ? "Recording voice note..." : "Type your message..."}
+            disabled={disabled || isRecording}
             className="min-h-[2.5rem] max-h-32 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base"
             rows={1}
           />
@@ -205,7 +218,7 @@ return (
           <Button
             type="submit"
             size="sm"
-            disabled={(!message.trim() && selectedFiles.length === 0) || disabled || uploading}
+            disabled={(!message.trim() && selectedFiles.length === 0) || disabled || uploading || isRecording}
             className="flex-shrink-0 h-touch min-w-touch p-0"
           >
             <Send className="h-4 w-4" />
