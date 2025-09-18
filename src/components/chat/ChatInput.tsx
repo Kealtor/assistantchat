@@ -19,6 +19,7 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showAudioPreview, setShowAudioPreview] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadFiles, uploading, uploadProgress } = useFileUpload();
@@ -52,20 +53,42 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
   };
 
   const handleVoiceRecording = async () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
+    if (recording) {
+      deleteRecording();
+      setShowAudioPreview(false);
+    }
+    await startRecording();
+  };
+
+  const handleStopRecording = () => {
+    stopRecording();
+  };
+
+  const handleSendDuringRecording = async () => {
+    stopRecording();
+    // Wait for recording to be processed, then send immediately
+    setTimeout(() => {
       if (recording) {
-        deleteRecording();
+        handleSendVoiceNote();
       }
-      await startRecording();
+    }, 100);
+  };
+
+  const handleSendAudioPreview = () => {
+    if (recording) {
+      handleSendVoiceNote();
     }
   };
 
-  // Auto-send voice note when recording stops
+  const handleDeleteAudioPreview = () => {
+    deleteRecording();
+    setShowAudioPreview(false);
+  };
+
+  // Handle recording completion
   useEffect(() => {
     if (recording && !isRecording) {
-      handleSendVoiceNote();
+      setShowAudioPreview(true);
     }
   }, [recording, isRecording]);
 
@@ -89,6 +112,7 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
 
       onSendMessage("", [mediaAttachment]);
       deleteRecording();
+      setShowAudioPreview(false);
       
       toast({
         title: "Voice note sent!",
@@ -224,6 +248,37 @@ return (
         </div>
       )}
 
+      {/* Audio Preview */}
+      {showAudioPreview && recording && (
+        <div className="mb-3 p-3 bg-muted rounded-lg">
+          <div className="flex items-center gap-3">
+            <audio
+              controls
+              src={recording.url}
+              className="flex-1"
+              preload="metadata"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDeleteAudioPreview}
+              disabled={isUploading}
+            >
+              🗑️
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleSendAudioPreview}
+              disabled={isUploading}
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="relative">
         <div className="flex items-end space-x-2 md:space-x-3 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
           {/* File Input */}
@@ -278,8 +333,8 @@ return (
           <Smile className="h-4 w-4" />
         </Button>
 
-          {/* Send/Voice Button */}
-          {message.trim() || selectedFiles.length > 0 ? (
+          {/* Send/Voice/Stop Buttons */}
+          {message.trim() || selectedFiles.length > 0 || showAudioPreview ? (
             <Button
               type="submit"
               size="sm"
@@ -288,21 +343,36 @@ return (
             >
               <Send className="h-4 w-4" />
             </Button>
+          ) : isRecording ? (
+            <>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSendDuringRecording}
+                disabled={disabled || uploading || isUploading}
+                className="flex-shrink-0 h-touch min-w-touch p-0"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleStopRecording}
+                disabled={disabled || uploading || isUploading}
+                className="flex-shrink-0 h-touch min-w-touch p-0 bg-red-500 hover:bg-red-600 text-white ml-2"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            </>
           ) : (
             <Button
               type="button"
               size="sm"
               onClick={handleVoiceRecording}
               disabled={disabled || uploading || isUploading}
-              className={`flex-shrink-0 h-touch min-w-touch p-0 ${
-                isRecording ? 'bg-red-500 hover:bg-red-600 text-white' : ''
-              }`}
+              className="flex-shrink-0 h-touch min-w-touch p-0"
             >
-              {isRecording ? (
-                <Square className="h-4 w-4" />
-              ) : (
-                <Mic className="h-4 w-4" />
-              )}
+              <Mic className="h-4 w-4" />
             </Button>
           )}
         </div>
