@@ -164,7 +164,7 @@ return (
             type="button"
             variant="ghost"
             size="sm"
-            className="hidden sm:flex flex-shrink-0 h-8 w-8 p-0"
+            className="flex flex-shrink-0 h-8 w-8 p-0"
             disabled={disabled || uploading}
             onClick={() => fileInputRef.current?.click()}
           >
