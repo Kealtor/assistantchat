@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -77,6 +77,21 @@ export const MobileChatHeader = ({
   onSignOut,
 }: MobileChatHeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Prevent autofocus when sheet opens
+  useEffect(() => {
+    if (sheetOpen) {
+      // Delay to ensure the sheet has opened, then blur any focused input
+      const timer = setTimeout(() => {
+        const activeElement = document.activeElement as HTMLElement;
+        if (activeElement && activeElement.tagName === 'INPUT') {
+          activeElement.blur();
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [sheetOpen]);
   
   const currentWorkflow = workflows.find(w => w.id === activeWorkflow);
   const activeChat = activeChatId ? chatSessions.find(chat => chat.id === activeChatId) : null;
@@ -111,7 +126,7 @@ export const MobileChatHeader = ({
   return (
     <header className="sticky top-0 z-40 bg-card border-b border-border md:hidden">
       <div className="flex items-center justify-between px-4 py-3">
-        <Sheet>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
               <Menu className="h-5 w-5" />
@@ -131,6 +146,7 @@ export const MobileChatHeader = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
+                    autoFocus={false}
                   />
                 </div>
 
@@ -174,7 +190,10 @@ export const MobileChatHeader = ({
                       filteredHistory.map((chat) => (
                         <div
                           key={chat.id}
-                          onClick={() => onSelectChat(chat.id)}
+                          onClick={() => {
+                            onSelectChat(chat.id);
+                            setSheetOpen(false);
+                          }}
                           className={cn(
                             "group flex items-start p-3 hover:bg-accent rounded-md cursor-pointer transition-colors",
                             activeChatId === chat.id && "bg-accent"

@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Paperclip, Smile, Upload, X } from "lucide-react";
+import { Send, Paperclip, Smile, Upload, X, Mic, Square } from "lucide-react";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { MediaAttachment } from "@/services/chatService";
 import { Progress } from "@/components/ui/progress";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
+import { VoiceUploadService } from "@/services/voiceUploadService";
+import { toast } from "@/hooks/use-toast";
 
 interface ChatInputProps {
   onSendMessage: (content: string, media?: MediaAttachment[]) => void;
@@ -15,13 +18,31 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showAudioPreview, setShowAudioPreview] = useState(false);
+  const [shouldSendImmediately, setShouldSendImmediately] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadFiles, uploading, uploadProgress } = useFileUpload();
+  const { 
+    isRecording, 
+    recording, 
+    startRecording, 
+    stopRecording, 
+    deleteRecording,
+    recordingTime 
+  } = useVoiceRecording();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((message.trim() || selectedFiles.length > 0) && !disabled && !uploading) {
+    
+    // If there's an audio preview, send it
+    if (showAudioPreview && recording) {
+      handleSendVoiceNote();
+      return;
+    }
+    
+    if ((message.trim() || selectedFiles.length > 0) && !disabled && !uploading && !isRecording) {
       let media: MediaAttachment[] = [];
       
       // Upload files if any are selected
@@ -39,8 +60,89 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
     }
   };
 
+  const handleVoiceRecording = async () => {
+    if (recording) {
+      deleteRecording();
+      setShowAudioPreview(false);
+    }
+    await startRecording();
+  };
+
+  const handleStopRecording = () => {
+    stopRecording();
+  };
+
+  const handleSendDuringRecording = async () => {
+    // Stop recording and send immediately without preview
+    setShouldSendImmediately(true);
+    stopRecording();
+  };
+
+  const handleSendAudioPreview = () => {
+    if (recording) {
+      handleSendVoiceNote();
+    }
+  };
+
+  const handleDeleteAudioPreview = () => {
+    deleteRecording();
+    setShowAudioPreview(false);
+  };
+
+  // Handle recording completion
+  useEffect(() => {
+    if (recording && !isRecording) {
+      if (shouldSendImmediately) {
+        // Send immediately without showing preview
+        handleSendVoiceNote();
+        setShouldSendImmediately(false);
+      } else {
+        // Show preview for user to review
+        setShowAudioPreview(true);
+      }
+    }
+  }, [recording, isRecording, shouldSendImmediately]);
+
+  const handleSendVoiceNote = async () => {
+    if (!recording) return;
+
+    setIsUploading(true);
+    try {
+      // Get the current user ID
+      const { configurableSupabase } = await import("@/lib/supabase-client");
+      const { data: { user } } = await configurableSupabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      const mediaAttachment = await VoiceUploadService.uploadVoiceNote(
+        recording.blob,
+        user.id,
+        recording.duration
+      );
+
+      onSendMessage("", [mediaAttachment]);
+      deleteRecording();
+      setShowAudioPreview(false);
+      
+      toast({
+        title: "Voice note sent!",
+        description: "Your voice note has been uploaded and sent."
+      });
+    } catch (error) {
+      console.error('Error uploading voice note:', error);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload voice note",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey && !uploading) {
+    if (e.key === "Enter" && !e.shiftKey && !uploading && !isRecording) {
       e.preventDefault();
       handleSubmit(e);
     }
@@ -147,6 +249,39 @@ return (
         </div>
       )}
 
+      {/* Recording Status */}
+      {isRecording && (
+        <div className="mb-3 p-3 bg-muted rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            Recording voice note... {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
+          </div>
+        </div>
+      )}
+
+      {/* Audio Preview */}
+      {showAudioPreview && recording && (
+        <div className="mb-3 p-3 bg-muted rounded-lg">
+          <div className="flex items-center gap-3">
+            <audio
+              controls
+              src={recording.url}
+              className="flex-1"
+              preload="metadata"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDeleteAudioPreview}
+              disabled={isUploading}
+            >
+              🗑️
+            </Button>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="relative">
         <div className="flex items-end space-x-2 md:space-x-3 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
           {/* File Input */}
@@ -164,8 +299,8 @@ return (
             type="button"
             variant="ghost"
             size="sm"
-            className="hidden sm:flex flex-shrink-0 h-8 w-8 p-0"
-            disabled={disabled || uploading}
+            className="flex flex-shrink-0 h-8 w-8 p-0"
+            disabled={disabled || uploading || isRecording}
             onClick={() => fileInputRef.current?.click()}
           >
             <Paperclip className="h-4 w-4" />
@@ -178,8 +313,8 @@ return (
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
-            disabled={disabled}
+            placeholder={isRecording ? "Recording voice note..." : "Type your message..."}
+            disabled={disabled || isRecording}
             className="min-h-[2.5rem] max-h-32 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base"
             rows={1}
           />
@@ -201,15 +336,48 @@ return (
           <Smile className="h-4 w-4" />
         </Button>
 
-          {/* Send Button */}
-          <Button
-            type="submit"
-            size="sm"
-            disabled={(!message.trim() && selectedFiles.length === 0) || disabled || uploading}
-            className="flex-shrink-0 h-touch min-w-touch p-0"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
+          {/* Send/Voice/Stop Buttons */}
+          {isRecording ? (
+            <>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleStopRecording}
+                disabled={disabled || uploading || isUploading}
+                className="flex-shrink-0 h-touch min-w-touch p-0 bg-red-500 hover:bg-red-600 text-white"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSendDuringRecording}
+                disabled={disabled || uploading || isUploading}
+                className="flex-shrink-0 h-touch min-w-touch p-0"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </>
+          ) : message.trim() || selectedFiles.length > 0 || showAudioPreview ? (
+            <Button
+              type="submit"
+              size="sm"
+              disabled={disabled || uploading || isUploading}
+              className="flex-shrink-0 h-touch min-w-touch p-0"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleVoiceRecording}
+              disabled={disabled || uploading || isUploading}
+              className="flex-shrink-0 h-touch min-w-touch p-0"
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
         {/* Input Tips - Only on desktop */}
