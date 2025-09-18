@@ -34,6 +34,13 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // If there's an audio preview, send it
+    if (showAudioPreview && recording) {
+      handleSendVoiceNote();
+      return;
+    }
+    
     if ((message.trim() || selectedFiles.length > 0) && !disabled && !uploading && !isRecording) {
       let media: MediaAttachment[] = [];
       
@@ -65,13 +72,11 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
   };
 
   const handleSendDuringRecording = async () => {
+    // Stop recording and send immediately without preview
     stopRecording();
-    // Wait for recording to be processed, then send immediately
-    setTimeout(() => {
-      if (recording) {
-        handleSendVoiceNote();
-      }
-    }, 100);
+    if (recording) {
+      await handleSendVoiceNote();
+    }
   };
 
   const handleSendAudioPreview = () => {
@@ -267,14 +272,6 @@ return (
             >
               🗑️
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleSendAudioPreview}
-              disabled={isUploading}
-            >
-              <Send className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       )}
@@ -334,17 +331,17 @@ return (
         </Button>
 
           {/* Send/Voice/Stop Buttons */}
-          {message.trim() || selectedFiles.length > 0 || showAudioPreview ? (
-            <Button
-              type="submit"
-              size="sm"
-              disabled={disabled || uploading || isRecording || isUploading}
-              className="flex-shrink-0 h-touch min-w-touch p-0"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          ) : isRecording ? (
+          {isRecording ? (
             <>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleStopRecording}
+                disabled={disabled || uploading || isUploading}
+                className="flex-shrink-0 h-touch min-w-touch p-0 bg-red-500 hover:bg-red-600 text-white"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
               <Button
                 type="button"
                 size="sm"
@@ -354,16 +351,16 @@ return (
               >
                 <Send className="h-4 w-4" />
               </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleStopRecording}
-                disabled={disabled || uploading || isUploading}
-                className="flex-shrink-0 h-touch min-w-touch p-0 bg-red-500 hover:bg-red-600 text-white ml-2"
-              >
-                <Square className="h-4 w-4" />
-              </Button>
             </>
+          ) : message.trim() || selectedFiles.length > 0 || showAudioPreview ? (
+            <Button
+              type="submit"
+              size="sm"
+              disabled={disabled || uploading || isUploading}
+              className="flex-shrink-0 h-touch min-w-touch p-0"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           ) : (
             <Button
               type="button"
