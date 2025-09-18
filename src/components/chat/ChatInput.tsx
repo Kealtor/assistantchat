@@ -20,6 +20,7 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showAudioPreview, setShowAudioPreview] = useState(false);
+  const [shouldSendImmediately, setShouldSendImmediately] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadFiles, uploading, uploadProgress } = useFileUpload();
@@ -73,10 +74,8 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
 
   const handleSendDuringRecording = async () => {
     // Stop recording and send immediately without preview
+    setShouldSendImmediately(true);
     stopRecording();
-    if (recording) {
-      await handleSendVoiceNote();
-    }
   };
 
   const handleSendAudioPreview = () => {
@@ -93,9 +92,16 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
   // Handle recording completion
   useEffect(() => {
     if (recording && !isRecording) {
-      setShowAudioPreview(true);
+      if (shouldSendImmediately) {
+        // Send immediately without showing preview
+        handleSendVoiceNote();
+        setShouldSendImmediately(false);
+      } else {
+        // Show preview for user to review
+        setShowAudioPreview(true);
+      }
     }
-  }, [recording, isRecording]);
+  }, [recording, isRecording, shouldSendImmediately]);
 
   const handleSendVoiceNote = async () => {
     if (!recording) return;
