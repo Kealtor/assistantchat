@@ -7,6 +7,7 @@ export type JournalEntry = {
   content: string;
   mood?: number;
   tags: string[];
+  images: string[];
   created_at: Date;
   updated_at: Date;
 };
@@ -17,12 +18,14 @@ export type CreateJournalEntryData = {
   content: string;
   mood?: number;
   tags?: string[];
+  images?: string[];
 };
 
 export type UpdateJournalEntryData = {
   content?: string;
   mood?: number;
   tags?: string[];
+  images?: string[];
 };
 
 export const journalService = {
@@ -47,6 +50,7 @@ export const journalService = {
         content: entry.content,
         mood: entry.mood || undefined,
         tags: entry.tags || [],
+        images: entry.images || [],
         created_at: new Date(entry.created_at),
         updated_at: new Date(entry.updated_at)
       }));
@@ -82,6 +86,7 @@ export const journalService = {
         content: entry.content,
         mood: entry.mood || undefined,
         tags: entry.tags || [],
+        images: entry.images || [],
         created_at: new Date(entry.created_at),
         updated_at: new Date(entry.updated_at)
       };
@@ -101,7 +106,8 @@ export const journalService = {
           entry_date: data.entry_date,
           content: data.content,
           mood: data.mood,
-          tags: data.tags || []
+          tags: data.tags || [],
+          images: data.images || []
         })
         .select()
         .single();
@@ -118,6 +124,7 @@ export const journalService = {
         content: entry.content,
         mood: entry.mood || undefined,
         tags: entry.tags || [],
+        images: entry.images || [],
         created_at: new Date(entry.created_at),
         updated_at: new Date(entry.updated_at)
       };
@@ -135,7 +142,8 @@ export const journalService = {
         .update({
           content: data.content,
           mood: data.mood,
-          tags: data.tags || []
+          tags: data.tags || [],
+          images: data.images
         })
         .eq('id', entryId)
         .select()
@@ -153,6 +161,7 @@ export const journalService = {
         content: entry.content,
         mood: entry.mood || undefined,
         tags: entry.tags || [],
+        images: entry.images || [],
         created_at: new Date(entry.created_at),
         updated_at: new Date(entry.updated_at)
       };

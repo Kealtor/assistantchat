@@ -136,6 +136,7 @@ export type Database = {
           created_at: string
           entry_date: string
           id: string
+          images: string[] | null
           mood: number | null
           tags: string[] | null
           updated_at: string
@@ -146,6 +147,7 @@ export type Database = {
           created_at?: string
           entry_date: string
           id?: string
+          images?: string[] | null
           mood?: number | null
           tags?: string[] | null
           updated_at?: string
@@ -156,6 +158,7 @@ export type Database = {
           created_at?: string
           entry_date?: string
           id?: string
+          images?: string[] | null
           mood?: number | null
           tags?: string[] | null
           updated_at?: string
