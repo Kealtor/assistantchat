@@ -14,7 +14,6 @@ export type Message = {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
-  media?: MediaAttachment[];
 };
 
 export type ChatSession = {
@@ -23,6 +22,7 @@ export type ChatSession = {
   workflow: string;
   chat_type: string;
   messages: Message[];
+  media: MediaAttachment[];
   created_at: Date;
   updated_at: Date;
   user_id: string;
@@ -39,6 +39,7 @@ export type CreateChatData = {
 export type UpdateChatData = {
   title?: string;
   messages?: Message[];
+  media?: MediaAttachment[];
   pinned?: boolean;
 };
 
@@ -53,7 +54,8 @@ export const chatService = {
           workflow: data.workflow,
           chat_type: data.chat_type,
           user_id: data.user_id,
-          messages: []
+          messages: [],
+          media: []
         })
         .select()
         .single();
@@ -69,6 +71,7 @@ export const chatService = {
         workflow: chat.workflow,
         chat_type: chat.chat_type,
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
+        media: Array.isArray(chat.media) ? (chat.media as unknown as MediaAttachment[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
         user_id: chat.user_id,
@@ -100,6 +103,7 @@ export const chatService = {
         workflow: chat.workflow,
         chat_type: chat.chat_type,
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
+        media: Array.isArray(chat.media) ? (chat.media as unknown as MediaAttachment[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
         user_id: chat.user_id,
@@ -124,6 +128,10 @@ export const chatService = {
         updateData.messages = updates.messages;
       }
 
+      if (updates.media !== undefined) {
+        updateData.media = updates.media;
+      }
+
       if (updates.pinned !== undefined) {
         updateData.pinned = updates.pinned;
       }
@@ -146,6 +154,7 @@ export const chatService = {
         workflow: chat.workflow,
         chat_type: chat.chat_type,
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
+        media: Array.isArray(chat.media) ? (chat.media as unknown as MediaAttachment[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
         user_id: chat.user_id,
@@ -197,6 +206,7 @@ export const chatService = {
         workflow: chat.workflow,
         chat_type: chat.chat_type,
         messages: Array.isArray(chat.messages) ? (chat.messages as unknown as Message[]) : [],
+        media: Array.isArray(chat.media) ? (chat.media as unknown as MediaAttachment[]) : [],
         created_at: new Date(chat.created_at),
         updated_at: new Date(chat.updated_at),
         user_id: chat.user_id,

@@ -9,9 +9,10 @@ import { MediaAttachment, Message } from "@/services/chatService";
 
 interface ChatMessageProps {
   message: Message;
+  media?: MediaAttachment[];
 }
 
-export const ChatMessage = ({ message }: ChatMessageProps) => {
+export const ChatMessage = ({ message, media }: ChatMessageProps) => {
   const isUser = message.role === "user";
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
 
@@ -147,9 +148,9 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
             )}
             
             {/* Render media attachments */}
-            {message.media && message.media.length > 0 && (
+            {media && media.length > 0 && (
               <div className="space-y-2">
-                {message.media.map((media, index) => renderMediaAttachment(media, index))}
+                {media.map((mediaItem, index) => renderMediaAttachment(mediaItem, index))}
               </div>
             )}
           </div>

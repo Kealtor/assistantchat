@@ -10,7 +10,7 @@ import { MessageSquare } from "lucide-react";
 interface ChatAreaProps {
   workflow: string;
   chatSession: ChatSession | null;
-  onUpdateChat: (chatId: string, updates: { messages?: Message[], title?: string }) => void;
+  onUpdateChat: (chatId: string, updates: { messages?: Message[], media?: MediaAttachment[], title?: string }) => void;
 }
 
 export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
@@ -42,14 +42,15 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       role: "user",
       content,
       timestamp: new Date(),
-      media
     };
 
     const updatedMessages = [...messages, userMessage];
+    const updatedMedia = media ? [...(chatSession.media || []), ...media] : chatSession.media || [];
     const newTitle = updatedMessages.length === 1 ? String(content).slice(0, 50) + (String(content).length > 50 ? '...' : '') : chatSession.title;
     
     onUpdateChat(chatSession.id, { 
       messages: updatedMessages,
+      media: updatedMedia,
       title: newTitle
     });
     
@@ -175,9 +176,14 @@ return (
               </div>
             </div>
           )}
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
+          {messages.map((message, index) => {
+            // Get media for this message - for now, just show all media on user messages
+            // In a more sophisticated implementation, you'd need to track which media belongs to which message
+            const messageMedia = message.role === "user" && index === messages.length - 1 ? chatSession?.media || [] : [];
+            return (
+              <ChatMessage key={message.id} message={message} media={messageMedia} />
+            );
+          })}
           {isLoading && (
             <div className="flex justify-start">
               <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs animate-pulse">
