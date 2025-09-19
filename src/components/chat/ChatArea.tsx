@@ -195,7 +195,7 @@ return (
       {/* Input Area */}
       <div className="border-t border-border bg-card p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
+          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} chatId={chatSession.id} />
         </div>
       </div>
     </div>

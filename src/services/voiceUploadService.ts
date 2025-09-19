@@ -5,14 +5,14 @@ export class VoiceUploadService {
   private static readonly BUCKET_NAME = 'voice-notes';
   private static readonly MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB for voice notes
 
-  static async uploadVoiceNote(blob: Blob, userId: string, duration: number): Promise<MediaAttachment> {
+  static async uploadVoiceNote(blob: Blob, userId: string, chatId: string, duration: number): Promise<MediaAttachment> {
     if (blob.size > this.MAX_FILE_SIZE) {
       throw new Error('Voice note size must be less than 50MB');
     }
 
     const timestamp = new Date().getTime();
     const fileName = `voice-${timestamp}.webm`;
-    const filePath = `${userId}/${fileName}`;
+    const filePath = `${userId}/${chatId}/${fileName}`;
 
     // Convert blob to file
     const file = new File([blob], fileName, { type: blob.type });
@@ -42,7 +42,9 @@ export class VoiceUploadService {
       url: urlData.signedUrl,
       name: `Voice Note (${this.formatDuration(duration)})`,
       type: blob.type,
-      size: blob.size
+      size: blob.size,
+      bucket: this.BUCKET_NAME,
+      filename: fileName
     };
   }
 

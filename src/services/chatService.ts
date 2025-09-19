@@ -5,6 +5,8 @@ export type MediaAttachment = {
   name: string;
   type: string;
   size: number;
+  bucket: string;
+  filename: string;
 };
 
 export type Message = {
