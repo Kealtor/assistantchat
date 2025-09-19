@@ -42,10 +42,18 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       role: "user",
       content,
       timestamp: new Date(),
+      mediaIds: media ? media.map((_, index) => `${Date.now()}-${index}`) : undefined
     };
 
     const updatedMessages = [...messages, userMessage];
-    const updatedMedia = media ? [...(chatSession.media || []), ...media] : chatSession.media || [];
+    
+    // Add media with unique IDs that match the message references
+    const newMediaWithIds = media ? media.map((mediaItem, index) => ({
+      ...mediaItem,
+      id: `${Date.now()}-${index}`
+    })) : [];
+    
+    const updatedMedia = [...(chatSession.media || []), ...newMediaWithIds];
     const newTitle = updatedMessages.length === 1 ? String(content).slice(0, 50) + (String(content).length > 50 ? '...' : '') : chatSession.title;
     
     onUpdateChat(chatSession.id, { 
@@ -176,10 +184,12 @@ return (
               </div>
             </div>
           )}
-          {messages.map((message, index) => {
-            // Get media for this message - for now, just show all media on user messages
-            // In a more sophisticated implementation, you'd need to track which media belongs to which message
-            const messageMedia = message.role === "user" && index === messages.length - 1 ? chatSession?.media || [] : [];
+          {messages.map((message) => {
+            // Get media for this message based on mediaIds
+            const messageMedia = message.mediaIds ? 
+              (chatSession?.media || []).filter(media => 
+                message.mediaIds?.includes((media as any).id)
+              ) : [];
             return (
               <ChatMessage key={message.id} message={message} media={messageMedia} />
             );

@@ -1,6 +1,7 @@
 import { configurableSupabase as supabase } from "@/lib/supabase-client";
 
 export type MediaAttachment = {
+  id?: string;
   url: string;
   name: string;
   type: string;
@@ -14,6 +15,7 @@ export type Message = {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  mediaIds?: string[]; // Reference to media by their indices in the chat media array
 };
 
 export type ChatSession = {
