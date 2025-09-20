@@ -3,8 +3,10 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 import { Message, ChatSession, MediaAttachment } from "@/services/chatService";
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { getWorkflowByName } from "@/config/workflows.config";
 import { toast } from "@/hooks/use-toast";
+import { getActiveInstance } from "@/config/supabase-instances";
 import { MessageSquare } from "lucide-react";
 
 interface ChatAreaProps {
@@ -71,6 +73,9 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
         throw new Error(`Workflow '${workflow}' not found in configuration`);
       }
 
+      // Get active Supabase instance info
+      const activeInstance = getActiveInstance();
+      
       // Prepare the webhook payload
       const payload = {
         message: content || " ",
@@ -79,6 +84,13 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
         userId: chatSession.user_id,
         timestamp: new Date().toISOString(),
         media: media || [],
+        // Supabase instance and execution context
+        supabaseInstance: {
+          name: activeInstance.name,
+          url: activeInstance.url,
+          description: activeInstance.description
+        },
+        executionMode: process.env.NODE_ENV || 'development',
         // messageHistory: messages.map(msg => ({
         //  role: msg.role,
         //  content: msg.content,
