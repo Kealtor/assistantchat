@@ -15,7 +15,7 @@ export const useFileUpload = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 
-  const uploadFiles = useCallback(async (files: File[]): Promise<MediaAttachment[]> => {
+  const uploadFiles = useCallback(async (files: File[], chatId: string): Promise<MediaAttachment[]> => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -50,7 +50,7 @@ export const useFileUpload = () => {
             )
           );
 
-          const result = await FileUploadService.uploadFile(file, user.id);
+          const result = await FileUploadService.uploadFile(file, user.id, chatId);
           uploadedFiles.push(result);
 
           // Update progress to completed

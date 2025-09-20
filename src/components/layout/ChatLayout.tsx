@@ -70,7 +70,7 @@ export const ChatLayout = () => {
     }
   };
 
-  const updateChatSession = async (chatId: string, updates: { messages?: any[], title?: string }) => {
+  const updateChatSession = async (chatId: string, updates: { messages?: any[], media?: any[], title?: string }) => {
     if (!user) return;
 
     const updatedChat = await chatService.updateChat(chatId, updates);

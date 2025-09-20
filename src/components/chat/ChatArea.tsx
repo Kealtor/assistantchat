@@ -10,7 +10,7 @@ import { MessageSquare } from "lucide-react";
 interface ChatAreaProps {
   workflow: string;
   chatSession: ChatSession | null;
-  onUpdateChat: (chatId: string, updates: { messages?: Message[], title?: string }) => void;
+  onUpdateChat: (chatId: string, updates: { messages?: Message[], media?: MediaAttachment[], title?: string }) => void;
 }
 
 export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
@@ -42,14 +42,23 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
       role: "user",
       content,
       timestamp: new Date(),
-      media
+      mediaIds: media ? media.map((_, index) => `${Date.now()}-${index}`) : undefined
     };
 
     const updatedMessages = [...messages, userMessage];
+    
+    // Add media with unique IDs that match the message references
+    const newMediaWithIds = media ? media.map((mediaItem, index) => ({
+      ...mediaItem,
+      id: `${Date.now()}-${index}`
+    })) : [];
+    
+    const updatedMedia = [...(chatSession.media || []), ...newMediaWithIds];
     const newTitle = updatedMessages.length === 1 ? String(content).slice(0, 50) + (String(content).length > 50 ? '...' : '') : chatSession.title;
     
     onUpdateChat(chatSession.id, { 
       messages: updatedMessages,
+      media: updatedMedia,
       title: newTitle
     });
     
@@ -175,9 +184,16 @@ return (
               </div>
             </div>
           )}
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
+          {messages.map((message) => {
+            // Get media for this message based on mediaIds
+            const messageMedia = message.mediaIds ? 
+              (chatSession?.media || []).filter(media => 
+                message.mediaIds?.includes((media as any).id)
+              ) : [];
+            return (
+              <ChatMessage key={message.id} message={message} media={messageMedia} />
+            );
+          })}
           {isLoading && (
             <div className="flex justify-start">
               <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs animate-pulse">
@@ -195,7 +211,7 @@ return (
       {/* Input Area */}
       <div className="border-t border-border bg-card p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
+          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} chatId={chatSession.id} />
         </div>
       </div>
     </div>

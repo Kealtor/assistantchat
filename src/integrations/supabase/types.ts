@@ -19,6 +19,7 @@ export type Database = {
           chat_type: string
           created_at: string
           id: string
+          media: Json | null
           messages: Json
           pinned: boolean | null
           title: string
@@ -30,6 +31,7 @@ export type Database = {
           chat_type: string
           created_at?: string
           id?: string
+          media?: Json | null
           messages?: Json
           pinned?: boolean | null
           title: string
@@ -41,6 +43,7 @@ export type Database = {
           chat_type?: string
           created_at?: string
           id?: string
+          media?: Json | null
           messages?: Json
           pinned?: boolean | null
           title?: string
@@ -136,6 +139,7 @@ export type Database = {
           created_at: string
           entry_date: string
           id: string
+          images: string[] | null
           mood: number | null
           tags: string[] | null
           updated_at: string
@@ -146,6 +150,7 @@ export type Database = {
           created_at?: string
           entry_date: string
           id?: string
+          images?: string[] | null
           mood?: number | null
           tags?: string[] | null
           updated_at?: string
@@ -156,6 +161,7 @@ export type Database = {
           created_at?: string
           entry_date?: string
           id?: string
+          images?: string[] | null
           mood?: number | null
           tags?: string[] | null
           updated_at?: string

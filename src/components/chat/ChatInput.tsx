@@ -12,9 +12,10 @@ import { toast } from "@/hooks/use-toast";
 interface ChatInputProps {
   onSendMessage: (content: string, media?: MediaAttachment[]) => void;
   disabled?: boolean;
+  chatId: string;
 }
 
-export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
+export const ChatInput = ({ onSendMessage, disabled, chatId }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -48,7 +49,7 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
       // Upload files if any are selected
       if (selectedFiles.length > 0) {
         try {
-          media = await uploadFiles(selectedFiles);
+          media = await uploadFiles(selectedFiles, chatId);
         } catch (error) {
           return; // Error is handled in the hook
         }
@@ -118,6 +119,7 @@ export const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
       const mediaAttachment = await VoiceUploadService.uploadVoiceNote(
         recording.blob,
         user.id,
+        chatId,
         recording.duration
       );
 

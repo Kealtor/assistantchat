@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CalendarDays, BookOpen, TrendingUp, Heart, Edit2 } from "lucide-react";
+import { CalendarDays, BookOpen, TrendingUp, Heart, Edit2, ImagePlus, X, Upload } from "lucide-react";
 import { format, isToday, isSameDay } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 import { journalService, JournalEntry } from "@/services/journalService";
+import { JournalImageService, JournalImageAttachment } from "@/services/journalImageService";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ export const JournalArea = () => {
   const [currentEntry, setCurrentEntry] = useState<JournalEntry | null>(null);
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [weeklyStats, setWeeklyStats] = useState({
     entriesThisWeek: 0,
     averageMood: 0,
@@ -36,7 +38,9 @@ export const JournalArea = () => {
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -68,10 +72,12 @@ export const JournalArea = () => {
       setCurrentEntry(entry);
       setJournalEntry(entry.content);
       setSelectedMood(entry.mood || null);
+      setSelectedImages(entry.images || []);
     } else {
       setCurrentEntry(null);
       setJournalEntry("");
       setSelectedMood(null);
+      setSelectedImages([]);
     }
     setIsEditing(false);
   };
@@ -96,7 +102,8 @@ export const JournalArea = () => {
       savedEntry = await journalService.updateEntry(currentEntry.id, {
         content: journalEntry.trim(),
         mood: selectedMood || undefined,
-        tags: []
+        tags: [],
+        images: selectedImages
       });
     } else {
       // Create new entry
@@ -105,7 +112,8 @@ export const JournalArea = () => {
         entry_date: entryDate,
         content: journalEntry.trim(),
         mood: selectedMood || undefined,
-        tags: []
+        tags: [],
+        images: selectedImages
       });
     }
     
@@ -143,8 +151,55 @@ export const JournalArea = () => {
     if (currentEntry) {
       setJournalEntry(currentEntry.content);
       setSelectedMood(currentEntry.mood || null);
+      setSelectedImages(currentEntry.images || []);
     }
     setIsEditing(false);
+  };
+
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || !user) return;
+
+    const imageFiles = Array.from(files).filter(file => 
+      JournalImageService.isImageFile(file.type)
+    );
+
+    if (imageFiles.length === 0) {
+      toast({
+        title: "Invalid files",
+        description: "Please select image files only.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const uploadedImages = await JournalImageService.uploadMultipleImages(imageFiles, user.id);
+      const newImageUrls = uploadedImages.map(img => img.url);
+      setSelectedImages(prev => [...prev, ...newImageUrls]);
+      
+      toast({
+        title: "Images uploaded",
+        description: `${uploadedImages.length} image(s) uploaded successfully.`,
+      });
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload images. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = async (imageUrl: string) => {
+    if (user) {
+      // Try to delete from storage (optional, as we'll clean up unused images later)
+      await JournalImageService.deleteImage(imageUrl, user.id);
+    }
+    setSelectedImages(prev => prev.filter(url => url !== imageUrl));
   };
 
   const hasEntryForDate = (date: Date) => {
@@ -322,6 +377,22 @@ export const JournalArea = () => {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm leading-relaxed mb-4">{currentEntry.content}</p>
+                      
+                      {/* Display images */}
+                      {currentEntry.images && currentEntry.images.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                          {currentEntry.images.map((imageUrl, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={imageUrl}
+                                alt={`Journal entry image ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-md border border-border"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
                       <div className="flex flex-wrap gap-2">
                         {currentEntry.tags.map((tag) => (
                           <Badge key={tag} variant="outline" className="text-xs">
@@ -339,6 +410,65 @@ export const JournalArea = () => {
                       placeholder="Write about your day, your thoughts, goals, or anything that comes to mind..."
                       className="min-h-64 resize-none"
                     />
+                    
+                    {/* Image upload and display */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium">Images</h4>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploading}
+                          className="flex items-center space-x-2"
+                        >
+                          {uploading ? (
+                            <>
+                              <Upload className="h-4 w-4 animate-spin" />
+                              <span>Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <ImagePlus className="h-4 w-4" />
+                              <span>Add Images</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      
+                      {selectedImages.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                          {selectedImages.map((imageUrl, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={imageUrl}
+                                alt={`Selected image ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-md border border-border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => handleRemoveImage(imageUrl)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e.target.files)}
+                      />
+                    </div>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -408,6 +538,22 @@ export const JournalArea = () => {
                           </CardHeader>
                           <CardContent>
                             <p className="text-sm leading-relaxed mb-4">{entry.content}</p>
+                            
+                            {/* Display images */}
+                            {entry.images && entry.images.length > 0 && (
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                                {entry.images.map((imageUrl, index) => (
+                                  <div key={index} className="relative group">
+                                    <img
+                                      src={imageUrl}
+                                      alt={`Journal entry image ${index + 1}`}
+                                      className="w-full h-32 object-cover rounded-md border border-border"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
                             <div className="flex flex-wrap gap-2">
                               {entry.tags.map((tag) => (
                                 <Badge key={tag} variant="outline" className="text-xs">
@@ -585,6 +731,22 @@ export const JournalArea = () => {
                         </CardHeader>
                         <CardContent>
                           <p className="text-sm leading-relaxed mb-4">{currentEntry.content}</p>
+                          
+                          {/* Display images */}
+                          {currentEntry.images && currentEntry.images.length > 0 && (
+                            <div className="grid grid-cols-2 gap-2 mb-4">
+                              {currentEntry.images.map((imageUrl, index) => (
+                                <div key={index} className="relative group">
+                                  <img
+                                    src={imageUrl}
+                                    alt={`Journal entry image ${index + 1}`}
+                                    className="w-full h-32 object-cover rounded-md border border-border"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
                           <div className="flex flex-wrap gap-2">
                             {currentEntry.tags.map((tag) => (
                               <Badge key={tag} variant="outline" className="text-xs">
@@ -601,6 +763,65 @@ export const JournalArea = () => {
                           onChange={(e) => setJournalEntry(e.target.value)}
                           placeholder="Write about your day, your thoughts, goals, or anything that comes to mind..."
                           className="min-h-48 sm:min-h-64 resize-none text-base"
+                        />
+                        
+                        {/* Image upload and display */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium">Images</h4>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => fileInputRef.current?.click()}
+                              disabled={uploading}
+                              className="flex items-center space-x-2"
+                            >
+                              {uploading ? (
+                                <>
+                                  <Upload className="h-4 w-4 animate-spin" />
+                                  <span className="text-xs">Uploading...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <ImagePlus className="h-4 w-4" />
+                                  <span className="text-xs">Add Images</span>
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          
+                          {selectedImages.length > 0 && (
+                            <div className="grid grid-cols-2 gap-3">
+                              {selectedImages.map((imageUrl, index) => (
+                                <div key={index} className="relative group">
+                                  <img
+                                    src={imageUrl}
+                                    alt={`Selected image ${index + 1}`}
+                                    className="w-full h-24 object-cover rounded-md border border-border"
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="sm"
+                                    className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => handleRemoveImage(imageUrl)}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={(e) => handleImageUpload(e.target.files)}
                         />
                         
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -673,6 +894,22 @@ export const JournalArea = () => {
                               </CardHeader>
                               <CardContent>
                                 <p className="text-sm leading-relaxed mb-4">{entry.content}</p>
+                                
+                                {/* Display images */}
+                                {entry.images && entry.images.length > 0 && (
+                                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                                    {entry.images.map((imageUrl, index) => (
+                                      <div key={index} className="relative group">
+                                        <img
+                                          src={imageUrl}
+                                          alt={`Journal entry image ${index + 1}`}
+                                          className="w-full h-32 object-cover rounded-md border border-border"
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
                                 <div className="flex flex-wrap gap-2">
                                   {entry.tags.map((tag) => (
                                     <Badge key={tag} variant="outline" className="text-xs">

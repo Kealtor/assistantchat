@@ -5,14 +5,14 @@ export class FileUploadService {
   private static readonly BUCKET_NAME = 'chat-media';
   private static readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-  static async uploadFile(file: File, userId: string): Promise<MediaAttachment> {
+  static async uploadFile(file: File, userId: string, chatId: string): Promise<MediaAttachment> {
     if (file.size > this.MAX_FILE_SIZE) {
       throw new Error('File size must be less than 10MB');
     }
 
     const timestamp = new Date().getTime();
     const fileName = `${timestamp}-${file.name}`;
-    const filePath = `${userId}/${fileName}`;
+    const filePath = `${userId}/${chatId}/${fileName}`;
 
     const { data, error } = await supabase.storage
       .from(this.BUCKET_NAME)
@@ -39,12 +39,14 @@ export class FileUploadService {
       url: urlData.signedUrl,
       name: file.name,
       type: file.type,
-      size: file.size
+      size: file.size,
+      bucket: this.BUCKET_NAME,
+      filename: fileName
     };
   }
 
-  static async uploadMultipleFiles(files: File[], userId: string): Promise<MediaAttachment[]> {
-    const uploadPromises = files.map(file => this.uploadFile(file, userId));
+  static async uploadMultipleFiles(files: File[], userId: string, chatId: string): Promise<MediaAttachment[]> {
+    const uploadPromises = files.map(file => this.uploadFile(file, userId, chatId));
     return Promise.all(uploadPromises);
   }
 
