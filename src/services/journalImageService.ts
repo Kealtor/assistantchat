@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { configurableSupabase as supabase } from "@/lib/supabase-client";
 
 export type JournalImageAttachment = {
   url: string;
