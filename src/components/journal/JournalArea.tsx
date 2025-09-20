@@ -13,6 +13,7 @@ import { journalService, JournalEntry } from "@/services/journalService";
 import { JournalImageService, JournalImageAttachment } from "@/services/journalImageService";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { JournalImageGallery } from "./JournalImageGallery";
 
 const moodEmojis = [
   { value: 1, emoji: "😢", label: "Very Bad", color: "text-red-500" },
@@ -437,28 +438,11 @@ export const JournalArea = () => {
                         </Button>
                       </div>
                       
-                      {selectedImages.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                          {selectedImages.map((imageUrl, index) => (
-                            <div key={index} className="relative group">
-                              <img
-                                src={imageUrl}
-                                alt={`Selected image ${index + 1}`}
-                                className="w-full h-24 object-cover rounded-md border border-border"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => handleRemoveImage(imageUrl)}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      <JournalImageGallery 
+                        images={selectedImages}
+                        editable={true}
+                        onRemoveImage={handleRemoveImage}
+                      />
                       
                       <input
                         ref={fileInputRef}
@@ -897,16 +881,11 @@ export const JournalArea = () => {
                                 
                                 {/* Display images */}
                                 {entry.images && entry.images.length > 0 && (
-                                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
-                                    {entry.images.map((imageUrl, index) => (
-                                      <div key={index} className="relative group">
-                                        <img
-                                          src={imageUrl}
-                                          alt={`Journal entry image ${index + 1}`}
-                                          className="w-full h-32 object-cover rounded-md border border-border"
-                                        />
-                                      </div>
-                                    ))}
+                                  <div className="mb-4">
+                                    <JournalImageGallery 
+                                      images={entry.images}
+                                      editable={false}
+                                    />
                                   </div>
                                 )}
                                 
