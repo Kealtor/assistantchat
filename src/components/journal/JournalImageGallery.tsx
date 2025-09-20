@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { X } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface JournalImageGalleryProps {
@@ -20,33 +20,41 @@ export const JournalImageGallery = ({
 
   if (!images || images.length === 0) return null;
 
+  const openImageModal = (index: number) => {
+    setSelectedImageIndex(index);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImageIndex(null);
+  };
+
+  const navigateImage = (direction: 'prev' | 'next') => {
+    if (selectedImageIndex === null) return;
+    
+    if (direction === 'prev') {
+      setSelectedImageIndex(selectedImageIndex > 0 ? selectedImageIndex - 1 : images.length - 1);
+    } else {
+      setSelectedImageIndex(selectedImageIndex < images.length - 1 ? selectedImageIndex + 1 : 0);
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {images.map((imageUrl, index) => (
           <div key={index} className="relative group">
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="cursor-pointer hover:opacity-90 transition-opacity">
-                  <AspectRatio ratio={1}>
-                    <img
-                      src={imageUrl}
-                      alt={`Journal image ${index + 1}`}
-                      className="w-full h-full object-cover rounded-md border border-border"
-                    />
-                  </AspectRatio>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] p-2">
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <img
-                    src={imageUrl}
-                    alt={`Journal image ${index + 1} - Full size`}
-                    className="max-w-full max-h-full object-contain rounded-md"
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
+            <div 
+              className="cursor-pointer hover:opacity-90 transition-opacity active:scale-95 transform transition-transform duration-150"
+              onClick={() => openImageModal(index)}
+            >
+              <AspectRatio ratio={1}>
+                <img
+                  src={imageUrl}
+                  alt={`Journal image ${index + 1}`}
+                  className="w-full h-full object-cover rounded-md border border-border"
+                />
+              </AspectRatio>
+            </div>
             
             {editable && onRemoveImage && (
               <Button
@@ -65,6 +73,62 @@ export const JournalImageGallery = ({
           </div>
         ))}
       </div>
+
+      {/* Mobile-optimized image viewer dialog */}
+      <Dialog open={selectedImageIndex !== null} onOpenChange={closeImageModal}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-0">
+          {selectedImageIndex !== null && (
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* Close button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 z-20 text-white hover:bg-white/20 h-8 w-8 p-0"
+                onClick={closeImageModal}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+
+              {/* Navigation buttons for multiple images */}
+              {images.length > 1 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-10 w-10 p-0"
+                    onClick={() => navigateImage('prev')}
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-10 w-10 p-0"
+                    onClick={() => navigateImage('next')}
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                </>
+              )}
+
+              {/* Image counter */}
+              {images.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                  {selectedImageIndex + 1} / {images.length}
+                </div>
+              )}
+
+              {/* Main image */}
+              <img
+                src={images[selectedImageIndex]}
+                alt={`Journal image ${selectedImageIndex + 1} - Full size`}
+                className="max-w-full max-h-full object-contain rounded-md"
+                onClick={closeImageModal}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
