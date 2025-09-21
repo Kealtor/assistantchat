@@ -76,17 +76,17 @@ export const JournalImageGallery = ({
 
       {/* Mobile-optimized image viewer dialog */}
       <Dialog open={selectedImageIndex !== null} onOpenChange={closeImageModal}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-0">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] lg:max-w-4xl lg:max-h-[90vh] p-0 bg-black/95 border-0">
           {selectedImageIndex !== null && (
             <div className="relative w-full h-full flex items-center justify-center">
               {/* Close button */}
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute top-2 right-2 z-20 text-white hover:bg-white/20 h-8 w-8 p-0"
+                className="absolute top-4 right-4 z-20 text-white hover:bg-white/20 h-10 w-10 p-0"
                 onClick={closeImageModal}
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </Button>
 
               {/* Navigation buttons for multiple images */}
@@ -95,25 +95,25 @@ export const JournalImageGallery = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-10 w-10 p-0"
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-12 w-12 p-0 lg:h-14 lg:w-14"
                     onClick={() => navigateImage('prev')}
                   >
-                    <ChevronLeft className="h-6 w-6" />
+                    <ChevronLeft className="h-6 w-6 lg:h-8 lg:w-8" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-10 w-10 p-0"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-12 w-12 p-0 lg:h-14 lg:w-14"
                     onClick={() => navigateImage('next')}
                   >
-                    <ChevronRight className="h-6 w-6" />
+                    <ChevronRight className="h-6 w-6 lg:h-8 lg:w-8" />
                   </Button>
                 </>
               )}
 
               {/* Image counter */}
               {images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 bg-black/70 text-white px-4 py-2 rounded-full text-sm lg:text-base">
                   {selectedImageIndex + 1} / {images.length}
                 </div>
               )}
@@ -122,7 +122,7 @@ export const JournalImageGallery = ({
               <img
                 src={images[selectedImageIndex]}
                 alt={`Journal image ${selectedImageIndex + 1} - Full size`}
-                className="max-w-full max-h-full object-contain rounded-md"
+                className="max-w-full max-h-full object-contain rounded-md cursor-pointer"
                 onClick={closeImageModal}
               />
             </div>
