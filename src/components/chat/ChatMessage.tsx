@@ -155,44 +155,20 @@ export const ChatMessage = ({ message, media }: ChatMessageProps) => {
             )}
           </div>
           
-          {/* Action buttons for assistant messages on hover (desktop only) */}
-          {!isUser && (
-            <div className="hidden md:flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 hover:bg-background/20"
-                onClick={handleCopy}
-              >
-                <Copy className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 hover:bg-background/20"
-              >
-                <ThumbsUp className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 hover:bg-background/20"
-              >
-                <ThumbsDown className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 hover:bg-background/20"
-              >
-                <MoreHorizontal className="h-3 w-3" />
-              </Button>
-            </div>
-          )}
         </div>
         
-        <div className="text-xs text-muted-foreground mt-1 px-1">
-          {format(message.timestamp, "HH:mm")}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1 px-1">
+          <span>{format(message.timestamp, "HH:mm")}</span>
+          {!isUser && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-4 w-4 p-0 hover:bg-background/20"
+              onClick={handleCopy}
+            >
+              <Copy className="h-3 w-3" />
+            </Button>
+          )}
         </div>
       </div>
       

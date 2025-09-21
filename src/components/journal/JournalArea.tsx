@@ -13,6 +13,7 @@ import { journalService, JournalEntry } from "@/services/journalService";
 import { JournalImageService, JournalImageAttachment } from "@/services/journalImageService";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { JournalImageGallery } from "./JournalImageGallery";
 
 const moodEmojis = [
   { value: 1, emoji: "😢", label: "Very Bad", color: "text-red-500" },
@@ -40,7 +41,12 @@ export const JournalArea = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [editingHistoryId, setEditingHistoryId] = useState<string | null>(null);
+  const [editingHistoryContent, setEditingHistoryContent] = useState("");
+  const [editingHistoryMood, setEditingHistoryMood] = useState<number | null>(null);
+  const [editingHistoryImages, setEditingHistoryImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const historyFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -200,6 +206,106 @@ export const JournalArea = () => {
       await JournalImageService.deleteImage(imageUrl, user.id);
     }
     setSelectedImages(prev => prev.filter(url => url !== imageUrl));
+  };
+
+  const handleEditHistoryEntry = (entry: JournalEntry) => {
+    setEditingHistoryId(entry.id);
+    setEditingHistoryContent(entry.content);
+    setEditingHistoryMood(entry.mood || null);
+    setEditingHistoryImages(entry.images || []);
+  };
+
+  const handleCancelHistoryEdit = () => {
+    setEditingHistoryId(null);
+    setEditingHistoryContent("");
+    setEditingHistoryMood(null);
+    setEditingHistoryImages([]);
+  };
+
+  const handleSaveHistoryEntry = async () => {
+    if (!user || !editingHistoryId || !editingHistoryContent.trim()) return;
+    
+    setSaving(true);
+    
+    const updatedEntry = await journalService.updateEntry(editingHistoryId, {
+      content: editingHistoryContent.trim(),
+      mood: editingHistoryMood || undefined,
+      tags: [],
+      images: editingHistoryImages
+    });
+    
+    if (updatedEntry) {
+      toast({
+        title: "Entry updated",
+        description: "Your journal entry has been updated successfully.",
+      });
+      
+      // Refresh data
+      loadUserEntries();
+      loadWeeklyStats();
+      
+      // If this is the current entry being viewed, update it too
+      if (currentEntry && currentEntry.id === editingHistoryId) {
+        setCurrentEntry(updatedEntry);
+        setJournalEntry(updatedEntry.content);
+        setSelectedMood(updatedEntry.mood || null);
+        setSelectedImages(updatedEntry.images || []);
+      }
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to update entry. Please try again.",
+        variant: "destructive"
+      });
+    }
+    
+    setSaving(false);
+    handleCancelHistoryEdit();
+  };
+
+  const handleHistoryImageUpload = async (files: FileList | null) => {
+    if (!files || !user) return;
+
+    const imageFiles = Array.from(files).filter(file => 
+      JournalImageService.isImageFile(file.type)
+    );
+
+    if (imageFiles.length === 0) {
+      toast({
+        title: "Invalid files",
+        description: "Please select image files only.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const uploadedImages = await JournalImageService.uploadMultipleImages(imageFiles, user.id);
+      const newImageUrls = uploadedImages.map(img => img.url);
+      setEditingHistoryImages(prev => [...prev, ...newImageUrls]);
+      
+      toast({
+        title: "Images uploaded",
+        description: `${uploadedImages.length} image(s) uploaded successfully.`,
+      });
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload images. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveHistoryImage = async (imageUrl: string) => {
+    if (user) {
+      await JournalImageService.deleteImage(imageUrl, user.id);
+    }
+    setEditingHistoryImages(prev => prev.filter(url => url !== imageUrl));
   };
 
   const hasEntryForDate = (date: Date) => {
@@ -378,19 +484,12 @@ export const JournalArea = () => {
                     <CardContent>
                       <p className="text-sm leading-relaxed mb-4">{currentEntry.content}</p>
                       
-                      {/* Display images */}
+                      {/* Display images with full-screen popup */}
                       {currentEntry.images && currentEntry.images.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
-                          {currentEntry.images.map((imageUrl, index) => (
-                            <div key={index} className="relative group">
-                              <img
-                                src={imageUrl}
-                                alt={`Journal entry image ${index + 1}`}
-                                className="w-full h-32 object-cover rounded-md border border-border"
-                              />
-                            </div>
-                          ))}
-                        </div>
+                        <JournalImageGallery 
+                          images={currentEntry.images}
+                          editable={false}
+                        />
                       )}
                       
                       <div className="flex flex-wrap gap-2">
@@ -437,28 +536,11 @@ export const JournalArea = () => {
                         </Button>
                       </div>
                       
-                      {selectedImages.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                          {selectedImages.map((imageUrl, index) => (
-                            <div key={index} className="relative group">
-                              <img
-                                src={imageUrl}
-                                alt={`Selected image ${index + 1}`}
-                                className="w-full h-24 object-cover rounded-md border border-border"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => handleRemoveImage(imageUrl)}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      <JournalImageGallery 
+                        images={selectedImages}
+                        editable={true}
+                        onRemoveImage={handleRemoveImage}
+                      />
                       
                       <input
                         ref={fileInputRef}
@@ -523,6 +605,16 @@ export const JournalArea = () => {
                                 {format(new Date(entry.entry_date), "EEEE, MMMM do, yyyy")}
                               </CardTitle>
                               <div className="flex items-center space-x-2">
+                                {editingHistoryId !== entry.id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEditHistoryEntry(entry)}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <Edit2 className="h-4 w-4" />
+                                  </Button>
+                                )}
                                 {entry.mood && (
                                   <>
                                     <span className="text-lg">
@@ -537,30 +629,112 @@ export const JournalArea = () => {
                             </div>
                           </CardHeader>
                           <CardContent>
-                            <p className="text-sm leading-relaxed mb-4">{entry.content}</p>
-                            
-                            {/* Display images */}
-                            {entry.images && entry.images.length > 0 && (
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
-                                {entry.images.map((imageUrl, index) => (
-                                  <div key={index} className="relative group">
-                                    <img
-                                      src={imageUrl}
-                                      alt={`Journal entry image ${index + 1}`}
-                                      className="w-full h-32 object-cover rounded-md border border-border"
-                                    />
+                            {editingHistoryId === entry.id ? (
+                              <div className="space-y-4">
+                                <Textarea
+                                  value={editingHistoryContent}
+                                  onChange={(e) => setEditingHistoryContent(e.target.value)}
+                                  className="min-h-32 resize-none"
+                                />
+                                
+                                {/* Mood selector for editing */}
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">Mood</label>
+                                  <div className="grid grid-cols-5 gap-2">
+                                    {moodEmojis.map((mood) => (
+                                      <Button
+                                        key={mood.value}
+                                        variant={editingHistoryMood === mood.value ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setEditingHistoryMood(mood.value)}
+                                        className="h-12 flex flex-col items-center justify-center p-2"
+                                      >
+                                        <span className="text-lg mb-1">{mood.emoji}</span>
+                                        <span className="text-xs font-medium">{mood.label}</span>
+                                      </Button>
+                                    ))}
                                   </div>
-                                ))}
+                                </div>
+
+                                {/* Image management for editing */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="text-sm font-medium">Images</h4>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => historyFileInputRef.current?.click()}
+                                      disabled={uploading}
+                                      className="flex items-center space-x-2"
+                                    >
+                                      {uploading ? (
+                                        <>
+                                          <Upload className="h-4 w-4 animate-spin" />
+                                          <span>Uploading...</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ImagePlus className="h-4 w-4" />
+                                          <span>Add Images</span>
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
+                                  
+                                  <JournalImageGallery 
+                                    images={editingHistoryImages}
+                                    editable={true}
+                                    onRemoveImage={handleRemoveHistoryImage}
+                                  />
+                                  
+                                  <input
+                                    ref={historyFileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => handleHistoryImageUpload(e.target.files)}
+                                  />
+                                </div>
+
+                                <div className="flex items-center justify-end space-x-2">
+                                  <Button 
+                                    variant="outline"
+                                    onClick={handleCancelHistoryEdit}
+                                    disabled={saving}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button 
+                                    onClick={handleSaveHistoryEntry}
+                                    disabled={!editingHistoryContent.trim() || saving}
+                                  >
+                                    {saving ? "Saving..." : "Update Entry"}
+                                  </Button>
+                                </div>
                               </div>
+                            ) : (
+                              <>
+                                <p className="text-sm leading-relaxed mb-4">{entry.content}</p>
+                                
+                                {/* Display images with full-screen popup */}
+                                {entry.images && entry.images.length > 0 && (
+                                  <JournalImageGallery 
+                                    images={entry.images}
+                                    editable={false}
+                                  />
+                                )}
+                                
+                                <div className="flex flex-wrap gap-2">
+                                  {entry.tags.map((tag) => (
+                                    <Badge key={tag} variant="outline" className="text-xs">
+                                      #{tag}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </>
                             )}
-                            
-                            <div className="flex flex-wrap gap-2">
-                              {entry.tags.map((tag) => (
-                                <Badge key={tag} variant="outline" className="text-xs">
-                                  #{tag}
-                                </Badge>
-                              ))}
-                            </div>
                           </CardContent>
                         </Card>
                       ))
@@ -732,19 +906,12 @@ export const JournalArea = () => {
                         <CardContent>
                           <p className="text-sm leading-relaxed mb-4">{currentEntry.content}</p>
                           
-                          {/* Display images */}
+                          {/* Display images with full-screen popup */}
                           {currentEntry.images && currentEntry.images.length > 0 && (
-                            <div className="grid grid-cols-2 gap-2 mb-4">
-                              {currentEntry.images.map((imageUrl, index) => (
-                                <div key={index} className="relative group">
-                                  <img
-                                    src={imageUrl}
-                                    alt={`Journal entry image ${index + 1}`}
-                                    className="w-full h-32 object-cover rounded-md border border-border"
-                                  />
-                                </div>
-                              ))}
-                            </div>
+                            <JournalImageGallery 
+                              images={currentEntry.images}
+                              editable={false}
+                            />
                           )}
                           
                           <div className="flex flex-wrap gap-2">
@@ -897,16 +1064,11 @@ export const JournalArea = () => {
                                 
                                 {/* Display images */}
                                 {entry.images && entry.images.length > 0 && (
-                                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
-                                    {entry.images.map((imageUrl, index) => (
-                                      <div key={index} className="relative group">
-                                        <img
-                                          src={imageUrl}
-                                          alt={`Journal entry image ${index + 1}`}
-                                          className="w-full h-32 object-cover rounded-md border border-border"
-                                        />
-                                      </div>
-                                    ))}
+                                  <div className="mb-4">
+                                    <JournalImageGallery 
+                                      images={entry.images}
+                                      editable={false}
+                                    />
                                   </div>
                                 )}
                                 

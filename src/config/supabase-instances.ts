@@ -72,6 +72,9 @@ export const getActiveInstance = (): SupabaseInstance => {
     );
   }
   
+  // Validate on access rather than on import
+  validateInstance(instance);
+  
   return instance;
 };
 
@@ -93,7 +96,3 @@ export const validateInstance = (instance: SupabaseInstance): void => {
   
   console.log(`✅ Connected to Supabase instance: ${instance.name} (${instance.description || 'No description'})`);
 };
-
-// Validate the active instance on import
-const activeInstance = getActiveInstance();
-validateInstance(activeInstance);
