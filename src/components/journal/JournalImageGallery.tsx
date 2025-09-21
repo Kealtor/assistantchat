@@ -74,11 +74,11 @@ export const JournalImageGallery = ({
         ))}
       </div>
 
-      {/* Mobile-optimized image viewer dialog */}
+      {/* Full-screen image viewer dialog */}
       <Dialog open={selectedImageIndex !== null} onOpenChange={closeImageModal}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] lg:max-w-4xl lg:max-h-[90vh] p-0 bg-black/95 border-0">
+        <DialogContent className="max-w-[100vw] max-h-[100vh] w-[100vw] h-[100vh] p-0 bg-black/95 border-0 overflow-hidden">
           {selectedImageIndex !== null && (
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div className="relative w-full h-full flex items-center justify-center p-4">
               {/* Close button */}
               <Button
                 variant="ghost"
@@ -118,13 +118,16 @@ export const JournalImageGallery = ({
                 </div>
               )}
 
-              {/* Main image */}
-              <img
-                src={images[selectedImageIndex]}
-                alt={`Journal image ${selectedImageIndex + 1} - Full size`}
-                className="max-w-full max-h-full object-contain rounded-md cursor-pointer"
-                onClick={closeImageModal}
-              />
+              {/* Main image with proper constraints */}
+              <div className="w-full h-full flex items-center justify-center">
+                <img
+                  src={images[selectedImageIndex]}
+                  alt={`Journal image ${selectedImageIndex + 1} - Full size`}
+                  className="max-w-[calc(100vw-32px)] max-h-[calc(100vh-32px)] w-auto h-auto object-contain rounded-md cursor-pointer"
+                  onClick={closeImageModal}
+                  style={{ maxWidth: 'calc(100vw - 32px)', maxHeight: 'calc(100vh - 32px)' }}
+                />
+              </div>
             </div>
           )}
         </DialogContent>
