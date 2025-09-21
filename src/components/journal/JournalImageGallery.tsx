@@ -78,13 +78,19 @@ export const JournalImageGallery = ({
       <Dialog open={selectedImageIndex !== null} onOpenChange={closeImageModal}>
         <DialogContent className="max-w-[100vw] max-h-[100vh] w-[100vw] h-[100vh] p-0 bg-black/95 border-0 overflow-hidden">
           {selectedImageIndex !== null && (
-            <div className="relative w-full h-full flex items-center justify-center p-4">
+            <div 
+              className="relative w-full h-full flex items-center justify-center p-4 cursor-pointer"
+              onClick={closeImageModal}
+            >
               {/* Close button */}
               <Button
                 variant="ghost"
                 size="sm"
                 className="absolute top-4 right-4 z-20 text-white hover:bg-white/20 h-10 w-10 p-0"
-                onClick={closeImageModal}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeImageModal();
+                }}
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -96,7 +102,10 @@ export const JournalImageGallery = ({
                     variant="ghost"
                     size="sm"
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-12 w-12 p-0 lg:h-14 lg:w-14"
-                    onClick={() => navigateImage('prev')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateImage('prev');
+                    }}
                   >
                     <ChevronLeft className="h-6 w-6 lg:h-8 lg:w-8" />
                   </Button>
@@ -104,7 +113,10 @@ export const JournalImageGallery = ({
                     variant="ghost"
                     size="sm"
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white hover:bg-white/20 h-12 w-12 p-0 lg:h-14 lg:w-14"
-                    onClick={() => navigateImage('next')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateImage('next');
+                    }}
                   >
                     <ChevronRight className="h-6 w-6 lg:h-8 lg:w-8" />
                   </Button>
@@ -123,8 +135,8 @@ export const JournalImageGallery = ({
                 <img
                   src={images[selectedImageIndex]}
                   alt={`Journal image ${selectedImageIndex + 1} - Full size`}
-                  className="max-w-[calc(100vw-32px)] max-h-[calc(100vh-32px)] w-auto h-auto object-contain rounded-md cursor-pointer"
-                  onClick={closeImageModal}
+                  className="max-w-[calc(100vw-32px)] max-h-[calc(100vh-32px)] w-auto h-auto object-contain rounded-md cursor-default"
+                  onClick={(e) => e.stopPropagation()}
                   style={{ maxWidth: 'calc(100vw - 32px)', maxHeight: 'calc(100vh - 32px)' }}
                 />
               </div>
