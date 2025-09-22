@@ -1,6 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
+import { QuickstartArea } from "./QuickstartArea";
 import { Message, ChatSession, MediaAttachment } from "@/services/chatService";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,9 +14,11 @@ interface ChatAreaProps {
   workflow: string;
   chatSession: ChatSession | null;
   onUpdateChat: (chatId: string, updates: { messages?: Message[], media?: MediaAttachment[], title?: string }) => void;
+  onWorkflowChange?: (workflow: string) => void;
+  onCreateNewChat?: () => void;
 }
 
-export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps) => {
+export const ChatArea = ({ workflow, chatSession, onUpdateChat, onWorkflowChange, onCreateNewChat }: ChatAreaProps) => {
   const [isLoading, setIsLoading] = useState(false);
   
   const workflowConfig = getWorkflowByName(workflow);
@@ -172,13 +175,11 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat }: ChatAreaProps)
 
   if (!chatSession) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No chat selected</h3>
-          <p className="text-muted-foreground">Start a new conversation to begin</p>
-        </div>
-      </div>
+      <QuickstartArea
+        activeWorkflow={workflow}
+        onWorkflowChange={onWorkflowChange || (() => {})}
+        onCreateNewChat={onCreateNewChat || (() => {})}
+      />
     );
   }
 
