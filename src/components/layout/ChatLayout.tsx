@@ -180,6 +180,8 @@ export const ChatLayout = () => {
               workflow={activeWorkflow}
               chatSession={activeChatId ? chatSessions.find(chat => chat.id === activeChatId) || null : null}
               onUpdateChat={updateChatSession}
+              onWorkflowChange={setActiveWorkflow}
+              onCreateNewChat={createNewChat}
             />
           )}
           {currentView === "journal" && (
@@ -294,6 +296,8 @@ export const ChatLayout = () => {
               workflow={activeWorkflow}
               chatSession={activeChatId ? chatSessions.find(chat => chat.id === activeChatId) || null : null}
               onUpdateChat={updateChatSession}
+              onWorkflowChange={setActiveWorkflow}
+              onCreateNewChat={createNewChat}
             />
           )}
           {currentView === "journal" && (
