@@ -171,7 +171,10 @@ export const MobileChatHeader = ({
                 </Select>
                 
                 {/* New Chat Button */}
-                <Button className="w-full mt-4" size="sm" onClick={onCreateNewChat}>
+                <Button className="w-full mt-4" size="sm" onClick={() => {
+                  onCreateNewChat();
+                  setSheetOpen(false);
+                }}>
                   <Plus className="h-4 w-4 mr-2" />
                   New Chat
                 </Button>
