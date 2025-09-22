@@ -54,12 +54,44 @@ This application serves as a comprehensive platform that combines multiple produ
 - **Smooth Animations**: Polished interactions and transitions
 - **Sidebar Navigation**: Collapsible navigation with workflow switching
 
-### 🏃‍♂️ Habit Tracking System
-- **Daily Progress Tracking**: Visual grid-based habit tracking with color-coded status
-- **Interactive Progress Cards**: Tap-to-view detailed habit information and notes on mobile
-- **Habit Management**: Create, edit, and organize personal habits with acceptance criteria
-- **Mobile-Optimized Interface**: Touch-friendly habit interaction with contextual information
-- **Progress Visualization**: Clear visual indicators for habit completion and streaks
+### 🏃‍♂️ Advanced Habit Tracking System
+- **Comprehensive Daily Tracking**: Rate habits from 1-5 daily with color-coded visual feedback
+- **Smart Progress Visualization**: 14-day desktop / 7-day mobile grid with intuitive color coding
+- **Habit Management**: Create, edit, and customize up to 5 habits with icons, colors, and acceptance criteria
+- **Streak Calculation**: Automatic streak tracking for consecutive days with ratings > 0
+- **7-Day Averages**: Performance analytics with rolling 7-day average calculations
+- **Notes System**: Add daily notes and observations for each habit
+- **Mobile-Optimized Interface**: Touch-friendly interactions with tap-to-view detailed information
+- **Default Habits**: Auto-initialization with 5 starter habits (Exercise, Read, Meditate, Hydrate, Sleep Early)
+
+### 🎤 Voice Recording & Audio Features  
+- **Voice Note Recording**: Record and send voice messages directly in chat
+- **Real-time Recording UI**: Visual recording indicators with timer and waveform
+- **Automatic Upload**: Seamless voice note upload to Supabase storage
+- **Audio Playback**: Built-in audio player for voice messages
+- **Cross-Platform Support**: WebRTC-based recording for browser compatibility
+
+### 📎 Advanced File Upload System
+- **Multi-Format Support**: Images, videos, audio files, and documents
+- **Drag & Drop Interface**: Intuitive file upload with visual drop zones
+- **Progress Tracking**: Real-time upload progress with detailed status
+- **File Size Validation**: Smart file size limits (50MB for voice, 25MB for images)
+- **Secure Storage**: Supabase storage with user-specific file organization
+- **Media Preview**: Inline preview for images, videos, and audio files
+
+### 📷 Journal Image Gallery
+- **Multi-Image Upload**: Support for multiple image attachments per journal entry
+- **Image Gallery View**: Beautiful lightbox gallery with navigation controls
+- **Image Management**: Upload, view, and organize images within journal entries
+- **Mobile-Optimized Display**: Touch-friendly image viewing and navigation
+- **Secure Image Storage**: User-specific image organization and access control
+
+### 🚀 Enhanced Onboarding Experience
+- **QuickStart Area**: Welcome screen with workflow selection for new users
+- **Workflow Cards**: Visual workflow selection with descriptions and icons
+- **One-Click Chat Creation**: Streamlined new chat creation from quickstart
+- **Mobile Menu Auto-Close**: Automatic menu closure after actions for better UX
+- **Contextual Help**: Built-in guidance for new users
 
 ## 🆕 Recent Updates & Mobile Improvements
 
@@ -81,11 +113,13 @@ This application serves as a comprehensive platform that combines multiple produ
 - **Scrollable Chat History**: Mobile sandwich menu now supports scrollable chat history
 - **Improved Touch Navigation**: Better mobile navigation with proper scroll constraints
 - **Responsive Menu Layout**: Optimized mobile menu layout with flex-based scrolling
+- **Auto-Close Mobile Menu**: Automatic menu closure when creating new chats or selecting items
 
 ### Component Architecture Updates
 - **src/components/ui/info-popover.tsx**: New component for mobile-friendly information display
 - **Enhanced Mobile Detection**: Improved mobile device detection and responsive behavior
 - **Touch Interaction Patterns**: Standardized touch interaction patterns across the application
+- **QuickStart Integration**: New quickstart area for improved user onboarding
 
 ## 🛠 Technology Stack
 
@@ -525,11 +559,144 @@ The configurable client wrapper (`src/lib/supabase-client.ts`) provides:
    BEFORE UPDATE ON public.journal_entries
    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
    
-   CREATE TRIGGER on_auth_user_created
-   AFTER INSERT ON auth.users
-   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user_permissions();
-   
-   -- 7. USER PERMISSIONS RLS POLICIES
+    CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user_permissions();
+    
+    -- 8. CREATE HABITS TABLE
+    CREATE TABLE public.habits (
+      id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+      user_id UUID NOT NULL,
+      name TEXT NOT NULL,
+      color TEXT NOT NULL DEFAULT '#3b82f6',
+      icon TEXT NOT NULL DEFAULT '📝',
+      position INTEGER NOT NULL DEFAULT 1,
+      acceptance_criteria TEXT,
+      notes TEXT,
+      created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+      updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+    );
+    
+    ALTER TABLE public.habits ENABLE ROW LEVEL SECURITY;
+    
+    -- Habits RLS policies
+    CREATE POLICY "Users can view their own habits" 
+    ON public.habits FOR SELECT USING (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can create their own habits" 
+    ON public.habits FOR INSERT WITH CHECK (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can update their own habits" 
+    ON public.habits FOR UPDATE USING (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can delete their own habits" 
+    ON public.habits FOR DELETE USING (auth.uid() = user_id);
+    
+    -- 9. CREATE HABIT ENTRIES TABLE
+    CREATE TABLE public.habit_entries (
+      id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+      habit_id UUID NOT NULL,
+      user_id UUID NOT NULL,
+      entry_date DATE NOT NULL,
+      rating INTEGER NOT NULL CHECK (rating >= 0 AND rating <= 5),
+      notes TEXT,
+      created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+      updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+      UNIQUE(habit_id, entry_date)
+    );
+    
+    ALTER TABLE public.habit_entries ENABLE ROW LEVEL SECURITY;
+    
+    -- Habit entries RLS policies
+    CREATE POLICY "Users can view their own habit entries" 
+    ON public.habit_entries FOR SELECT USING (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can create their own habit entries" 
+    ON public.habit_entries FOR INSERT WITH CHECK (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can update their own habit entries" 
+    ON public.habit_entries FOR UPDATE USING (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can delete their own habit entries" 
+    ON public.habit_entries FOR DELETE USING (auth.uid() = user_id);
+    
+    -- 10. CREATE JOURNAL IMAGES TABLE
+    CREATE TABLE public.journal_images (
+      id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+      user_id UUID NOT NULL,
+      url TEXT NOT NULL,
+      filename TEXT NOT NULL,
+      size_bytes INTEGER,
+      content_type TEXT,
+      created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+    );
+    
+    ALTER TABLE public.journal_images ENABLE ROW LEVEL SECURITY;
+    
+    -- Journal images RLS policies
+    CREATE POLICY "Users can view their own journal images" 
+    ON public.journal_images FOR SELECT USING (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can create their own journal images" 
+    ON public.journal_images FOR INSERT WITH CHECK (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can delete their own journal images" 
+    ON public.journal_images FOR DELETE USING (auth.uid() = user_id);
+    
+    -- 11. CREATE ADDITIONAL TRIGGERS FOR NEW TABLES
+    CREATE TRIGGER update_habits_updated_at
+    BEFORE UPDATE ON public.habits
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+    
+    CREATE TRIGGER update_habit_entries_updated_at
+    BEFORE UPDATE ON public.habit_entries
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+    
+    -- 12. CREATE STORAGE BUCKETS FOR FILE UPLOADS
+    INSERT INTO storage.buckets (id, name, public) VALUES ('chat-files', 'chat-files', false);
+    INSERT INTO storage.buckets (id, name, public) VALUES ('voice-notes', 'voice-notes', false);
+    INSERT INTO storage.buckets (id, name, public) VALUES ('journal-images', 'journal-images', false);
+    
+    -- Storage policies for chat files
+    CREATE POLICY "Users can view their own chat files" 
+    ON storage.objects FOR SELECT 
+    USING (bucket_id = 'chat-files' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    CREATE POLICY "Users can upload their own chat files" 
+    ON storage.objects FOR INSERT 
+    WITH CHECK (bucket_id = 'chat-files' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    CREATE POLICY "Users can delete their own chat files" 
+    ON storage.objects FOR DELETE 
+    USING (bucket_id = 'chat-files' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    -- Storage policies for voice notes
+    CREATE POLICY "Users can view their own voice notes" 
+    ON storage.objects FOR SELECT 
+    USING (bucket_id = 'voice-notes' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    CREATE POLICY "Users can upload their own voice notes" 
+    ON storage.objects FOR INSERT 
+    WITH CHECK (bucket_id = 'voice-notes' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    CREATE POLICY "Users can delete their own voice notes" 
+    ON storage.objects FOR DELETE 
+    USING (bucket_id = 'voice-notes' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    -- Storage policies for journal images
+    CREATE POLICY "Users can view their own journal images" 
+    ON storage.objects FOR SELECT 
+    USING (bucket_id = 'journal-images' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    CREATE POLICY "Users can upload their own journal images" 
+    ON storage.objects FOR INSERT 
+    WITH CHECK (bucket_id = 'journal-images' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    CREATE POLICY "Users can delete their own journal images" 
+    ON storage.objects FOR DELETE 
+    USING (bucket_id = 'journal-images' AND auth.uid()::text = (storage.foldername(name))[1]);
+    
+    -- 13. USER PERMISSIONS RLS POLICIES
    CREATE POLICY "Users can view their own permissions" 
    ON public.user_permissions FOR SELECT USING (auth.uid() = user_id);
    
