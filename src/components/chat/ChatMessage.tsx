@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Copy, ThumbsUp, ThumbsDown, MoreHorizontal, Download, Play, Pause } from "lucide-react";
+import { Copy, Download, Play, Pause, FileText, ExternalLink } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useState } from "react";
@@ -98,27 +98,54 @@ export const ChatMessage = ({ message, media }: ChatMessageProps) => {
       );
     }
 
-    // For other file types, show as download link
+    // For document and other file types
+    const isDocument = FileUploadService.isDocumentFile(media.type);
+    const fileIcon = FileUploadService.getFileIcon(media.type, media.name);
+    
     return (
       <div key={index} className="mt-2 p-3 bg-muted rounded-lg max-w-sm">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">
-            <div className="h-8 w-8 bg-primary/10 rounded flex items-center justify-center">
-              <Download className="h-4 w-4 text-primary" />
+            <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center text-lg">
+              {fileIcon}
             </div>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{media.name}</p>
-            <p className="text-xs text-muted-foreground">{FileUploadService.formatFileSize(media.size)}</p>
+            <p className="text-xs text-muted-foreground">
+              {FileUploadService.formatFileSize(media.size)}
+              {isDocument && ' • Document'}
+            </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-3"
-            onClick={() => window.open(media.url, '_blank')}
-          >
-            <Download className="h-3 w-3" />
-          </Button>
+          <div className="flex gap-1">
+            {/* View/Preview button for PDFs and documents */}
+            {isDocument && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={() => window.open(media.url, '_blank')}
+                title="View document"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            )}
+            {/* Download button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = media.url;
+                link.download = media.name;
+                link.click();
+              }}
+              title="Download file"
+            >
+              <Download className="h-3 w-3" />
+            </Button>
+          </div>
         </div>
       </div>
     );

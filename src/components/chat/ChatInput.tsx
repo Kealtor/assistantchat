@@ -293,7 +293,7 @@ return (
             multiple
             className="hidden"
             onChange={handleFileSelect}
-            accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
+            accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.csv,.json,.xml,.xls,.xlsx,.ppt,.pptx"
           />
           
           {/* Attachment Button */}
