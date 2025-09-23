@@ -62,6 +62,42 @@ export class FileUploadService {
     return type.startsWith('video/');
   }
 
+  static isDocumentFile(type: string): boolean {
+    const documentTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'text/csv',
+      'application/json',
+      'application/xml',
+      'text/xml'
+    ];
+    return documentTypes.includes(type);
+  }
+
+  static getFileIcon(type: string, name: string): string {
+    if (this.isImageFile(type)) return '🖼️';
+    if (this.isAudioFile(type)) return '🎵';
+    if (this.isVideoFile(type)) return '🎬';
+    
+    // Document specific icons
+    if (type === 'application/pdf') return '📄';
+    if (type.includes('word') || name.endsWith('.doc') || name.endsWith('.docx')) return '📝';
+    if (type.includes('excel') || type.includes('sheet') || name.endsWith('.xls') || name.endsWith('.xlsx')) return '📊';
+    if (type.includes('powerpoint') || type.includes('presentation') || name.endsWith('.ppt') || name.endsWith('.pptx')) return '📋';
+    if (type === 'text/plain' || name.endsWith('.txt')) return '📃';
+    if (type === 'text/csv' || name.endsWith('.csv')) return '📊';
+    if (type === 'application/json' || name.endsWith('.json')) return '🔧';
+    if (type.includes('xml') || name.endsWith('.xml')) return '🔧';
+    
+    return '📎';
+  }
+
   static formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
