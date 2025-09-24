@@ -6,15 +6,15 @@ import { ChatArea } from "../chat/ChatArea";
 import { JournalArea } from "../journal/JournalArea";
 import { HabitsArea } from "../habits/HabitsArea";
 import { UserSettings } from "../user/UserSettings";
+import { DashboardArea } from "../dashboard/DashboardArea";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, BookOpen, User, LogOut, Target } from "lucide-react";
+import { MessageSquare, BookOpen, User, LogOut, Target, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { chatService, ChatSession as ServiceChatSession } from "@/services/chatService";
 import { userService } from "@/services/userService";
 import { getUIWorkflows, getDefaultWorkflow } from "@/config/workflows.config";
-
-type ViewMode = "chat" | "journal" | "habits" | "user";
+import { ViewMode } from "@/types/navigation";
 
 type ChatSession = ServiceChatSession & {
   createdAt: Date;
@@ -24,7 +24,7 @@ type ChatSession = ServiceChatSession & {
 export const ChatLayout = () => {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
-  const [currentView, setCurrentView] = useState<ViewMode>("chat");
+  const [currentView, setCurrentView] = useState<ViewMode>("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState(getDefaultWorkflow().workflowName);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
@@ -175,6 +175,9 @@ export const ChatLayout = () => {
 
         {/* Mobile Content */}
         <div className="flex-1 overflow-hidden pb-16">
+          {currentView === "dashboard" && (
+            <DashboardArea onNavigate={setCurrentView} />
+          )}
           {currentView === "chat" && (
             <ChatArea 
               workflow={activeWorkflow}
@@ -242,6 +245,15 @@ export const ChatLayout = () => {
           
           <div className="flex items-center space-x-2">
             <Button
+              variant={currentView === "dashboard" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setCurrentView("dashboard")}
+              className="h-9"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+            <Button
               variant={currentView === "chat" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("chat")}
@@ -291,6 +303,9 @@ export const ChatLayout = () => {
 
         {/* Desktop Content */}
         <div className="flex-1 overflow-hidden">
+          {currentView === "dashboard" && (
+            <DashboardArea onNavigate={setCurrentView} />
+          )}
           {currentView === "chat" && (
             <ChatArea 
               workflow={activeWorkflow}

@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, BookOpen, User, Plus, Target } from "lucide-react";
+import { MessageSquare, BookOpen, User, Plus, Target, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type ViewMode = "chat" | "journal" | "habits" | "user";
+import { ViewMode } from "@/types/navigation";
 
 interface MobileNavigationProps {
   currentView: ViewMode;
@@ -15,6 +14,12 @@ export const MobileNavigation = ({
   onViewChange,
 }: MobileNavigationProps) => {
   const navItems = [
+    {
+      id: "dashboard" as const,
+      label: "Home",
+      icon: Home,
+      action: () => onViewChange("dashboard"),
+    },
     {
       id: "chat" as const,
       label: "Chat",
