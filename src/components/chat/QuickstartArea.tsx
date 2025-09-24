@@ -1,8 +1,12 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, MessageSquare, ArrowRight } from "lucide-react";
 import { getUIWorkflows } from "@/config/workflows.config";
+import { useAuth } from "@/hooks/useAuth";
+import { userService } from "@/services/userService";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface QuickstartAreaProps {
   activeWorkflow: string;
@@ -11,7 +15,35 @@ interface QuickstartAreaProps {
 }
 
 export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewChat }: QuickstartAreaProps) => {
-  const workflows = getUIWorkflows();
+  const { user } = useAuth();
+  const { isAdmin } = useAdmin();
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
+  const [allowedWorkflows, setAllowedWorkflows] = useState(getUIWorkflows());
+
+  useEffect(() => {
+    const fetchUserPermissions = async () => {
+      if (!user) return;
+      
+      try {
+        const permissions = await userService.getUserPermissions(user.id);
+        const permissionWorkflows = permissions.map(p => p.workflow_id);
+        setUserPermissions(permissionWorkflows);
+        
+        // Filter workflows based on permissions or admin status
+        const allWorkflows = getUIWorkflows();
+        const filtered = isAdmin 
+          ? allWorkflows 
+          : allWorkflows.filter(workflow => permissionWorkflows.includes(workflow.id));
+        
+        setAllowedWorkflows(filtered);
+      } catch (error) {
+        console.error('Failed to fetch user permissions:', error);
+        setAllowedWorkflows([]);
+      }
+    };
+
+    fetchUserPermissions();
+  }, [user, isAdmin]);
 
   const handleQuickStart = (workflowId: string) => {
     onWorkflowChange(workflowId);
@@ -36,7 +68,7 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          {workflows.map((workflow) => (
+          {allowedWorkflows.map((workflow) => (
             <Card
               key={workflow.id}
               className={`cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
@@ -83,7 +115,7 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
           
           <p className="text-sm text-muted-foreground">
             Selected: <span className="font-medium text-foreground">
-              {workflows.find(w => w.id === activeWorkflow)?.name}
+              {allowedWorkflows.find(w => w.id === activeWorkflow)?.name}
             </span>
           </p>
         </div>

@@ -33,6 +33,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { userService, UserPermission } from "@/services/userService";
 import { getDefaultWorkflow } from "@/config/workflows.config";
+import { ViewMode } from "@/types/navigation";
 
 type Workflow = {
   id: string;
@@ -40,8 +41,6 @@ type Workflow = {
   emoji: string;
   color: string;
 };
-
-type ViewMode = "chat" | "journal" | "habits" | "user";
 
 type ChatSession = {
   id: string;
