@@ -8,14 +8,27 @@ import { RecentJournalWidget } from "./RecentJournalWidget";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ViewMode } from "@/types/navigation";
+import { QuickstartArea } from "../chat/QuickstartArea";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DashboardAreaProps {
   onNavigate: (view: ViewMode) => void;
+  workflows?: any[];
+  activeWorkflow?: string;
+  onWorkflowChange?: (workflow: string) => void;
+  onCreateNewChat?: () => void;
 }
 
-export const DashboardArea = ({ onNavigate }: DashboardAreaProps) => {
+export const DashboardArea = ({ 
+  onNavigate, 
+  workflows = [], 
+  activeWorkflow = "", 
+  onWorkflowChange = () => {}, 
+  onCreateNewChat = () => {} 
+}: DashboardAreaProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshingHero, setRefreshingHero] = useState(false);
@@ -103,37 +116,101 @@ export const DashboardArea = ({ onNavigate }: DashboardAreaProps) => {
     );
   }
 
+  // Mobile layout - keep original design
+  if (isMobile) {
+    return (
+      <div className="h-full overflow-auto bg-background">
+        <div className="max-w-2xl mx-auto p-4 space-y-6">
+          {/* Header */}
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight">Good morning</h1>
+            <p className="text-muted-foreground">Let's make today meaningful</p>
+          </div>
+
+          {/* Dashboard Widgets */}
+          <div className="space-y-4">
+            <HeroCard 
+              message={dashboardData.heroMessage}
+              onRefresh={handleRefreshHero}
+              isRefreshing={refreshingHero}
+            />
+            
+            <QuickReflectionWidget 
+              placeholder={dashboardData.reflectionPreview}
+              onTap={() => onNavigate("journal")}
+            />
+            
+            <HabitsSnapshot 
+              habits={dashboardData.topHabits}
+              onViewAll={() => onNavigate("habits")}
+            />
+            
+            <RecentJournalWidget 
+              snippet={dashboardData.recentJournalSnippet}
+              onTap={() => onNavigate("journal")}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop layout - card-based grid with homebase feel
   return (
     <div className="h-full overflow-auto bg-background">
-      <div className="max-w-2xl mx-auto p-4 space-y-6">
+      <div className="max-w-6xl mx-auto p-6 md:p-8">
         {/* Header */}
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Good morning</h1>
-          <p className="text-muted-foreground">Let's make today meaningful</p>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Good morning</h1>
+          <p className="text-muted-foreground text-lg">Let's make today meaningful</p>
         </div>
 
-        {/* Dashboard Widgets */}
-        <div className="space-y-4">
-          <HeroCard 
-            message={dashboardData.heroMessage}
-            onRefresh={handleRefreshHero}
-            isRefreshing={refreshingHero}
-          />
+        {/* Dashboard Grid */}
+        <div className="space-y-6">
+          {/* Hero Card - Full Width */}
+          <div className="w-full">
+            <HeroCard 
+              message={dashboardData.heroMessage}
+              onRefresh={handleRefreshHero}
+              isRefreshing={refreshingHero}
+            />
+          </div>
           
-          <QuickReflectionWidget 
-            placeholder={dashboardData.reflectionPreview}
-            onTap={() => onNavigate("journal")}
-          />
-          
-          <HabitsSnapshot 
-            habits={dashboardData.topHabits}
-            onViewAll={() => onNavigate("habits")}
-          />
-          
-          <RecentJournalWidget 
-            snippet={dashboardData.recentJournalSnippet}
-            onTap={() => onNavigate("journal")}
-          />
+          {/* 2-Column Grid for Widgets */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <QuickReflectionWidget 
+              placeholder={dashboardData.reflectionPreview}
+              onTap={() => onNavigate("journal")}
+            />
+            
+            <HabitsSnapshot 
+              habits={dashboardData.topHabits}
+              onViewAll={() => onNavigate("habits")}
+            />
+            
+            <RecentJournalWidget 
+              snippet={dashboardData.recentJournalSnippet}
+              onTap={() => onNavigate("journal")}
+            />
+            
+            {/* Empty slot for visual balance or future widget */}
+            <div className="hidden md:block"></div>
+          </div>
+
+          {/* Quick Access - Full Width Bottom */}
+          <div className="w-full mt-8">
+            <div className="bg-card border rounded-lg p-6">
+              <h2 className="text-xl font-semibold mb-4 text-center">Quick Access</h2>
+              <QuickstartArea
+                activeWorkflow={activeWorkflow}
+                onWorkflowChange={onWorkflowChange}
+                onCreateNewChat={() => {
+                  onCreateNewChat();
+                  onNavigate("chat");
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

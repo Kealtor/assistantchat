@@ -207,7 +207,95 @@ export const ChatLayout = () => {
     );
   }
 
-  // Desktop Layout
+  // Desktop Layout - Dashboard has its own full-width layout
+  if (currentView === "dashboard") {
+    return (
+      <div className="h-screen bg-background font-inter">
+        {/* Dashboard Header */}
+        <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-medium">
+              🏠
+            </div>
+            <div>
+              <h1 className="font-semibold text-lg">Dashboard</h1>
+              <p className="text-muted-foreground text-sm">Your daily reflection space</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setCurrentView("dashboard")}
+              className="h-9"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentView("chat")}
+              className="h-9"
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Chat
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentView("journal")}
+              className="h-9"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Journal
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentView("habits")}
+              className="h-9"
+            >
+              <Target className="h-4 w-4 mr-2" />
+              Habits
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentView("user")}
+              className="h-9"
+            >
+              <User className="h-4 w-4 mr-2" />
+              User
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleSignOut}
+              className="h-9"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </header>
+
+        {/* Dashboard Content - Full Width */}
+        <div className="flex-1 overflow-hidden">
+          <DashboardArea 
+            onNavigate={setCurrentView}
+            workflows={workflows}
+            activeWorkflow={activeWorkflow}
+            onWorkflowChange={setActiveWorkflow}
+            onCreateNewChat={createNewChat}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Layout for non-dashboard views - with sidebar
   return (
     <div className="flex h-screen bg-background font-inter">
       {/* Desktop Sidebar */}
@@ -245,7 +333,7 @@ export const ChatLayout = () => {
           
           <div className="flex items-center space-x-2">
             <Button
-              variant={currentView === "dashboard" ? "default" : "ghost"}
+              variant="ghost"
               size="sm"
               onClick={() => setCurrentView("dashboard")}
               className="h-9"
@@ -303,9 +391,6 @@ export const ChatLayout = () => {
 
         {/* Desktop Content */}
         <div className="flex-1 overflow-hidden">
-          {currentView === "dashboard" && (
-            <DashboardArea onNavigate={setCurrentView} />
-          )}
           {currentView === "chat" && (
             <ChatArea 
               workflow={activeWorkflow}
