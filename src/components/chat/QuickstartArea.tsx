@@ -22,27 +22,40 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
 
   useEffect(() => {
     const fetchUserPermissions = async () => {
+      console.log('Fetching permissions for user:', user?.id, 'isAdmin:', isAdmin);
+      
       if (!user) {
-        // When user is not authenticated, show no workflows
+        console.log('No user authenticated, showing no workflows');
         setAllowedWorkflows([]);
+        setUserPermissions([]);
         return;
       }
       
       try {
         const permissions = await userService.getUserPermissions(user.id);
         const permissionWorkflows = permissions.map(p => p.workflow_id);
+        
+        console.log('User permissions:', permissionWorkflows);
+        console.log('Available workflows:', getUIWorkflows().map(w => w.id));
+        
         setUserPermissions(permissionWorkflows);
         
         // Filter workflows based on permissions or admin status
         const allWorkflows = getUIWorkflows();
         const filtered = isAdmin 
           ? allWorkflows 
-          : allWorkflows.filter(workflow => permissionWorkflows.includes(workflow.id));
+          : allWorkflows.filter(workflow => {
+              const hasPermission = permissionWorkflows.includes(workflow.id);
+              console.log(`Workflow "${workflow.id}" - Has permission: ${hasPermission}`);
+              return hasPermission;
+            });
         
+        console.log('Filtered workflows:', filtered.map(w => w.id));
         setAllowedWorkflows(filtered);
       } catch (error) {
         console.error('Failed to fetch user permissions:', error);
         setAllowedWorkflows([]);
+        setUserPermissions([]);
       }
     };
 

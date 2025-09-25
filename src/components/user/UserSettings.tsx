@@ -11,18 +11,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Mail, Shield, Edit2, Save, X } from "lucide-react";
+import { User, Mail, Shield, Edit2, Save, X, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { configurableSupabase as supabase } from "@/lib/supabase-client";
+import { useLocation } from "wouter";
 
 export const UserSettings = () => {
   const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdmin();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   
   const [formData, setFormData] = useState({
     display_name: '',
@@ -85,6 +89,34 @@ export const UserSettings = () => {
       });
     }
     setIsEditing(false);
+  };
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to sign out. Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Signed out",
+          description: "You have been successfully signed out.",
+        });
+        setLocation("/auth");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive"
+      });
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   if (loading) {
@@ -258,6 +290,20 @@ export const UserSettings = () => {
                   {user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Unknown'}
                 </p>
               </div>
+            </div>
+            
+            <Separator />
+            
+            <div className="flex justify-end">
+              <Button 
+                variant="destructive" 
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                {signingOut ? "Signing out..." : "Sign Out"}
+              </Button>
             </div>
            </CardContent>
          </Card>
