@@ -28,6 +28,9 @@ import {
   Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
+import { userService, UserPermission } from "@/services/userService";
 
 type Workflow = {
   id: string;
@@ -76,8 +79,35 @@ export const MobileChatHeader = ({
   onTogglePinChat,
   onSignOut,
 }: MobileChatHeaderProps) => {
+  const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [userPermissions, setUserPermissions] = useState<UserPermission[]>([]);
+  const [allowedWorkflows, setAllowedWorkflows] = useState<Workflow[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      loadUserPermissions();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    // Filter workflows based on permissions or admin status
+    const filtered = isAdmin 
+      ? workflows 
+      : workflows.filter(workflow => {
+          return userPermissions.some(perm => perm.workflow_id === workflow.id);
+        });
+    setAllowedWorkflows(filtered);
+  }, [workflows, userPermissions, isAdmin]);
+
+  const loadUserPermissions = async () => {
+    if (!user) return;
+    
+    const permissions = await userService.getUserPermissions(user.id);
+    setUserPermissions(permissions);
+  };
 
   // Prevent autofocus when sheet opens
   useEffect(() => {
@@ -93,7 +123,7 @@ export const MobileChatHeader = ({
     }
   }, [sheetOpen]);
   
-  const currentWorkflow = workflows.find(w => w.id === activeWorkflow);
+  const currentWorkflow = allowedWorkflows.find(w => w.id === activeWorkflow);
   const activeChat = activeChatId ? chatSessions.find(chat => chat.id === activeChatId) : null;
   
   const formatTimestamp = (date: Date) => {
@@ -159,7 +189,7 @@ export const MobileChatHeader = ({
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    {workflows.map((workflow) => (
+                    {allowedWorkflows.map((workflow) => (
                       <SelectItem key={workflow.id} value={workflow.id}>
                         <div className="flex items-center gap-3">
                           <span className="text-base">{workflow.emoji}</span>
