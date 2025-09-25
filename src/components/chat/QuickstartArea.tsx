@@ -67,7 +67,7 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div className="space-y-3 mb-8">
           {allowedWorkflows.map((workflow) => (
             <Card
               key={workflow.id}
@@ -78,13 +78,13 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
               }`}
               onClick={() => onWorkflowChange(workflow.id)}
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg ${workflow.color} flex items-center justify-center text-white text-lg`}>
+                  <div className={`w-8 h-8 rounded-lg ${workflow.color} flex items-center justify-center text-white text-sm`}>
                     {workflow.emoji}
                   </div>
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{workflow.name}</CardTitle>
+                    <CardTitle className="text-base">{workflow.name}</CardTitle>
                     {activeWorkflow === workflow.id && (
                       <Badge variant="secondary" className="mt-1 text-xs">
                         Selected
@@ -94,7 +94,7 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <CardDescription className="text-sm leading-relaxed">
+                <CardDescription className="text-xs leading-relaxed">
                   {workflow.description}
                 </CardDescription>
               </CardContent>
