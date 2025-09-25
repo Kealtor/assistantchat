@@ -155,49 +155,52 @@ export const DashboardArea = ({
     );
   }
 
-  // Desktop layout - broader with quick access
+  // Desktop layout - card-based grid with homebase feel
   return (
     <div className="h-full overflow-auto bg-background">
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Dashboard Widgets */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Header */}
-            <div className="space-y-1">
-              <h1 className="text-3xl font-bold tracking-tight">Good morning</h1>
-              <p className="text-muted-foreground text-lg">Let's make today meaningful</p>
-            </div>
+      <div className="max-w-6xl mx-auto p-6 md:p-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Good morning</h1>
+          <p className="text-muted-foreground text-lg">Let's make today meaningful</p>
+        </div>
 
-            {/* Dashboard Widgets */}
-            <div className="space-y-6">
-              <HeroCard 
-                message={dashboardData.heroMessage}
-                onRefresh={handleRefreshHero}
-                isRefreshing={refreshingHero}
-              />
-              
-              <QuickReflectionWidget 
-                placeholder={dashboardData.reflectionPreview}
-                onTap={() => onNavigate("journal")}
-              />
-              
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <HabitsSnapshot 
-                  habits={dashboardData.topHabits}
-                  onViewAll={() => onNavigate("habits")}
-                />
-                
-                <RecentJournalWidget 
-                  snippet={dashboardData.recentJournalSnippet}
-                  onTap={() => onNavigate("journal")}
-                />
-              </div>
-            </div>
+        {/* Dashboard Grid */}
+        <div className="space-y-6">
+          {/* Hero Card - Full Width */}
+          <div className="w-full">
+            <HeroCard 
+              message={dashboardData.heroMessage}
+              onRefresh={handleRefreshHero}
+              isRefreshing={refreshingHero}
+            />
+          </div>
+          
+          {/* 2-Column Grid for Widgets */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <QuickReflectionWidget 
+              placeholder={dashboardData.reflectionPreview}
+              onTap={() => onNavigate("journal")}
+            />
+            
+            <HabitsSnapshot 
+              habits={dashboardData.topHabits}
+              onViewAll={() => onNavigate("habits")}
+            />
+            
+            <RecentJournalWidget 
+              snippet={dashboardData.recentJournalSnippet}
+              onTap={() => onNavigate("journal")}
+            />
+            
+            {/* Empty slot for visual balance or future widget */}
+            <div className="hidden md:block"></div>
           </div>
 
-          {/* Right Column - Quick Access */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
+          {/* Quick Access - Full Width Bottom */}
+          <div className="w-full mt-8">
+            <div className="bg-card border rounded-lg p-6">
+              <h2 className="text-xl font-semibold mb-4 text-center">Quick Access</h2>
               <QuickstartArea
                 activeWorkflow={activeWorkflow}
                 onWorkflowChange={onWorkflowChange}
