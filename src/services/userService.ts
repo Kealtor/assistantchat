@@ -1,4 +1,5 @@
 import { configurableSupabase as supabase } from "@/lib/supabase-client";
+import { workflows } from "@/config/workflows.config";
 
 export type UserProfile = {
   id: string;
@@ -68,6 +69,12 @@ export const userService = {
       if (error) {
         console.error('Error creating user profile:', error);
         return null;
+      }
+
+      // Grant default workflow permissions
+      const defaultWorkflows = workflows.filter(workflow => workflow.default);
+      for (const workflow of defaultWorkflows) {
+        await this.grantPermission(userId, workflow.workflowName, 'system');
       }
 
       return {
