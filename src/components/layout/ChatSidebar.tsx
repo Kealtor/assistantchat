@@ -33,6 +33,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { userService, UserPermission } from "@/services/userService";
 import { getDefaultWorkflow } from "@/config/workflows.config";
+import { useAdmin } from "@/hooks/useAdmin";
 import { ViewMode } from "@/types/navigation";
 
 type Workflow = {
@@ -89,6 +90,7 @@ export const ChatSidebar = ({
   onTogglePinChat,
 }: ChatSidebarProps) => {
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [userPermissions, setUserPermissions] = useState<UserPermission[]>([]);
   const [allowedWorkflows, setAllowedWorkflows] = useState<Workflow[]>([]);
@@ -97,19 +99,21 @@ export const ChatSidebar = ({
     if (user) {
       loadUserPermissions();
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   useEffect(() => {
-    // Filter workflows based on permissions
-    const allowed = workflows.filter(workflow => {
-      // Default workflow is always available
-      if (workflow.id === getDefaultWorkflow().workflowName) return true;
-      
-      // Check if user has permission for this workflow
-      return userPermissions.some(perm => perm.workflow_id === workflow.id);
-    });
-    setAllowedWorkflows(allowed);
-  }, [workflows, userPermissions]);
+    // Filter workflows based on permissions and admin status
+    if (isAdmin) {
+      // Admin sees all workflows
+      setAllowedWorkflows(workflows);
+    } else {
+      // Regular users see only workflows they have permissions for
+      const allowed = workflows.filter(workflow => {
+        return userPermissions.some(perm => perm.workflow_id === workflow.id);
+      });
+      setAllowedWorkflows(allowed);
+    }
+  }, [workflows, userPermissions, isAdmin]);
 
   const loadUserPermissions = async () => {
     if (!user) return;
