@@ -22,7 +22,11 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
 
   useEffect(() => {
     const fetchUserPermissions = async () => {
-      if (!user) return;
+      if (!user) {
+        // When user is not authenticated, show no workflows
+        setAllowedWorkflows([]);
+        return;
+      }
       
       try {
         const permissions = await userService.getUserPermissions(user.id);
