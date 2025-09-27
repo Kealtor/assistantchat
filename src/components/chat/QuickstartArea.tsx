@@ -70,7 +70,7 @@ export const QuickstartArea = ({ activeWorkflow, onWorkflowChange, onCreateNewCh
   };
 
   return (
-    <div className="flex items-center justify-center h-full p-6">
+    <div className="min-h-full flex items-center justify-center p-6 md:h-full">
       <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
