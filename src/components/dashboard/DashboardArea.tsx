@@ -120,7 +120,7 @@ export const DashboardArea = ({
   if (isMobile) {
     return (
       <div className="h-full overflow-auto bg-background">
-        <div className="max-w-2xl mx-auto p-4 space-y-6">
+        <div className="w-full mx-auto p-4 space-y-6 max-w-2xl">
           {/* Header */}
           <div className="space-y-1">
             <h1 className="text-2xl font-bold tracking-tight">Good morning</h1>

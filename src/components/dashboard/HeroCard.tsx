@@ -20,7 +20,7 @@ export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) =>
             </div>
             <span className="text-sm font-medium text-primary">Daily Inspiration</span>
           </div>
-          <p className="text-foreground leading-relaxed text-base md:text-lg pr-12">
+          <p className="text-foreground leading-relaxed text-base md:text-lg pr-8 md:pr-12">
             {message}
           </p>
         </div>
