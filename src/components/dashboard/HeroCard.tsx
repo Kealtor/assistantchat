@@ -11,8 +11,8 @@ interface HeroCardProps {
 
 export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) => {
   return (
-    <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-      <CardContent className="p-6">
+    <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-lg">
+      <CardContent className="p-8">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
@@ -21,7 +21,7 @@ export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) =>
               </div>
               <span className="text-sm font-medium text-primary">Daily Inspiration</span>
             </div>
-            <p className="text-foreground leading-relaxed">
+            <p className="text-foreground leading-relaxed text-lg">
               {message}
             </p>
           </div>
