@@ -12,35 +12,33 @@ interface HeroCardProps {
 export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) => {
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-lg">
-      <CardContent className="p-4 md:p-8">
-        <div className="flex items-start justify-between gap-2 md:gap-4">
-          <div className="flex-1 min-w-0 pr-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-sm font-medium text-primary">Daily Inspiration</span>
+      <CardContent className="p-4 md:p-8 relative">
+        <div className="w-full">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-foreground leading-relaxed text-base md:text-lg">
-              {message}
-            </p>
+            <span className="text-sm font-medium text-primary">Daily Inspiration</span>
           </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            className="flex-shrink-0 text-primary hover:bg-primary/10"
-          >
-            <RefreshCw 
-              className={cn(
-                "w-4 h-4", 
-                isRefreshing && "animate-spin"
-              )} 
-            />
-          </Button>
+          <p className="text-foreground leading-relaxed text-base md:text-lg pr-12">
+            {message}
+          </p>
         </div>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          className="absolute top-4 right-4 text-primary hover:bg-primary/10"
+        >
+          <RefreshCw 
+            className={cn(
+              "w-4 h-4", 
+              isRefreshing && "animate-spin"
+            )} 
+          />
+        </Button>
       </CardContent>
     </Card>
   );
