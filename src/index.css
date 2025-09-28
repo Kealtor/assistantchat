@@ -222,12 +222,14 @@
 /* React Grid Layout Styles */
 .react-grid-layout {
   position: relative;
+  min-height: auto !important;
 }
 
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top;
   border-radius: 0.5rem;
+  box-sizing: border-box;
 }
 
 .react-grid-item.cssTransforms {
@@ -236,36 +238,46 @@
 
 .react-grid-item > .react-resizable-handle {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  bottom: 0;
-  right: 0;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZG90cyBmaWxsPSIjODg4IiBkPSJtMTUgMTJjMCAuNTUyLjQ0OCAxIDEgMXMxLS40NDggMS0xLS40NDgtMS0xLTEtMSAuNDQ4LTEgMXptLTIgM2MwIC41NTIuNDQ4IDEgMSAxczEtLjQ0OCAxLTEtLjQ0OC0xLTEtMS0xIC40NDgtMSAxem0wIDNjMCAuNTUyLjQ0OCAxIDEgMXMxLS40NDggMS0xLS40NDgtMS0xLTEtMSAuNDQ4LTEgMXptMy0zYzAgLjU1Mi40NDggMSAxIDFzMS0uNDQ4IDEtMS0uNDQ4LTEtMS0xLTEgLjQ0OC0xIDF6bTAtM2MwIC41NTIuNDQ4IDEgMSAxczEtLjQ0OCAxLTEtLjQ0OC0xLTEtMS0xIC40NDgtMSAxem0zIDBjMCAuNTUyLjQ0OCAxIDEgMXMxLS40NDggMS0xLS40NDgtMS0xLTEtMSAuNDQ4LTEgMXptMCAzYzAgLjU1Mi40NDggMSAxIDFzMS0uNDQ4IDEtMS0uNDQ4LTEtMS0xLTEgLjQ0OC0xIDF6bTAgNGMwIC41NTIuNDQ4IDEgMSAxczEtLjQ0OCAxLTEtLjQ0OC0xLTEtMS0xIC40NDgtMSAxeiIvPgo8L3N2Zz4K');
-  background-position: bottom right;
-  padding: 0 3px 3px 0;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  bottom: 2px;
+  right: 2px;
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 2px;
   cursor: se-resize;
+  z-index: 10;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-right: 2px solid hsl(var(--muted-foreground));
+  border-bottom: 2px solid hsl(var(--muted-foreground));
 }
 
 .react-grid-item.react-grid-placeholder {
-  background: hsl(var(--primary) / 0.2);
-  opacity: 0.6;
+  background: hsl(var(--primary) / 0.1);
+  opacity: 0.8;
   transition-duration: 100ms;
   z-index: 2;
   user-select: none;
-  border: 2px dashed hsl(var(--primary));
+  border: 2px dashed hsl(var(--primary) / 0.5);
+  border-radius: 0.5rem;
 }
 
 .react-grid-item.react-draggable-dragging {
   transition: none;
   z-index: 3;
-  opacity: 0.8;
+  opacity: 0.9;
+  box-shadow: 0 8px 25px -8px hsl(var(--primary) / 0.3);
 }
 
 .layout {
-  min-height: 500px;
+  min-height: auto !important;
 }
 
 .dark {

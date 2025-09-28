@@ -182,16 +182,18 @@ export const CustomizableDashboard = ({
         );
       case 'quickstart':
         return (
-          <div className="bg-card border rounded-lg p-6 h-full">
-            <h2 className="text-xl font-semibold mb-4 text-center">Quick Access</h2>
-            <QuickstartArea
-              activeWorkflow={activeWorkflow}
-              onWorkflowChange={onWorkflowChange}
-              onCreateNewChat={() => {
-                onCreateNewChat();
-                onNavigate("chat");
-              }}
-            />
+          <div className="bg-card border rounded-lg p-4 h-full flex flex-col">
+            <h2 className="text-lg font-semibold mb-3">Quick Access</h2>
+            <div className="flex-1 min-h-0">
+              <QuickstartArea
+                activeWorkflow={activeWorkflow}
+                onWorkflowChange={onWorkflowChange}
+                onCreateNewChat={() => {
+                  onCreateNewChat();
+                  onNavigate("chat");
+                }}
+              />
+            </div>
           </div>
         );
       default:
@@ -273,10 +275,10 @@ export const CustomizableDashboard = ({
 
   // Desktop layout with grid
   return (
-    <div className="h-full overflow-auto bg-background">
+    <div className="h-full overflow-y-auto bg-background">
       <div className="max-w-6xl mx-auto p-6">
         {/* Header with controls */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-6">
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Good morning</h1>
             <p className="text-muted-foreground text-lg">Let's make today meaningful</p>
@@ -309,22 +311,26 @@ export const CustomizableDashboard = ({
           layouts={{ lg: gridLayout }}
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-          rowHeight={60}
+          rowHeight={80}
           isDraggable={isEditMode}
           isResizable={isEditMode}
           onLayoutChange={handleLayoutChange}
-          margin={[16, 16]}
+          margin={[12, 12]}
+          containerPadding={[0, 0]}
+          compactType="vertical"
         >
-          {layout.widgets.map(widget => (
-            <div key={widget.id} className={isEditMode ? "cursor-move" : ""}>
+        {layout.widgets.map(widget => (
+          <div key={widget.id} className={`${isEditMode ? "cursor-move" : ""} h-full`}>
+            <div className="h-full">
               {renderWidget(widget)}
-              {isEditMode && (
-                <div className="absolute top-2 right-2 bg-background/80 rounded p-1">
-                  <span className="text-xs text-muted-foreground">{widget.type}</span>
-                </div>
-              )}
             </div>
-          ))}
+            {isEditMode && (
+              <div className="absolute top-2 right-2 bg-background/80 rounded p-1 z-10">
+                <span className="text-xs text-muted-foreground capitalize">{widget.type}</span>
+              </div>
+            )}
+          </div>
+        ))}
         </ResponsiveGridLayout>
 
         {isEditMode && (
