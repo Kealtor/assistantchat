@@ -85,13 +85,16 @@ export const defaultLayout: DashboardLayout = {
 export const dashboardConfigService = {
   async getUserLayout(userId: string): Promise<DashboardLayout> {
     try {
+      // Get the most recent layout for the user
       const { data, error } = await supabase
         .from('dashboard_configs')
         .select('layout')
         .eq('user_id', userId)
-        .maybeSingle();
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') throw error;
       
       return (data?.layout as unknown as DashboardLayout) || defaultLayout;
     } catch (error) {
@@ -102,9 +105,16 @@ export const dashboardConfigService = {
 
   async saveUserLayout(userId: string, layout: DashboardLayout): Promise<void> {
     try {
+      // Delete any existing configs for this user first to prevent duplicates
+      await supabase
+        .from('dashboard_configs')
+        .delete()
+        .eq('user_id', userId);
+
+      // Insert the new layout
       const { error } = await supabase
         .from('dashboard_configs')
-        .upsert({ 
+        .insert({ 
           user_id: userId, 
           layout: layout as any 
         });
