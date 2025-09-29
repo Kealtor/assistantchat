@@ -105,7 +105,7 @@ export const CustomizableDashboard = ({
       return widget;
     });
 
-    setLayout({ widgets: updatedWidgets });
+    setLayout(prev => prev ? { ...prev, widgets: updatedWidgets } : null);
   };
 
   const saveLayout = async () => {
@@ -114,6 +114,8 @@ export const CustomizableDashboard = ({
     try {
       await dashboardConfigService.saveUserLayout(user.id, layout);
       setIsEditMode(false);
+      // Reload to ensure we have the saved version
+      await loadUserLayout();
     } catch (error) {
       console.error('Error saving layout:', error);
     }
@@ -310,12 +312,12 @@ export const CustomizableDashboard = ({
           className="layout"
           layouts={{ lg: gridLayout }}
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-          cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-          rowHeight={80}
+          cols={{ lg: 2, md: 2, sm: 1, xs: 1, xxs: 1 }}
+          rowHeight={60}
           isDraggable={isEditMode}
           isResizable={isEditMode}
           onLayoutChange={handleLayoutChange}
-          margin={[12, 12]}
+          margin={[16, 16]}
           containerPadding={[0, 0]}
           compactType="vertical"
         >

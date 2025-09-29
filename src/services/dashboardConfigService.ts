@@ -24,10 +24,11 @@ export const defaultLayout: DashboardLayout = {
       type: 'hero',
       x: 0,
       y: 0,
-      w: 12,
+      w: 2,
       h: 2,
-      minW: 6,
+      minW: 1,
       minH: 2,
+      maxW: 2,
       maxH: 3
     },
     {
@@ -35,21 +36,23 @@ export const defaultLayout: DashboardLayout = {
       type: 'reflection',
       x: 0,
       y: 2,
-      w: 6,
+      w: 1,
       h: 2,
-      minW: 4,
+      minW: 1,
       minH: 2,
+      maxW: 2,
       maxH: 3
     },
     {
       id: 'habits',
       type: 'habits',
-      x: 6,
+      x: 1,
       y: 2,
-      w: 6,
+      w: 1,
       h: 3,
-      minW: 4,
+      minW: 1,
       minH: 3,
+      maxW: 2,
       maxH: 4
     },
     {
@@ -57,10 +60,11 @@ export const defaultLayout: DashboardLayout = {
       type: 'journal',
       x: 0,
       y: 4,
-      w: 6,
+      w: 1,
       h: 3,
-      minW: 4,
+      minW: 1,
       minH: 3,
+      maxW: 2,
       maxH: 4
     },
     {
@@ -68,10 +72,11 @@ export const defaultLayout: DashboardLayout = {
       type: 'quickstart',
       x: 0,
       y: 7,
-      w: 12,
+      w: 2,
       h: 3,
-      minW: 8,
+      minW: 1,
       minH: 3,
+      maxW: 2,
       maxH: 4
     }
   ]
