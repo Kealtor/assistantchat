@@ -25,7 +25,7 @@ export const HabitsSnapshot = ({ habits, onViewAll }: HabitsSnapshotProps) => {
   };
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Today's Habits</CardTitle>
@@ -40,7 +40,7 @@ export const HabitsSnapshot = ({ habits, onViewAll }: HabitsSnapshotProps) => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 flex-1 overflow-auto">
         {habits.map((habit) => (
           <div key={habit.id} className="space-y-2">
             <div className="flex items-center justify-between">
