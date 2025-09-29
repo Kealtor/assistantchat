@@ -105,7 +105,7 @@ export const CustomizableDashboard = ({
       return widget;
     });
 
-    setLayout(prev => prev ? { ...prev, widgets: updatedWidgets } : null);
+    setLayout({ widgets: updatedWidgets });
   };
 
   const saveLayout = async () => {
@@ -155,32 +155,40 @@ export const CustomizableDashboard = ({
     switch (widget.type) {
       case 'hero':
         return (
-          <HeroCard
-            message={dashboardData.heroMessage}
-            onRefresh={handleRefreshHero}
-            isRefreshing={refreshingHero}
-          />
+          <div className="h-full">
+            <HeroCard
+              message={dashboardData.heroMessage}
+              onRefresh={handleRefreshHero}
+              isRefreshing={refreshingHero}
+            />
+          </div>
         );
       case 'reflection':
         return (
-          <QuickReflectionWidget
-            placeholder={dashboardData.reflectionPreview}
-            onTap={() => onNavigate("journal")}
-          />
+          <div className="h-full">
+            <QuickReflectionWidget
+              placeholder={dashboardData.reflectionPreview}
+              onTap={() => onNavigate("journal")}
+            />
+          </div>
         );
       case 'habits':
         return (
-          <HabitsSnapshot
-            habits={dashboardData.topHabits}
-            onViewAll={() => onNavigate("habits")}
-          />
+          <div className="h-full">
+            <HabitsSnapshot
+              habits={dashboardData.topHabits}
+              onViewAll={() => onNavigate("habits")}
+            />
+          </div>
         );
       case 'journal':
         return (
-          <RecentJournalWidget
-            snippet={dashboardData.recentJournalSnippet}
-            onTap={() => onNavigate("journal")}
-          />
+          <div className="h-full">
+            <RecentJournalWidget
+              snippet={dashboardData.recentJournalSnippet}
+              onTap={() => onNavigate("journal")}
+            />
+          </div>
         );
       case 'quickstart':
         return (
@@ -199,7 +207,7 @@ export const CustomizableDashboard = ({
           </div>
         );
       default:
-        return <div>Unknown widget type</div>;
+        return <div className="h-full">Unknown widget type</div>;
     }
   };
 
@@ -322,10 +330,8 @@ export const CustomizableDashboard = ({
           compactType="vertical"
         >
         {layout.widgets.map(widget => (
-          <div key={widget.id} className={`${isEditMode ? "cursor-move" : ""} h-full`}>
-            <div className="h-full">
-              {renderWidget(widget)}
-            </div>
+          <div key={widget.id} className={`${isEditMode ? "cursor-move" : ""} h-full overflow-hidden`}>
+            {renderWidget(widget)}
             {isEditMode && (
               <div className="absolute top-2 right-2 bg-background/80 rounded p-1 z-10">
                 <span className="text-xs text-muted-foreground capitalize">{widget.type}</span>
