@@ -218,3 +218,168 @@
     }
   }
 }
+
+/* React Grid Layout Styles */
+.react-grid-layout {
+  position: relative;
+  min-height: auto !important;
+}
+
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+}
+
+.react-grid-item.cssTransforms {
+  transition-property: transform;
+}
+
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  bottom: 2px;
+  right: 2px;
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 2px;
+  cursor: se-resize;
+  z-index: 10;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-right: 2px solid hsl(var(--muted-foreground));
+  border-bottom: 2px solid hsl(var(--muted-foreground));
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: hsl(var(--primary) / 0.1);
+  opacity: 0.8;
+  transition-duration: 100ms;
+  z-index: 2;
+  user-select: none;
+  border: 2px dashed hsl(var(--primary) / 0.5);
+  border-radius: 0.5rem;
+}
+
+.react-grid-item.react-draggable-dragging {
+  transition: none;
+  z-index: 3;
+  opacity: 0.9;
+  box-shadow: 0 8px 25px -8px hsl(var(--primary) / 0.3);
+}
+
+.layout {
+  min-height: auto !important;
+}
+
+.dark {
+  --background: 224 71% 4%;
+  --foreground: 0 0% 100%;
+  
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 217 91% 50%;
+  
+  --secondary: 215 25% 15%;
+  --secondary-foreground: 0 0% 100%;
+  
+  --muted: 215 25% 15%;
+  --muted-foreground: 217 10% 64%;
+  --accent: 215 25% 15%;
+  --accent-foreground: 0 0% 100%;
+  
+  --success: 142 76% 36%;
+  --warning: 38 92% 50%;
+  --error: 0 84% 60%;
+  
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 215 28% 17%;
+  --input: 215 28% 17%;
+  --ring: 217 91% 60%;
+  
+  --card: 224 71% 4%;
+  --card-foreground: 0 0% 100%;
+  
+  --popover: 224 71% 4%;
+  --popover-foreground: 0 0% 100%;
+  
+  --surface: 215 25% 10%;
+  --surface-elevated: 215 25% 15%;
+  
+  /* Chat-specific colors */
+  --chat-user: 217 91% 60%;
+  --chat-user-foreground: 0 0% 100%;
+  --chat-assistant: 215 25% 15%;
+  --chat-assistant-foreground: 0 0% 100%;
+  
+  /* Sidebar colors */
+  --sidebar-background: 215 25% 10%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 217 91% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 215 25% 15%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 215 28% 17%;
+  --sidebar-ring: 217 91% 60%;
+  
+  /* Habit Rating Colors - Dark Mode */
+  --habit-unrated: 215 25% 15%;
+  --habit-rating-1: 0 84% 60%;
+  --habit-rating-2: 25 95% 53%;
+  --habit-rating-3: 45 93% 58%;
+  --habit-rating-4: 84 81% 44%;
+  --habit-rating-5: 142 76% 36%;
+
+  /* Dark mode gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 50%));
+  --gradient-surface: linear-gradient(180deg, hsl(224 71% 4%), hsl(215 25% 10%));
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply border-border bg-background text-foreground font-inter;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-size: 16px;
+    line-height: 1.5;
+    
+    /* Safe area for mobile devices */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+  }
+
+  /* Additional utility classes for responsive design */
+  @layer utilities {
+    .safe-area-inset-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .touch-target {
+      min-height: var(--touch-target-min);
+      min-width: var(--touch-target-min);
+    }
+    
+    .touch-target-comfortable {
+      min-height: var(--touch-target-comfortable);
+      min-width: var(--touch-target-comfortable);
+    }
+  }
+}

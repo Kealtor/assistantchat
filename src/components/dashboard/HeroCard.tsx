@@ -11,8 +11,8 @@ interface HeroCardProps {
 
 export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) => {
   return (
-    <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-lg">
-      <CardContent className="p-4 md:p-8 relative">
+    <Card className="h-full bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-lg flex flex-col">
+      <CardContent className="p-4 md:p-8 relative flex-1 flex items-center">
         <div className="w-full">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
