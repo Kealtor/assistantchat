@@ -25,59 +25,59 @@ export const defaultLayout: DashboardLayout = {
       x: 0,
       y: 0,
       w: 2,
-      h: 2,
+      h: 3,
       minW: 1,
       minH: 2,
       maxW: 2,
-      maxH: 3
+      maxH: 6
     },
     {
       id: 'reflection',
       type: 'reflection',
       x: 0,
-      y: 2,
+      y: 3,
       w: 1,
-      h: 2,
+      h: 3,
       minW: 1,
       minH: 2,
       maxW: 2,
-      maxH: 3
+      maxH: 6
     },
     {
       id: 'habits',
       type: 'habits',
       x: 1,
-      y: 2,
+      y: 3,
       w: 1,
-      h: 3,
+      h: 4,
       minW: 1,
       minH: 3,
       maxW: 2,
-      maxH: 4
+      maxH: 8
     },
     {
       id: 'journal',
       type: 'journal',
       x: 0,
-      y: 4,
+      y: 6,
       w: 1,
-      h: 3,
+      h: 4,
       minW: 1,
       minH: 3,
       maxW: 2,
-      maxH: 4
+      maxH: 8
     },
     {
       id: 'quickstart',
       type: 'quickstart',
       x: 0,
-      y: 7,
+      y: 10,
       w: 2,
-      h: 3,
+      h: 5,
       minW: 1,
-      minH: 3,
+      minH: 4,
       maxW: 2,
-      maxH: 4
+      maxH: 8
     }
   ]
 };
