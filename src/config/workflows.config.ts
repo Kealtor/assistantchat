@@ -19,6 +19,40 @@ export const workflows: WorkflowConfig[] = [
     default: true
   },
   {
+    workflowName: "Prompting Architect",
+    description: "General purpose prompting architect",
+    webhookUrl: "https://n8n.kealtor.de/webhook/prompt-architect",
+    message: `<role> 
+              I am a user who needs help designing an AI prompt.
+              </role>
+
+              <context>
+              [Paste chat history or background here]
+              </context>
+              
+              <input>
+              [Write your new message or request here]
+              </input>
+
+              <task>
+              Reformulate my request into a high-quality AI prompt I can use directly.
+              </task>
+              
+              <constraints>
+              - Be concise and structured.
+              - Retain all important details.
+              - Optimize for clarity and usability.
+              </constraints>
+
+              <output>
+              Return the final optimized prompt.
+              </output>
+              `,
+    emoji: "🏛️",
+    color: "bg-primary",
+    default: true
+  },
+  {
     workflowName: "Journal Buddy",
     description: "General AI assistant for various tasks and conversations",
     webhookUrl: "https://n8n.kealtor.de/webhook/duplicate",
