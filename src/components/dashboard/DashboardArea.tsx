@@ -82,14 +82,14 @@ export const DashboardArea = ({
 
   if (loading) {
     return (
-      <div className="h-full overflow-auto bg-background">
-        <div className="max-w-2xl mx-auto p-4 space-y-6">
-          <div className="space-y-3">
+      <div className="h-full overflow-auto bg-background safe-area-inset-bottom">
+        <div className="max-w-2xl mx-auto p-space-md space-y-space-lg">
+          <div className="space-y-space-sm">
             <Skeleton className="h-8 w-48" />
             <Skeleton className="h-4 w-32" />
           </div>
           
-          <div className="space-y-4">
+          <div className="space-y-space-md">
             <Skeleton className="h-32 w-full rounded-lg" />
             <Skeleton className="h-24 w-full rounded-lg" />
             <Skeleton className="h-40 w-full rounded-lg" />
@@ -102,12 +102,12 @@ export const DashboardArea = ({
 
   if (!dashboardData) {
     return (
-      <div className="h-full flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <p className="text-muted-foreground">Unable to load dashboard content</p>
+      <div className="h-full flex items-center justify-center bg-background p-space-md safe-area-inset-bottom">
+        <div className="text-center space-y-space-md">
+          <p className="text-muted-foreground text-size-base">Unable to load dashboard content</p>
           <button 
             onClick={loadDashboardData}
-            className="text-primary hover:underline"
+            className="text-primary hover:underline min-h-touch text-size-base font-medium"
           >
             Try again
           </button>
@@ -119,16 +119,16 @@ export const DashboardArea = ({
   // Mobile layout - keep original design
   if (isMobile) {
     return (
-      <div className="h-full overflow-auto bg-background">
-        <div className="w-full mx-auto p-4 space-y-6 max-w-2xl">
+      <div className="h-full overflow-auto bg-background pb-20 safe-area-inset-bottom">
+        <div className="w-full mx-auto p-space-md space-y-space-lg max-w-2xl">
           {/* Header */}
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight">Good morning</h1>
-            <p className="text-muted-foreground">Let's make today meaningful</p>
+          <div className="space-y-space-xs">
+            <h1 className="text-size-xl font-bold tracking-tight">Good morning</h1>
+            <p className="text-muted-foreground text-size-sm">Let's make today meaningful</p>
           </div>
 
           {/* Dashboard Widgets */}
-          <div className="space-y-4">
+          <div className="space-y-space-md">
             <HeroCard 
               message={dashboardData.heroMessage}
               onRefresh={handleRefreshHero}
@@ -158,15 +158,15 @@ export const DashboardArea = ({
   // Desktop layout - card-based grid with homebase feel
   return (
     <div className="h-full overflow-auto bg-background">
-      <div className="max-w-6xl mx-auto p-6 md:p-8">
+      <div className="max-w-6xl mx-auto p-space-md md:p-space-xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Good morning</h1>
-          <p className="text-muted-foreground text-lg">Let's make today meaningful</p>
+        <div className="text-center mb-space-xl">
+          <h1 className="text-size-2xl md:text-size-3xl font-bold tracking-tight mb-space-xs">Good morning</h1>
+          <p className="text-muted-foreground text-size-base md:text-size-lg">Let's make today meaningful</p>
         </div>
 
         {/* Dashboard Grid */}
-        <div className="space-y-6">
+        <div className="space-y-space-lg">
           {/* Hero Card - Full Width */}
           <div className="w-full">
             <HeroCard 
@@ -177,7 +177,7 @@ export const DashboardArea = ({
           </div>
           
           {/* 2-Column Grid for Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
             <QuickReflectionWidget 
               placeholder={dashboardData.reflectionPreview}
               onTap={() => onNavigate("journal")}
@@ -198,9 +198,9 @@ export const DashboardArea = ({
           </div>
 
           {/* Quick Access - Full Width Bottom */}
-          <div className="w-full mt-8">
-            <div className="bg-card border rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4 text-center">Quick Access</h2>
+          <div className="w-full mt-space-xl">
+            <div className="bg-card border rounded-lg p-space-lg">
+              <h2 className="text-size-lg font-semibold mb-space-md text-center">Quick Access</h2>
               <QuickstartArea
                 activeWorkflow={activeWorkflow}
                 onWorkflowChange={onWorkflowChange}

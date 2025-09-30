@@ -156,7 +156,7 @@ export const ChatLayout = () => {
   // Mobile Layout
   if (isMobile) {
     return (
-      <div className="flex flex-col h-screen bg-background font-inter">
+      <div className="flex flex-col h-screen w-full bg-background font-inter overflow-hidden">
         {/* Mobile Header - only show for chat view */}
         {currentView === "chat" && (
           <MobileChatHeader
@@ -174,7 +174,7 @@ export const ChatLayout = () => {
         )}
 
         {/* Mobile Content */}
-        <div className="flex-1 overflow-y-auto pb-16">
+        <div className="flex-1 overflow-y-auto">
           {currentView === "dashboard" && (
             <CustomizableDashboard onNavigate={setCurrentView} />
           )}
@@ -210,25 +210,25 @@ export const ChatLayout = () => {
   // Desktop Layout - Dashboard has its own full-width layout
   if (currentView === "dashboard") {
     return (
-      <div className="h-screen bg-background font-inter">
+      <div className="h-screen w-full bg-background font-inter overflow-hidden flex flex-col">
         {/* Dashboard Header */}
-        <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-medium">
+        <header className="h-16 border-b border-border bg-card px-space-md lg:px-space-lg flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-space-sm">
+            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white text-base font-medium">
               🏠
             </div>
             <div>
-              <h1 className="font-semibold text-lg">Dashboard</h1>
-              <p className="text-muted-foreground text-sm">Your daily reflection space</p>
+              <h1 className="font-semibold text-size-base">Dashboard</h1>
+              <p className="text-muted-foreground text-size-xs">Your daily reflection space</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-space-xs flex-wrap">
             <Button
               variant="default"
               size="sm"
               onClick={() => setCurrentView("dashboard")}
-              className="h-9"
+              className="min-h-touch"
             >
               <Home className="h-4 w-4 mr-2" />
               Dashboard
@@ -237,7 +237,7 @@ export const ChatLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => setCurrentView("chat")}
-              className="h-9"
+              className="min-h-touch"
             >
               <MessageSquare className="h-4 w-4 mr-2" />
               Chat
@@ -246,7 +246,7 @@ export const ChatLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => setCurrentView("journal")}
-              className="h-9"
+              className="min-h-touch"
             >
               <BookOpen className="h-4 w-4 mr-2" />
               Journal
@@ -255,7 +255,7 @@ export const ChatLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => setCurrentView("habits")}
-              className="h-9"
+              className="min-h-touch"
             >
               <Target className="h-4 w-4 mr-2" />
               Habits
@@ -264,7 +264,7 @@ export const ChatLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => setCurrentView("user")}
-              className="h-9"
+              className="min-h-touch"
             >
               <User className="h-4 w-4 mr-2" />
               User
@@ -273,7 +273,7 @@ export const ChatLayout = () => {
               variant="ghost" 
               size="sm" 
               onClick={handleSignOut}
-              className="h-9"
+              className="min-h-touch"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
