@@ -154,11 +154,11 @@ export const MobileChatHeader = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-card border-b border-border md:hidden shadow-sm">
-      <div className="flex items-center justify-between px-space-md py-space-sm min-h-[60px]">
+    <header className="sticky top-0 z-40 bg-card border-b border-border md:hidden">
+      <div className="flex items-center justify-between px-4 py-3">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="sm" className="min-h-touch min-w-touch p-0 flex-shrink-0">
+            <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
@@ -295,19 +295,19 @@ export const MobileChatHeader = ({
           </SheetContent>
         </Sheet>
 
-        <div className="flex items-center gap-space-sm min-w-0 flex-1 ml-space-sm">
+        <div className="flex items-center space-x-2 min-w-0 flex-1 ml-3">
           <div className={cn(
-            "w-10 h-10 rounded-lg flex items-center justify-center text-white text-base font-medium flex-shrink-0",
+            "w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-medium flex-shrink-0",
             currentWorkflow?.color
           )}>
             {currentWorkflow?.emoji}
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="font-medium text-size-base truncate">
+            <h1 className="font-medium text-base truncate">
               {activeChat?.title || currentWorkflow?.name}
             </h1>
             {activeChat && (
-              <p className="text-size-xs text-muted-foreground truncate">
+              <p className="text-xs text-muted-foreground truncate">
                 {formatTimestamp(activeChat.updatedAt)}
               </p>
             )}

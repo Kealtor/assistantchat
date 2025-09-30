@@ -47,8 +47,8 @@ export const MobileNavigation = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border md:hidden shadow-lg">
-      <div className="flex items-center justify-around px-space-xs py-space-xs safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border md:hidden">
+      <div className="flex items-center justify-around px-2 py-2 safe-area-inset-bottom">
         {navItems.map((item) => {
           const isActive = currentView === item.id;
           const Icon = item.icon;
@@ -58,15 +58,15 @@ export const MobileNavigation = ({
               key={item.id}
               onClick={item.action}
               className={cn(
-                "flex flex-col items-center justify-center min-h-touch-comfortable min-w-[60px] px-space-xs py-space-xs transition-all duration-200",
-                "rounded-lg relative touch-target",
+                "flex flex-col items-center justify-center min-h-touch-comfortable px-3 py-2 transition-colors",
+                "rounded-lg relative",
                 isActive 
-                  ? "text-primary bg-primary/10 scale-105" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95"
+                  ? "text-primary bg-primary/10" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
               )}
             >
-              <Icon className="h-5 w-5 mb-1 flex-shrink-0" />
-              <span className="text-xs font-medium truncate max-w-full">{item.label}</span>
+              <Icon className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">{item.label}</span>
             </button>
           );
         })}
