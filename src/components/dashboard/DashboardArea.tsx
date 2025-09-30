@@ -119,16 +119,16 @@ export const DashboardArea = ({
   // Mobile layout - keep original design
   if (isMobile) {
     return (
-      <div className="h-full overflow-auto bg-background pb-20 safe-area-inset-bottom">
-        <div className="w-full mx-auto p-space-md space-y-space-lg max-w-2xl">
+      <div className="h-full overflow-auto bg-background pb-24 safe-area-inset-bottom">
+        <div className="w-full mx-auto px-4 py-6 space-y-8">
           {/* Header */}
-          <div className="space-y-space-xs">
+          <div className="space-y-2">
             <h1 className="text-size-xl font-bold tracking-tight">Good morning</h1>
             <p className="text-muted-foreground text-size-sm">Let's make today meaningful</p>
           </div>
 
           {/* Dashboard Widgets */}
-          <div className="space-y-space-md">
+          <div className="space-y-5">
             <HeroCard 
               message={dashboardData.heroMessage}
               onRefresh={handleRefreshHero}
