@@ -20,18 +20,22 @@ const Index = () => {
 
   if (!user) {
     return (
-      <div className="h-screen overflow-auto">
-        <div className="flex items-center justify-center p-4 md:p-8">
+      <div className="min-h-screen h-screen overflow-auto bg-background">
+        <div className="flex items-center justify-center p-space-md md:p-space-xl min-h-full">
           <div className="w-full max-w-4xl">
-            <div className="space-y-6 md:space-y-8">
-              <div className="text-center md:text-left">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Welcome to Chat AI</h1>
-                <p className="text-lg md:text-xl text-muted-foreground mt-2">
+            <div className="space-y-space-lg md:space-y-space-xl">
+              <div className="text-center md:text-left px-space-sm">
+                <h1 className="text-size-xl md:text-size-2xl font-bold tracking-tight">Welcome to Chat AI</h1>
+                <p className="text-size-base md:text-size-lg text-muted-foreground mt-space-sm">
                   Your intelligent chat assistant for various workflows
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button onClick={() => setLocation("/auth")} size="lg" className="w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-space-md justify-center md:justify-start px-space-sm">
+                <Button 
+                  onClick={() => setLocation("/auth")} 
+                  size="lg" 
+                  className="w-full sm:w-auto min-h-touch"
+                >
                   Get Started
                 </Button>
               </div>
