@@ -213,19 +213,19 @@ export const CustomizableDashboard = ({
 
   if (loading) {
     return (
-      <div className="h-full overflow-auto bg-background safe-area-inset-bottom">
-        <div className="max-w-6xl mx-auto p-space-md md:p-space-lg">
-          <div className="flex justify-between items-center mb-space-lg">
-            <div className="space-y-space-xs">
+      <div className="h-full overflow-auto bg-background">
+        <div className="max-w-6xl mx-auto p-6">
+          <div className="flex justify-between items-center mb-8">
+            <div className="space-y-1">
               <Skeleton className="h-8 w-48" />
               <Skeleton className="h-4 w-32" />
             </div>
             <Skeleton className="h-10 w-24" />
           </div>
           
-          <div className="space-y-space-md">
+          <div className="space-y-4">
             <Skeleton className="h-32 w-full rounded-lg" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Skeleton className="h-24 w-full rounded-lg" />
               <Skeleton className="h-40 w-full rounded-lg" />
             </div>
@@ -251,30 +251,29 @@ export const CustomizableDashboard = ({
   // Mobile layout - simplified without grid
   if (isMobile) {
     return (
-      <div className="h-full overflow-auto bg-background pb-20 safe-area-inset-bottom">
-        <div className="w-full mx-auto p-space-md space-y-space-lg max-w-2xl">
+      <div className="h-full overflow-auto bg-background">
+        <div className="w-full mx-auto p-4 space-y-6 max-w-2xl">
           {/* Header */}
-          <div className="flex justify-between items-center gap-space-sm">
-            <div className="space-y-space-xs min-w-0 flex-1">
-              <h1 className="text-size-xl font-bold tracking-tight truncate">Good morning</h1>
-              <p className="text-muted-foreground text-size-sm truncate">Let's make today meaningful</p>
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight">Good morning</h1>
+              <p className="text-muted-foreground">Let's make today meaningful</p>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsEditMode(!isEditMode)}
-              className="min-h-touch min-w-touch flex-shrink-0"
             >
               <Edit className="w-4 h-4" />
             </Button>
           </div>
 
           {/* Widgets in order */}
-          <div className="space-y-space-md">
+          <div className="space-y-4">
             {layout.widgets
               .sort((a, b) => a.y - b.y)
               .map(widget => (
-                <div key={widget.id} className="min-h-[120px]">
+                <div key={widget.id}>
                   {renderWidget(widget)}
                 </div>
               ))}
@@ -287,28 +286,28 @@ export const CustomizableDashboard = ({
   // Desktop layout with grid
   return (
     <div className="h-full overflow-y-auto bg-background">
-      <div className="max-w-6xl mx-auto p-space-md lg:p-space-lg">
+      <div className="max-w-6xl mx-auto p-6">
         {/* Header with controls */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-space-lg gap-space-md">
-          <div className="w-full lg:w-auto text-center lg:text-left">
-            <h1 className="text-size-2xl lg:text-size-3xl font-bold tracking-tight mb-space-xs">Good morning</h1>
-            <p className="text-muted-foreground text-size-base lg:text-size-lg">Let's make today meaningful</p>
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-center">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Good morning</h1>
+            <p className="text-muted-foreground text-lg">Let's make today meaningful</p>
           </div>
           
-          <div className="flex gap-space-sm w-full lg:w-auto justify-end">
+          <div className="flex gap-2">
             {isEditMode ? (
               <>
-                <Button variant="outline" onClick={resetLayout} size="sm" className="min-h-touch">
+                <Button variant="outline" onClick={resetLayout} size="sm">
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset
                 </Button>
-                <Button onClick={saveLayout} size="sm" className="min-h-touch">
+                <Button onClick={saveLayout} size="sm">
                   <Save className="w-4 h-4 mr-2" />
                   Save
                 </Button>
               </>
             ) : (
-              <Button variant="outline" onClick={() => setIsEditMode(true)} size="sm" className="min-h-touch">
+              <Button variant="outline" onClick={() => setIsEditMode(true)} size="sm">
                 <Edit className="w-4 h-4 mr-2" />
                 Customize
               </Button>
@@ -331,11 +330,11 @@ export const CustomizableDashboard = ({
           compactType="vertical"
         >
         {layout.widgets.map(widget => (
-          <div key={widget.id} className={`${isEditMode ? "cursor-move" : ""} h-full overflow-hidden rounded-lg`}>
+          <div key={widget.id} className={`${isEditMode ? "cursor-move" : ""} h-full overflow-hidden`}>
             {renderWidget(widget)}
             {isEditMode && (
-              <div className="absolute top-space-xs right-space-xs bg-background/90 rounded p-space-xs z-10 shadow-sm">
-                <span className="text-size-xs text-muted-foreground capitalize">{widget.type}</span>
+              <div className="absolute top-2 right-2 bg-background/80 rounded p-1 z-10">
+                <span className="text-xs text-muted-foreground capitalize">{widget.type}</span>
               </div>
             )}
           </div>
