@@ -6,7 +6,7 @@ import { ChatArea } from "../chat/ChatArea";
 import { JournalArea } from "../journal/JournalArea";
 import { HabitsArea } from "../habits/HabitsArea";
 import { UserSettings } from "../user/UserSettings";
-import { CustomizableDashboard } from "../dashboard/CustomizableDashboard";
+import { DashboardArea } from "../dashboard/DashboardArea";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, BookOpen, User, LogOut, Target, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -176,7 +176,7 @@ export const ChatLayout = () => {
         {/* Mobile Content */}
         <div className="flex-1 overflow-y-auto pb-16">
           {currentView === "dashboard" && (
-            <CustomizableDashboard onNavigate={setCurrentView} />
+            <DashboardArea onNavigate={setCurrentView} />
           )}
           {currentView === "chat" && (
             <ChatArea 
@@ -283,7 +283,7 @@ export const ChatLayout = () => {
 
         {/* Dashboard Content - Full Width */}
         <div className="flex-1 overflow-hidden">
-          <CustomizableDashboard 
+          <DashboardArea 
             onNavigate={setCurrentView}
             workflows={workflows}
             activeWorkflow={activeWorkflow}
