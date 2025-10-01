@@ -10,11 +10,13 @@ import { MediaAttachment, Message } from "@/services/chatService";
 interface ChatMessageProps {
   message: Message;
   media?: MediaAttachment[];
+  isInitialMessage?: boolean;
 }
 
-export const ChatMessage = ({ message, media }: ChatMessageProps) => {
+export const ChatMessage = ({ message, media, isInitialMessage = false }: ChatMessageProps) => {
   const isUser = message.role === "user";
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -29,6 +31,34 @@ export const ChatMessage = ({ message, media }: ChatMessageProps) => {
         description: "Failed to copy message content.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleCopyInitial = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      // Fallback for clipboard permission denied
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = message.content;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (fallbackError) {
+        toast({
+          title: "Copy failed",
+          description: "Unable to copy to clipboard.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -161,12 +191,28 @@ export const ChatMessage = ({ message, media }: ChatMessageProps) => {
         </Avatar>
       )}
       
-      <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} max-w-[85%] md:max-w-xs`}>
+      <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} max-w-[95%] md:max-w-[85%] lg:max-w-[80%]`}>
         <div className={`rounded-md p-3 md:p-4 ${
           isUser 
             ? "bg-chat-user text-chat-user-foreground" 
             : "bg-chat-assistant text-chat-assistant-foreground"
-        }`}>
+        } relative group/message`}>
+          {/* Copy button for initial workflow message */}
+          {isInitialMessage && !isUser && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-2 h-7 px-2 opacity-0 group-hover/message:opacity-100 focus-visible:opacity-100 transition-opacity"
+              onClick={handleCopyInitial}
+              aria-label="Copy initial message"
+            >
+              {copied ? (
+                <span className="text-xs">Copied</span>
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
+            </Button>
+          )}
           <div className="space-y-1">
             {message.content && (
               <div className="text-sm whitespace-pre-wrap break-words">

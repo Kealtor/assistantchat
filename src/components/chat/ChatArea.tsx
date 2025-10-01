@@ -190,26 +190,33 @@ return (
         <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto">
           {messages.length === 0 && (
             <div className="flex justify-start">
-              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs">
-                <p className="text-sm whitespace-pre-line">
+              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[95%] md:max-w-[85%] lg:max-w-[80%]">
+                <p className="text-sm whitespace-pre-wrap break-words">
                   {workflowConfig?.message || "Hello! I'm your AI assistant. How can I help you today?"}
                 </p>
               </div>
             </div>
           )}
-          {messages.map((message) => {
+          {messages.map((message, index) => {
             // Get media for this message based on mediaIds
             const messageMedia = message.mediaIds ? 
               (chatSession?.media || []).filter(media => 
                 message.mediaIds?.includes((media as any).id)
               ) : [];
+            // First assistant message is the initial workflow message
+            const isInitial = index === 0 && message.role === "assistant";
             return (
-              <ChatMessage key={message.id} message={message} media={messageMedia} />
+              <ChatMessage 
+                key={message.id} 
+                message={message} 
+                media={messageMedia}
+                isInitialMessage={isInitial}
+              />
             );
           })}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[85%] md:max-w-xs animate-pulse">
+              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[95%] md:max-w-[85%] lg:max-w-[80%] animate-pulse">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
