@@ -29,7 +29,7 @@ export const defaultLayout: DashboardLayout = {
       minW: 1,
       minH: 2,
       maxW: 2,
-      maxH: 6
+      maxH: 12
     },
     {
       id: 'reflection',
@@ -41,7 +41,7 @@ export const defaultLayout: DashboardLayout = {
       minW: 1,
       minH: 2,
       maxW: 2,
-      maxH: 6
+      maxH: 12
     },
     {
       id: 'habits',
@@ -53,7 +53,7 @@ export const defaultLayout: DashboardLayout = {
       minW: 1,
       minH: 3,
       maxW: 2,
-      maxH: 8
+      maxH: 16
     },
     {
       id: 'journal',
@@ -65,7 +65,7 @@ export const defaultLayout: DashboardLayout = {
       minW: 1,
       minH: 3,
       maxW: 2,
-      maxH: 8
+      maxH: 16
     },
     {
       id: 'quickstart',
@@ -73,11 +73,11 @@ export const defaultLayout: DashboardLayout = {
       x: 0,
       y: 10,
       w: 2,
-      h: 5,
+      h: 6,
       minW: 1,
       minH: 4,
       maxW: 2,
-      maxH: 8
+      maxH: 20
     }
   ]
 };

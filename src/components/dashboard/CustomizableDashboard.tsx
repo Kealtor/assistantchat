@@ -9,6 +9,9 @@ import { Edit, Save, RotateCcw, Plus } from "lucide-react";
 import { ViewMode } from "@/types/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getUIWorkflows } from "@/config/workflows.config";
+import { userService } from "@/services/userService";
+import { useAdmin } from "@/hooks/useAdmin";
 
 // Widget Components
 import { HeroCard } from "./HeroCard";
@@ -16,6 +19,7 @@ import { QuickReflectionWidget } from "./QuickReflectionWidget";
 import { HabitsSnapshot } from "./HabitsSnapshot";
 import { RecentJournalWidget } from "./RecentJournalWidget";
 import { QuickstartArea } from "../chat/QuickstartArea";
+import { QuickAccessButtons } from "./QuickAccessButtons";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -35,19 +39,48 @@ export const CustomizableDashboard = ({
   onCreateNewChat = () => {}
 }: CustomizableDashboardProps) => {
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const isMobile = useIsMobile();
   const [isEditMode, setIsEditMode] = useState(false);
   const [layout, setLayout] = useState<DashboardLayout | null>(null);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshingHero, setRefreshingHero] = useState(false);
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
+  const [allowedWorkflows, setAllowedWorkflows] = useState(getUIWorkflows());
 
   useEffect(() => {
     if (user) {
       loadDashboardData();
       loadUserLayout();
+      fetchUserPermissions();
     }
-  }, [user]);
+  }, [user, isAdmin]);
+
+  const fetchUserPermissions = async () => {
+    if (!user) {
+      setAllowedWorkflows([]);
+      setUserPermissions([]);
+      return;
+    }
+    
+    try {
+      const permissions = await userService.getUserPermissions(user.id);
+      const permissionWorkflows = permissions.map(p => p.workflow_id);
+      setUserPermissions(permissionWorkflows);
+      
+      const allWorkflows = getUIWorkflows();
+      const filtered = isAdmin 
+        ? allWorkflows 
+        : allWorkflows.filter(workflow => permissionWorkflows.includes(workflow.id));
+      
+      setAllowedWorkflows(filtered);
+    } catch (error) {
+      console.error('Failed to fetch user permissions:', error);
+      setAllowedWorkflows([]);
+      setUserPermissions([]);
+    }
+  };
 
   const loadDashboardData = async () => {
     if (!user) return;
@@ -192,11 +225,12 @@ export const CustomizableDashboard = ({
         );
       case 'quickstart':
         return (
-          <div className="bg-card border rounded-lg p-4 h-full flex flex-col">
-            <h2 className="text-lg font-semibold mb-3">Quick Access</h2>
+          <div className="bg-card border rounded-lg p-6 h-full flex flex-col overflow-auto">
+            <h2 className="text-xl font-semibold mb-4">Quick Access</h2>
             <div className="flex-1 min-h-0">
-              <QuickstartArea
+              <QuickAccessButtons
                 activeWorkflow={activeWorkflow}
+                allowedWorkflows={allowedWorkflows}
                 onWorkflowChange={onWorkflowChange}
                 onCreateNewChat={() => {
                   onCreateNewChat();
@@ -321,20 +355,27 @@ export const CustomizableDashboard = ({
           layouts={{ lg: gridLayout }}
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           cols={{ lg: 2, md: 2, sm: 1, xs: 1, xxs: 1 }}
-          rowHeight={60}
+          rowHeight={50}
           isDraggable={isEditMode}
           isResizable={isEditMode}
           onLayoutChange={handleLayoutChange}
           margin={[16, 16]}
           containerPadding={[0, 0]}
           compactType="vertical"
+          resizeHandles={['se']}
         >
         {layout.widgets.map(widget => (
-          <div key={widget.id} className={`${isEditMode ? "cursor-move" : ""} h-full overflow-hidden`}>
-            {renderWidget(widget)}
+          <div 
+            key={widget.id} 
+            className={`${isEditMode ? "cursor-move" : ""} h-full flex flex-col`}
+            style={{ minHeight: `${(widget.minH || 2) * 50}px` }}
+          >
+            <div className="h-full overflow-auto">
+              {renderWidget(widget)}
+            </div>
             {isEditMode && (
-              <div className="absolute top-2 right-2 bg-background/80 rounded p-1 z-10">
-                <span className="text-xs text-muted-foreground capitalize">{widget.type}</span>
+              <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded px-2 py-1 z-10 shadow-sm">
+                <span className="text-xs text-muted-foreground capitalize font-medium">{widget.type}</span>
               </div>
             )}
           </div>
@@ -342,9 +383,9 @@ export const CustomizableDashboard = ({
         </ResponsiveGridLayout>
 
         {isEditMode && (
-          <Card className="mt-6 p-4 bg-muted/30">
+          <Card className="mt-6 p-4 bg-muted/30 border-dashed">
             <p className="text-sm text-muted-foreground text-center">
-              Drag and resize widgets to customize your dashboard. Click Save when done.
+              <span className="font-medium">Drag</span> to reposition • <span className="font-medium">Resize handle</span> (bottom-right corner) to adjust height • <span className="font-medium">Save</span> to keep changes
             </p>
           </Card>
         )}
