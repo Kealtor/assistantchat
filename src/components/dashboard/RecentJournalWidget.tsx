@@ -4,13 +4,14 @@ import { BookOpen } from "lucide-react";
 interface RecentJournalWidgetProps {
   snippet: string;
   onTap: () => void;
+  isEditMode?: boolean;
 }
 
-export const RecentJournalWidget = ({ snippet, onTap }: RecentJournalWidgetProps) => {
+export const RecentJournalWidget = ({ snippet, onTap, isEditMode = false }: RecentJournalWidgetProps) => {
   return (
     <Card 
-      className="h-full cursor-pointer transition-all hover:shadow-lg hover:bg-accent/50 active:scale-[0.99] shadow-md flex flex-col"
-      onClick={onTap}
+      className={`h-full transition-all shadow-md flex flex-col ${!isEditMode ? 'cursor-pointer hover:shadow-lg hover:bg-accent/50 active:scale-[0.99]' : ''}`}
+      onClick={isEditMode ? undefined : onTap}
     >
       <CardContent className="p-6 flex-1 flex items-center">
         <div className="flex items-start gap-3 w-full">

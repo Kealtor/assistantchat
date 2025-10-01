@@ -15,10 +15,12 @@ interface Habit {
 interface HabitsSnapshotProps {
   habits: Habit[];
   onViewAll: () => void;
+  isEditMode?: boolean;
 }
 
-export const HabitsSnapshot = ({ habits, onViewAll }: HabitsSnapshotProps) => {
+export const HabitsSnapshot = ({ habits, onViewAll, isEditMode = false }: HabitsSnapshotProps) => {
   const handleToggleHabit = (habitId: string, e: React.MouseEvent) => {
+    if (isEditMode) return;
     e.stopPropagation();
     // This would integrate with the habit service to update completion
     console.log('Toggle habit:', habitId);
@@ -32,8 +34,9 @@ export const HabitsSnapshot = ({ habits, onViewAll }: HabitsSnapshotProps) => {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={onViewAll}
+            onClick={isEditMode ? undefined : onViewAll}
             className="text-primary hover:bg-primary/10"
+            disabled={isEditMode}
           >
             View all
             <ArrowRight className="w-4 h-4 ml-1" />

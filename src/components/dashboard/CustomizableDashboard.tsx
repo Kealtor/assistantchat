@@ -202,6 +202,7 @@ export const CustomizableDashboard = ({
             <QuickReflectionWidget
               placeholder={dashboardData.reflectionPreview}
               onTap={() => onNavigate("journal")}
+              isEditMode={isEditMode}
             />
           </div>
         );
@@ -211,6 +212,7 @@ export const CustomizableDashboard = ({
             <HabitsSnapshot
               habits={dashboardData.topHabits}
               onViewAll={() => onNavigate("habits")}
+              isEditMode={isEditMode}
             />
           </div>
         );
@@ -220,6 +222,7 @@ export const CustomizableDashboard = ({
             <RecentJournalWidget
               snippet={dashboardData.recentJournalSnippet}
               onTap={() => onNavigate("journal")}
+              isEditMode={isEditMode}
             />
           </div>
         );

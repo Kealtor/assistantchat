@@ -4,13 +4,14 @@ import { PenTool } from "lucide-react";
 interface QuickReflectionWidgetProps {
   placeholder: string;
   onTap: () => void;
+  isEditMode?: boolean;
 }
 
-export const QuickReflectionWidget = ({ placeholder, onTap }: QuickReflectionWidgetProps) => {
+export const QuickReflectionWidget = ({ placeholder, onTap, isEditMode = false }: QuickReflectionWidgetProps) => {
   return (
     <Card 
-      className="h-full cursor-pointer transition-all hover:shadow-md hover:bg-accent/50 active:scale-[0.99] flex flex-col"
-      onClick={onTap}
+      className={`h-full transition-all flex flex-col ${!isEditMode ? 'cursor-pointer hover:shadow-md hover:bg-accent/50 active:scale-[0.99]' : ''}`}
+      onClick={isEditMode ? undefined : onTap}
     >
       <CardContent className="p-4 flex-1 flex items-center">
         <div className="flex items-center gap-3 w-full">
