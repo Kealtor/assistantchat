@@ -228,7 +228,7 @@ export const CustomizableDashboard = ({
         );
       case 'quickstart':
         return (
-          <div className={`bg-card border rounded-lg p-6 h-full flex flex-col overflow-auto ${isEditMode ? '' : 'pointer-events-auto'}`}>
+          <div className="bg-card border rounded-lg p-6 h-full flex flex-col overflow-auto">
             <h2 className="text-xl font-semibold mb-4">Quick Access</h2>
             <div className="flex-1 min-h-0">
               <QuickAccessButtons
@@ -371,10 +371,10 @@ export const CustomizableDashboard = ({
         {layout.widgets.map(widget => (
           <div 
             key={widget.id} 
-            className={`${isEditMode ? "cursor-move" : "pointer-events-none"} h-full flex flex-col`}
+            className={`${isEditMode ? "cursor-move" : ""} h-full flex flex-col`}
             style={{ minHeight: `${(widget.minH || 2) * 50}px` }}
           >
-            <div className={`h-full overflow-auto ${!isEditMode ? 'pointer-events-auto' : ''}`}>
+            <div className="h-full overflow-auto">
               {renderWidget(widget)}
             </div>
             {isEditMode && (
