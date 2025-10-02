@@ -13,6 +13,7 @@ interface QuickAccessButtonsProps {
   allowedWorkflows: ReturnType<typeof getUIWorkflows>;
   onWorkflowChange: (workflowId: string) => void;
   onCreateNewChat: () => void;
+  isEditMode?: boolean;
 }
 
 export const QuickAccessButtons = ({
@@ -20,12 +21,21 @@ export const QuickAccessButtons = ({
   allowedWorkflows,
   onWorkflowChange,
   onCreateNewChat,
+  isEditMode = false,
 }: QuickAccessButtonsProps) => {
-  const handleQuickStart = (workflowId: string) => {
+  const handleQuickStart = (workflowId: string, e: React.MouseEvent) => {
+    if (isEditMode) return;
+    e.stopPropagation();
     onWorkflowChange(workflowId);
     setTimeout(() => {
       onCreateNewChat();
     }, 100);
+  };
+
+  const handleWorkflowChange = (workflowId: string, e: React.MouseEvent) => {
+    if (isEditMode) return;
+    e.stopPropagation();
+    onWorkflowChange(workflowId);
   };
 
   return (
@@ -45,7 +55,8 @@ export const QuickAccessButtons = ({
                         ? 'ring-2 ring-primary ring-offset-2' 
                         : 'hover:bg-accent'
                     }`}
-                    onClick={() => onWorkflowChange(workflow.id)}
+                    onClick={(e) => handleWorkflowChange(workflow.id, e)}
+                    disabled={isEditMode}
                     aria-label={`Select ${workflow.name} workflow`}
                   >
                     <span className="text-2xl" role="img" aria-hidden="true">
@@ -72,9 +83,9 @@ export const QuickAccessButtons = ({
           <div className="flex justify-center pt-2">
             <Button
               size="lg"
-              onClick={() => handleQuickStart(activeWorkflow)}
+              onClick={(e) => handleQuickStart(activeWorkflow, e)}
               className="px-8 h-12 text-base font-medium"
-              disabled={!activeWorkflow}
+              disabled={!activeWorkflow || isEditMode}
             >
               <MessageSquare className="h-5 w-5 mr-2" />
               Start Chat

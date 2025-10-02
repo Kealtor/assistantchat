@@ -239,6 +239,7 @@ export const CustomizableDashboard = ({
                   onCreateNewChat();
                   onNavigate("chat");
                 }}
+                isEditMode={isEditMode}
               />
             </div>
           </div>
