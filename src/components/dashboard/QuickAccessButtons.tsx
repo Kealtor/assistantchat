@@ -23,13 +23,19 @@ export const QuickAccessButtons = ({
   onCreateNewChat,
   isEditMode = false,
 }: QuickAccessButtonsProps) => {
+  // Auto-select first workflow if none selected
+  const effectiveWorkflow = activeWorkflow || (allowedWorkflows.length > 0 ? allowedWorkflows[0].id : '');
+
   const handleQuickStart = (workflowId: string, e: React.MouseEvent) => {
     if (isEditMode) return;
     e.stopPropagation();
-    onWorkflowChange(workflowId);
-    setTimeout(() => {
-      onCreateNewChat();
-    }, 100);
+    const targetWorkflow = workflowId || effectiveWorkflow;
+    if (targetWorkflow) {
+      onWorkflowChange(targetWorkflow);
+      setTimeout(() => {
+        onCreateNewChat();
+      }, 100);
+    }
   };
 
   const handleWorkflowChange = (workflowId: string, e: React.MouseEvent) => {
@@ -48,10 +54,10 @@ export const QuickAccessButtons = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant={activeWorkflow === workflow.id ? "default" : "outline"}
+                    variant={effectiveWorkflow === workflow.id ? "default" : "outline"}
                     size="lg"
                     className={`h-20 w-full flex flex-col items-center justify-center gap-2 transition-all ${
-                      activeWorkflow === workflow.id 
+                      effectiveWorkflow === workflow.id 
                         ? 'ring-2 ring-primary ring-offset-2' 
                         : 'hover:bg-accent'
                     }`}
@@ -83,9 +89,9 @@ export const QuickAccessButtons = ({
           <div className="flex justify-center pt-2">
             <Button
               size="lg"
-              onClick={(e) => handleQuickStart(activeWorkflow, e)}
+              onClick={(e) => handleQuickStart(effectiveWorkflow, e)}
               className="px-8 h-12 text-base font-medium"
-              disabled={!activeWorkflow || isEditMode}
+              disabled={!effectiveWorkflow || isEditMode}
             >
               <MessageSquare className="h-5 w-5 mr-2" />
               Start Chat
