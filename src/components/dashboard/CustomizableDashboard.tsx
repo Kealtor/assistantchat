@@ -228,9 +228,9 @@ export const CustomizableDashboard = ({
         );
       case 'quickstart':
         return (
-          <div className="bg-card border rounded-lg p-6 h-full flex flex-col overflow-auto">
+          <div className="bg-card border rounded-lg p-6 h-full flex flex-col overflow-visible relative">
             <h2 className="text-xl font-semibold mb-4">Quick Access</h2>
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 relative z-10">
               <QuickAccessButtons
                 activeWorkflow={activeWorkflow}
                 allowedWorkflows={allowedWorkflows}

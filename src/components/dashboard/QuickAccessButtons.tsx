@@ -37,16 +37,16 @@ export const QuickAccessButtons = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 touch-auto">
+    <div className="flex flex-col gap-4 touch-auto relative z-10">
       {/* Workflow Buttons Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 relative z-10">
         {allowedWorkflows.map((workflow) => (
           <Button
             key={workflow.id}
             type="button"
             variant={effectiveWorkflow === workflow.id ? "default" : "outline"}
             size="lg"
-            className={`h-20 w-full flex flex-col items-center justify-center gap-2 transition-all touch-manipulation ${
+            className={`h-20 w-full flex flex-col items-center justify-center gap-2 transition-all touch-manipulation relative z-10 ${
               effectiveWorkflow === workflow.id 
                 ? 'ring-2 ring-primary ring-offset-2' 
                 : 'hover:bg-accent'
@@ -67,12 +67,12 @@ export const QuickAccessButtons = ({
 
       {/* Start Chat Button */}
       {allowedWorkflows.length > 0 && (
-        <div className="flex justify-center pt-2">
+        <div className="flex justify-center pt-2 relative z-10">
           <Button
             type="button"
             size="lg"
             onClick={() => handleQuickStart(effectiveWorkflow)}
-            className="px-8 h-12 text-base font-medium touch-manipulation"
+            className="px-8 h-12 text-base font-medium touch-manipulation relative z-10"
             disabled={!effectiveWorkflow || isEditMode}
           >
             <MessageSquare className="h-5 w-5 mr-2" />
