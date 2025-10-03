@@ -19,22 +19,10 @@ export const QuickAccessButtons = ({
 }: QuickAccessButtonsProps) => {
   // Auto-select first workflow if none selected
   const effectiveWorkflow = activeWorkflow || (allowedWorkflows.length > 0 ? allowedWorkflows[0].id : '');
-  
-  console.log('🎯 QuickAccessButtons render', {
-    activeWorkflow,
-    effectiveWorkflow,
-    allowedWorkflows: allowedWorkflows.map(w => w.id),
-    isEditMode
-  });
 
   const handleQuickStart = (workflowId: string) => {
-    console.log('🟢 handleQuickStart called', { workflowId, isEditMode, effectiveWorkflow });
-    if (isEditMode) {
-      console.log('⚠️ Blocked by edit mode');
-      return;
-    }
+    if (isEditMode) return;
     const targetWorkflow = workflowId || effectiveWorkflow;
-    console.log('✅ Target workflow:', targetWorkflow);
     if (targetWorkflow) {
       onWorkflowChange(targetWorkflow);
       setTimeout(() => {
@@ -44,12 +32,7 @@ export const QuickAccessButtons = ({
   };
 
   const handleWorkflowChange = (workflowId: string) => {
-    console.log('🔵 handleWorkflowChange called', { workflowId, isEditMode, activeWorkflow });
-    if (isEditMode) {
-      console.log('⚠️ Blocked by edit mode');
-      return;
-    }
-    console.log('✅ Calling onWorkflowChange with:', workflowId);
+    if (isEditMode) return;
     onWorkflowChange(workflowId);
   };
 
@@ -68,10 +51,7 @@ export const QuickAccessButtons = ({
                 ? 'ring-2 ring-primary ring-offset-2' 
                 : 'hover:bg-accent'
             }`}
-            onClick={(e) => {
-              console.log('🖱️ Button clicked:', workflow.name, workflow.id, e);
-              handleWorkflowChange(workflow.id);
-            }}
+            onClick={() => handleWorkflowChange(workflow.id)}
             disabled={isEditMode}
             aria-label={`Select ${workflow.name} workflow`}
           >

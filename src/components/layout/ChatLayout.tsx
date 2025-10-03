@@ -176,7 +176,13 @@ export const ChatLayout = () => {
         {/* Mobile Content */}
         <div className="flex-1 overflow-y-auto pb-16">
           {currentView === "dashboard" && (
-            <CustomizableDashboard onNavigate={setCurrentView} />
+            <CustomizableDashboard 
+              onNavigate={setCurrentView}
+              workflows={workflows}
+              activeWorkflow={activeWorkflow}
+              onWorkflowChange={setActiveWorkflow}
+              onCreateNewChat={createNewChat}
+            />
           )}
           {currentView === "chat" && (
             <ChatArea 
