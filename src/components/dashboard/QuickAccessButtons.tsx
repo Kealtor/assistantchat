@@ -20,9 +20,8 @@ export const QuickAccessButtons = ({
   // Auto-select first workflow if none selected
   const effectiveWorkflow = activeWorkflow || (allowedWorkflows.length > 0 ? allowedWorkflows[0].id : '');
 
-  const handleQuickStart = (workflowId: string, e: React.MouseEvent) => {
+  const handleQuickStart = (workflowId: string) => {
     if (isEditMode) return;
-    e.stopPropagation();
     const targetWorkflow = workflowId || effectiveWorkflow;
     if (targetWorkflow) {
       onWorkflowChange(targetWorkflow);
@@ -32,9 +31,8 @@ export const QuickAccessButtons = ({
     }
   };
 
-  const handleWorkflowChange = (workflowId: string, e: React.MouseEvent) => {
+  const handleWorkflowChange = (workflowId: string) => {
     if (isEditMode) return;
-    e.stopPropagation();
     onWorkflowChange(workflowId);
   };
 
@@ -45,6 +43,7 @@ export const QuickAccessButtons = ({
         {allowedWorkflows.map((workflow) => (
           <Button
             key={workflow.id}
+            type="button"
             variant={effectiveWorkflow === workflow.id ? "default" : "outline"}
             size="lg"
             className={`h-20 w-full flex flex-col items-center justify-center gap-2 transition-all touch-manipulation ${
@@ -52,7 +51,7 @@ export const QuickAccessButtons = ({
                 ? 'ring-2 ring-primary ring-offset-2' 
                 : 'hover:bg-accent'
             }`}
-            onClick={(e) => handleWorkflowChange(workflow.id, e)}
+            onClick={() => handleWorkflowChange(workflow.id)}
             disabled={isEditMode}
             aria-label={`Select ${workflow.name} workflow`}
           >
@@ -70,9 +69,10 @@ export const QuickAccessButtons = ({
       {allowedWorkflows.length > 0 && (
         <div className="flex justify-center pt-2">
           <Button
+            type="button"
             size="lg"
-            onClick={(e) => handleQuickStart(effectiveWorkflow, e)}
-            className="px-8 h-12 text-base font-medium"
+            onClick={() => handleQuickStart(effectiveWorkflow)}
+            className="px-8 h-12 text-base font-medium touch-manipulation"
             disabled={!effectiveWorkflow || isEditMode}
           >
             <MessageSquare className="h-5 w-5 mr-2" />
