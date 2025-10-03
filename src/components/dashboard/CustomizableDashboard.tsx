@@ -311,7 +311,7 @@ export const CustomizableDashboard = ({
             {layout.widgets
               .sort((a, b) => a.y - b.y)
               .map(widget => (
-                <div key={widget.id} className="pointer-events-auto">
+                <div key={widget.id} className="touch-auto">
                   {renderWidget(widget)}
                 </div>
               ))}

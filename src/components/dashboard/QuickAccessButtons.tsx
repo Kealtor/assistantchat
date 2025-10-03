@@ -39,7 +39,7 @@ export const QuickAccessButtons = ({
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 touch-auto">
       {/* Workflow Buttons Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {allowedWorkflows.map((workflow) => (
@@ -47,7 +47,7 @@ export const QuickAccessButtons = ({
             key={workflow.id}
             variant={effectiveWorkflow === workflow.id ? "default" : "outline"}
             size="lg"
-            className={`h-20 w-full flex flex-col items-center justify-center gap-2 transition-all ${
+            className={`h-20 w-full flex flex-col items-center justify-center gap-2 transition-all touch-manipulation ${
               effectiveWorkflow === workflow.id 
                 ? 'ring-2 ring-primary ring-offset-2' 
                 : 'hover:bg-accent'
