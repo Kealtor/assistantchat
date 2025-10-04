@@ -10,7 +10,7 @@ interface QuickReflectionWidgetProps {
 export const QuickReflectionWidget = ({ placeholder, onTap, isEditMode = false }: QuickReflectionWidgetProps) => {
   return (
     <Card 
-      className={`h-full transition-all flex flex-col ${!isEditMode ? 'cursor-pointer hover:shadow-md hover:bg-accent/50 active:scale-[0.99]' : ''}`}
+      className={`h-full transition-all flex flex-col overflow-hidden ${!isEditMode ? 'cursor-pointer hover:shadow-md hover:bg-accent/50 active:scale-[0.99]' : ''}`}
       onClick={isEditMode ? undefined : onTap}
     >
       <CardContent className="p-4 flex-1 flex items-center">
