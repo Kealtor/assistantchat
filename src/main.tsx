@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import './index.css'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,8 +17,15 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <TooltipProvider>
           <Switch>
-            <Route path="/" component={Index} />
             <Route path="/auth" component={Auth} />
+            <Route path="/dashboard" component={Index} />
+            <Route path="/chat" component={Index} />
+            <Route path="/journal" component={Index} />
+            <Route path="/habits" component={Index} />
+            <Route path="/user" component={Index} />
+            <Route path="/">
+              <Redirect to="/dashboard" />
+            </Route>
             <Route component={NotFound} />
           </Switch>
         </TooltipProvider>

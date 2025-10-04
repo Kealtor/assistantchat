@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { ChatSidebar } from "./ChatSidebar";
 import { MobileNavigation } from "./MobileNavigation";
 import { MobileChatHeader } from "./MobileChatHeader";
@@ -24,11 +25,25 @@ type ChatSession = ServiceChatSession & {
 export const ChatLayout = () => {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
-  const [currentView, setCurrentView] = useState<ViewMode>("dashboard");
+  const [location, setLocation] = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState(getDefaultWorkflow().workflowName);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
+
+  // Derive current view from URL
+  const currentView: ViewMode = 
+    location === "/dashboard" ? "dashboard" :
+    location === "/chat" ? "chat" :
+    location === "/journal" ? "journal" :
+    location === "/habits" ? "habits" :
+    location === "/user" ? "user" :
+    "dashboard";
+
+  // Navigation helper
+  const navigateTo = (view: ViewMode) => {
+    setLocation(`/${view}`);
+  };
 
   // Load user's chats when user is authenticated
   useEffect(() => {
@@ -66,7 +81,7 @@ export const ChatLayout = () => {
       };
       setChatSessions(prev => [mappedChat, ...prev]);
       setActiveChatId(newChat.id);
-      setCurrentView("chat");
+      navigateTo("chat");
     }
   };
 
@@ -90,7 +105,7 @@ export const ChatLayout = () => {
 
   const selectChat = (chatId: string) => {
     setActiveChatId(chatId);
-    setCurrentView("chat");
+    navigateTo("chat");
   };
 
   const deleteChat = async (chatId: string) => {
@@ -176,13 +191,13 @@ export const ChatLayout = () => {
         {/* Mobile Content */}
         <div className="flex-1 overflow-y-auto pb-16">
           {currentView === "dashboard" && (
-            <CustomizableDashboard 
-              onNavigate={setCurrentView}
-              workflows={workflows}
-              activeWorkflow={activeWorkflow}
-              onWorkflowChange={setActiveWorkflow}
-              onCreateNewChat={createNewChat}
-            />
+          <CustomizableDashboard 
+            onNavigate={navigateTo}
+            workflows={workflows}
+            activeWorkflow={activeWorkflow}
+            onWorkflowChange={setActiveWorkflow}
+            onCreateNewChat={createNewChat}
+          />
           )}
           {currentView === "chat" && (
             <ChatArea 
@@ -207,7 +222,7 @@ export const ChatLayout = () => {
         {/* Mobile Bottom Navigation */}
         <MobileNavigation
           currentView={currentView}
-          onViewChange={setCurrentView}
+          onViewChange={navigateTo}
         />
       </div>
     );
@@ -233,7 +248,7 @@ export const ChatLayout = () => {
             <Button
               variant="default"
               size="sm"
-              onClick={() => setCurrentView("dashboard")}
+              onClick={() => navigateTo("dashboard")}
               className="h-9"
             >
               <Home className="h-4 w-4 mr-2" />
@@ -242,7 +257,7 @@ export const ChatLayout = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentView("chat")}
+              onClick={() => navigateTo("chat")}
               className="h-9"
             >
               <MessageSquare className="h-4 w-4 mr-2" />
@@ -251,7 +266,7 @@ export const ChatLayout = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentView("journal")}
+              onClick={() => navigateTo("journal")}
               className="h-9"
             >
               <BookOpen className="h-4 w-4 mr-2" />
@@ -260,7 +275,7 @@ export const ChatLayout = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentView("habits")}
+              onClick={() => navigateTo("habits")}
               className="h-9"
             >
               <Target className="h-4 w-4 mr-2" />
@@ -269,7 +284,7 @@ export const ChatLayout = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentView("user")}
+              onClick={() => navigateTo("user")}
               className="h-9"
             >
               <User className="h-4 w-4 mr-2" />
@@ -290,7 +305,7 @@ export const ChatLayout = () => {
         {/* Dashboard Content - Full Width */}
         <div className="flex-1 overflow-hidden">
           <CustomizableDashboard 
-            onNavigate={setCurrentView}
+            onNavigate={navigateTo}
             workflows={workflows}
             activeWorkflow={activeWorkflow}
             onWorkflowChange={setActiveWorkflow}
@@ -313,7 +328,7 @@ export const ChatLayout = () => {
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           currentView={currentView}
-          onViewChange={setCurrentView}
+          onViewChange={navigateTo}
           chatSessions={chatSessions}
           activeChatId={activeChatId}
           onCreateNewChat={createNewChat}
@@ -341,7 +356,7 @@ export const ChatLayout = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentView("dashboard")}
+              onClick={() => navigateTo("dashboard")}
               className="h-9"
             >
               <Home className="h-4 w-4 mr-2" />
@@ -350,7 +365,7 @@ export const ChatLayout = () => {
             <Button
               variant={currentView === "chat" ? "default" : "ghost"}
               size="sm"
-              onClick={() => setCurrentView("chat")}
+              onClick={() => navigateTo("chat")}
               className="h-9"
             >
               <MessageSquare className="h-4 w-4 mr-2" />
@@ -359,7 +374,7 @@ export const ChatLayout = () => {
             <Button
               variant={currentView === "journal" ? "default" : "ghost"}
               size="sm"
-              onClick={() => setCurrentView("journal")}
+              onClick={() => navigateTo("journal")}
               className="h-9"
             >
               <BookOpen className="h-4 w-4 mr-2" />
@@ -368,7 +383,7 @@ export const ChatLayout = () => {
             <Button
               variant={currentView === "habits" ? "default" : "ghost"}
               size="sm"
-              onClick={() => setCurrentView("habits")}
+              onClick={() => navigateTo("habits")}
               className="h-9"
             >
               <Target className="h-4 w-4 mr-2" />
@@ -377,7 +392,7 @@ export const ChatLayout = () => {
             <Button
               variant={currentView === "user" ? "default" : "ghost"}
               size="sm"
-              onClick={() => setCurrentView("user")}
+              onClick={() => navigateTo("user")}
               className="h-9"
             >
               <User className="h-4 w-4 mr-2" />
