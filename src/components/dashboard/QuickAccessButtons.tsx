@@ -39,14 +39,14 @@ export const QuickAccessButtons = ({
   return (
     <div className="flex flex-col gap-4 touch-auto relative z-10">
       {/* Workflow Buttons Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 relative z-10">
+      <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 relative z-10">
         {allowedWorkflows.map((workflow) => (
           <Button
             key={workflow.id}
             type="button"
             variant={effectiveWorkflow === workflow.id ? "default" : "outline"}
             size="lg"
-            className={`h-20 w-full flex flex-col items-center justify-center gap-2 transition-all touch-manipulation relative z-10 ${
+            className={`h-12 w-full flex flex-row items-center justify-center gap-2 transition-all touch-manipulation relative z-10 ${
               effectiveWorkflow === workflow.id 
                 ? 'ring-2 ring-primary ring-offset-2' 
                 : 'hover:bg-accent'
@@ -55,10 +55,10 @@ export const QuickAccessButtons = ({
             disabled={isEditMode}
             aria-label={`Select ${workflow.name} workflow`}
           >
-            <span className="text-2xl" role="img" aria-hidden="true">
+            <span className="text-lg" role="img" aria-hidden="true">
               {workflow.emoji}
             </span>
-            <span className="text-xs font-medium line-clamp-1">
+            <span className="text-sm font-medium line-clamp-1">
               {workflow.name}
             </span>
           </Button>
