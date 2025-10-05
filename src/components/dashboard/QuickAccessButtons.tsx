@@ -46,7 +46,7 @@ export const QuickAccessButtons = ({
             type="button"
             variant={effectiveWorkflow === workflow.id ? "default" : "outline"}
             size="lg"
-            className={`h-24 w-full flex flex-row items-center justify-center gap-3 transition-all touch-manipulation relative z-10 ${
+            className={`h-12 w-full flex flex-row items-center justify-center gap-2 transition-all touch-manipulation relative z-10 ${
               effectiveWorkflow === workflow.id 
                 ? 'ring-2 ring-primary ring-offset-2' 
                 : 'hover:bg-accent'
@@ -55,10 +55,10 @@ export const QuickAccessButtons = ({
             disabled={isEditMode}
             aria-label={`Select ${workflow.name} workflow`}
           >
-            <span className="text-3xl" role="img" aria-hidden="true">
+            <span className="text-lg" role="img" aria-hidden="true">
               {workflow.emoji}
             </span>
-            <span className="text-base font-medium line-clamp-1">
+            <span className="text-sm font-medium line-clamp-1">
               {workflow.name}
             </span>
           </Button>
