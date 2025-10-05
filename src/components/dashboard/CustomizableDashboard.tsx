@@ -169,31 +169,37 @@ export const CustomizableDashboard = ({
   const moveWidgetUp = (index: number) => {
     if (!layout || index === 0) return;
     
-    const newWidgets = [...layout.widgets];
-    const currentWidget = newWidgets[index];
-    const previousWidget = newWidgets[index - 1];
+    // Work with sorted widgets to match display order
+    const sortedWidgets = [...layout.widgets].sort((a, b) => a.y - b.y);
     
-    // Swap y positions
-    const tempY = currentWidget.y;
-    currentWidget.y = previousWidget.y;
-    previousWidget.y = tempY;
+    // Swap positions in sorted array
+    [sortedWidgets[index], sortedWidgets[index - 1]] = [sortedWidgets[index - 1], sortedWidgets[index]];
     
-    setLayout({ widgets: newWidgets });
+    // Reassign y positions based on new order
+    sortedWidgets.forEach((widget, i) => {
+      widget.y = i;
+    });
+    
+    setLayout({ widgets: sortedWidgets });
   };
 
   const moveWidgetDown = (index: number) => {
-    if (!layout || index === layout.widgets.length - 1) return;
+    if (!layout) return;
     
-    const newWidgets = [...layout.widgets];
-    const currentWidget = newWidgets[index];
-    const nextWidget = newWidgets[index + 1];
+    // Work with sorted widgets to match display order
+    const sortedWidgets = [...layout.widgets].sort((a, b) => a.y - b.y);
     
-    // Swap y positions
-    const tempY = currentWidget.y;
-    currentWidget.y = nextWidget.y;
-    nextWidget.y = tempY;
+    if (index === sortedWidgets.length - 1) return;
     
-    setLayout({ widgets: newWidgets });
+    // Swap positions in sorted array
+    [sortedWidgets[index], sortedWidgets[index + 1]] = [sortedWidgets[index + 1], sortedWidgets[index]];
+    
+    // Reassign y positions based on new order
+    sortedWidgets.forEach((widget, i) => {
+      widget.y = i;
+    });
+    
+    setLayout({ widgets: sortedWidgets });
   };
 
   const gridLayout = useMemo(() => {
