@@ -5,7 +5,7 @@ import { dashboardConfigService, DashboardWidget, DashboardLayout } from "@/serv
 import { dashboardService, DashboardData } from "@/services/dashboardService";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Edit, Save, RotateCcw, Plus } from "lucide-react";
+import { Edit, Save, RotateCcw, Plus, ArrowUp, ArrowDown } from "lucide-react";
 import { ViewMode } from "@/types/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -166,6 +166,36 @@ export const CustomizableDashboard = ({
     }
   };
 
+  const moveWidgetUp = (index: number) => {
+    if (!layout || index === 0) return;
+    
+    const newWidgets = [...layout.widgets];
+    const currentWidget = newWidgets[index];
+    const previousWidget = newWidgets[index - 1];
+    
+    // Swap y positions
+    const tempY = currentWidget.y;
+    currentWidget.y = previousWidget.y;
+    previousWidget.y = tempY;
+    
+    setLayout({ widgets: newWidgets });
+  };
+
+  const moveWidgetDown = (index: number) => {
+    if (!layout || index === layout.widgets.length - 1) return;
+    
+    const newWidgets = [...layout.widgets];
+    const currentWidget = newWidgets[index];
+    const nextWidget = newWidgets[index + 1];
+    
+    // Swap y positions
+    const tempY = currentWidget.y;
+    currentWidget.y = nextWidget.y;
+    nextWidget.y = tempY;
+    
+    setLayout({ widgets: newWidgets });
+  };
+
   const gridLayout = useMemo(() => {
     if (!layout) return [];
     
@@ -288,6 +318,8 @@ export const CustomizableDashboard = ({
 
   // Mobile layout - simplified without grid
   if (isMobile) {
+    const sortedWidgets = [...layout.widgets].sort((a, b) => a.y - b.y);
+    
     return (
       <div className="h-full overflow-auto bg-background">
         <div className="w-full mx-auto p-4 space-y-6 max-w-2xl">
@@ -297,24 +329,66 @@ export const CustomizableDashboard = ({
               <h1 className="text-2xl font-bold tracking-tight">Good morning</h1>
               <p className="text-muted-foreground">Let's make today meaningful</p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditMode(!isEditMode)}
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
+            {isEditMode ? (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    loadUserLayout();
+                    setIsEditMode(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={saveLayout}
+                >
+                  <Save className="w-4 h-4 mr-1" />
+                  Save
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditMode(true)}
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            )}
           </div>
 
           {/* Widgets in order */}
           <div className="space-y-4">
-            {layout.widgets
-              .sort((a, b) => a.y - b.y)
-              .map(widget => (
-                <div key={widget.id} className="touch-auto">
-                  {renderWidget(widget)}
-                </div>
-              ))}
+            {sortedWidgets.map((widget, index) => (
+              <div key={widget.id} className="touch-auto relative">
+                {renderWidget(widget)}
+                {isEditMode && (
+                  <div className="absolute top-2 right-2 flex gap-1 z-20">
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8"
+                      onClick={() => moveWidgetUp(index)}
+                      disabled={index === 0}
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8"
+                      onClick={() => moveWidgetDown(index)}
+                      disabled={index === sortedWidgets.length - 1}
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
