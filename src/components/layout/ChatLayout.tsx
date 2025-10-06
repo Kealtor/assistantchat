@@ -342,7 +342,7 @@ export const ChatLayout = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Desktop Header */}
         <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 md:hidden lg:flex">
             <div className={`w-8 h-8 rounded-lg ${currentWorkflow?.color} flex items-center justify-center text-white text-sm font-medium`}>
               {currentWorkflow?.emoji}
             </div>
