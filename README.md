@@ -147,9 +147,10 @@ This application serves as a comprehensive platform that combines multiple produ
 ### Frontend Architecture
 - **React 18**: Modern React with hooks and functional components
 - **TypeScript**: Full type safety throughout the application
-- **Vite**: Fast development server and optimized builds
+- **Vite 7.1.9**: Fast development server and optimized builds
 - **Wouter**: Lightweight client-side routing
 - **React Query**: Server state management and caching
+- **Node.js**: Requires >= 20.0.0
 
 ### Styling & UI
 - **Tailwind CSS**: Utility-first CSS framework with custom design system
