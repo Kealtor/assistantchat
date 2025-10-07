@@ -189,7 +189,7 @@ export const ChatInput = ({ onSendMessage, disabled, chatId }: ChatInputProps) =
 
 return (
     <div 
-      className="relative"
+      className="relative h-full flex flex-col"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -284,8 +284,8 @@ return (
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-end space-x-2 md:space-x-3 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
+      <form onSubmit={handleSubmit} className="relative flex-1 flex flex-col">
+        <div className="flex-1 flex items-end space-x-2 md:space-x-3 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
           {/* File Input */}
           <input
             ref={fileInputRef}
@@ -309,7 +309,7 @@ return (
           </Button>
 
         {/* Message Input */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative flex flex-col">
           <Textarea
             ref={textareaRef}
             value={message}
@@ -317,7 +317,7 @@ return (
             onKeyDown={handleKeyDown}
             placeholder={isRecording ? "Recording voice note..." : "Type your message..."}
             disabled={disabled || isRecording}
-            className="min-h-[2.5rem] max-h-32 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base"
+            className="h-full min-h-[2.5rem] resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base"
             rows={1}
           />
           
