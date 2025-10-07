@@ -179,14 +179,6 @@ export const ChatInput = ({ onSendMessage, disabled, chatId }: ChatInputProps) =
     setSelectedFiles(prev => [...prev, ...files]);
   };
 
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [message]);
-
 return (
     <div 
       className="relative h-full flex flex-col"
@@ -309,7 +301,7 @@ return (
           </Button>
 
         {/* Message Input */}
-        <div className="flex-1 relative flex flex-col">
+        <div className="flex-1 relative flex flex-col overflow-hidden">
           <Textarea
             ref={textareaRef}
             value={message}
@@ -317,7 +309,7 @@ return (
             onKeyDown={handleKeyDown}
             placeholder={isRecording ? "Recording voice note..." : "Type your message..."}
             disabled={disabled || isRecording}
-            className="h-full min-h-[2.5rem] resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base"
+            className="h-full min-h-[2.5rem] resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base overflow-y-auto"
             rows={1}
           />
           
