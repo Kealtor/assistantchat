@@ -235,8 +235,8 @@ return (
 
       {/* Input Area */}
       <ResizablePanel defaultSize={25} minSize={15} maxSize={50}>
-        <div className="h-full border-t border-border bg-card p-4 md:p-6 flex flex-col">
-          <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
+        <div className="h-full border-t border-border bg-card p-4 md:p-6 flex flex-col min-h-0">
+          <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col min-h-0">
             <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} chatId={chatSession.id} />
           </div>
         </div>

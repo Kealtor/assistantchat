@@ -181,7 +181,7 @@ export const ChatInput = ({ onSendMessage, disabled, chatId }: ChatInputProps) =
 
 return (
     <div 
-      className="relative h-full flex flex-col"
+      className="h-full flex flex-col min-h-0"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -276,8 +276,8 @@ return (
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="relative flex-1 flex flex-col">
-        <div className="flex-1 flex items-end space-x-2 md:space-x-3 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 p-3 md:p-4 bg-surface-elevated rounded-lg border border-border shadow-sm">
           {/* File Input */}
           <input
             ref={fileInputRef}
@@ -288,90 +288,98 @@ return (
             accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.csv,.json,.xml,.xls,.xlsx,.ppt,.pptx"
           />
           
-          {/* Attachment Button */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="flex flex-shrink-0 h-8 w-8 p-0"
-            disabled={disabled || uploading || isRecording}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Paperclip className="h-4 w-4" />
-          </Button>
-
-        {/* Message Input */}
-        <div className="flex-1 relative flex flex-col min-h-0">
-          <Textarea
-            ref={textareaRef}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isRecording ? "Recording voice note..." : "Type your message..."}
-            disabled={disabled || isRecording}
-            className="flex-1 min-h-0 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base overflow-y-auto"
-            rows={1}
-          />
-          
-          {/* Markdown Hint - Only on desktop */}
-          <div className="hidden md:block absolute bottom-1 right-2 text-xs text-muted-foreground">
-            Markdown supported
+          {/* Message Input Area */}
+          <div className="flex-1 relative min-h-0 mb-3">
+            <Textarea
+              ref={textareaRef}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={isRecording ? "Recording voice note..." : "Type your message..."}
+              disabled={disabled || isRecording}
+              className="w-full h-full resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base overflow-y-auto p-0"
+              rows={1}
+            />
+            
+            {/* Markdown Hint - Only on desktop */}
+            <div className="hidden md:block absolute bottom-1 right-2 text-xs text-muted-foreground pointer-events-none">
+              Markdown supported
+            </div>
           </div>
-        </div>
 
-        {/* Emoji Button - Hidden on small screens */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="hidden sm:flex flex-shrink-0 h-8 w-8 p-0"
-          disabled={disabled}
-        >
-          <Smile className="h-4 w-4" />
-        </Button>
-
-          {/* Send/Voice/Stop Buttons */}
-          {isRecording ? (
-            <>
+          {/* Action Buttons Row */}
+          <div className="flex items-center justify-between">
+            {/* Left side buttons */}
+            <div className="flex items-center gap-2">
+              {/* Attachment Button */}
               <Button
                 type="button"
+                variant="ghost"
                 size="sm"
-                onClick={handleStopRecording}
-                disabled={disabled || uploading || isUploading}
-                className="flex-shrink-0 h-touch min-w-touch p-0 bg-red-500 hover:bg-red-600 text-white"
+                className="flex-shrink-0 h-8 w-8 p-0"
+                disabled={disabled || uploading || isRecording}
+                onClick={() => fileInputRef.current?.click()}
               >
-                <Square className="h-4 w-4" />
+                <Paperclip className="h-4 w-4" />
               </Button>
+
+              {/* Emoji Button - Hidden on small screens */}
               <Button
                 type="button"
+                variant="ghost"
                 size="sm"
-                onClick={handleSendDuringRecording}
-                disabled={disabled || uploading || isUploading}
-                className="flex-shrink-0 h-touch min-w-touch p-0"
+                className="hidden sm:flex flex-shrink-0 h-8 w-8 p-0"
+                disabled={disabled}
               >
-                <Send className="h-4 w-4" />
+                <Smile className="h-4 w-4" />
               </Button>
-            </>
-          ) : message.trim() || selectedFiles.length > 0 || showAudioPreview ? (
-            <Button
-              type="submit"
-              size="sm"
-              disabled={disabled || uploading || isUploading}
-              className="flex-shrink-0 h-touch min-w-touch p-0"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleVoiceRecording}
-              disabled={disabled || uploading || isUploading}
-              className="flex-shrink-0 h-touch min-w-touch p-0"
-            >
-              <Mic className="h-4 w-4" />
-            </Button>
-          )}
+            </div>
+
+            {/* Right side action buttons */}
+            <div className="flex items-center gap-2">
+              {isRecording ? (
+                <>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleStopRecording}
+                    disabled={disabled || uploading || isUploading}
+                    className="flex-shrink-0 h-touch min-w-touch p-0 bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    <Square className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleSendDuringRecording}
+                    disabled={disabled || uploading || isUploading}
+                    className="flex-shrink-0 h-touch min-w-touch p-0"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : message.trim() || selectedFiles.length > 0 || showAudioPreview ? (
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={disabled || uploading || isUploading}
+                  className="flex-shrink-0 h-touch min-w-touch p-0"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleVoiceRecording}
+                  disabled={disabled || uploading || isUploading}
+                  className="flex-shrink-0 h-touch min-w-touch p-0"
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Input Tips - Only on desktop */}
