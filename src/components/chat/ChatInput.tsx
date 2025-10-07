@@ -301,7 +301,7 @@ return (
           </Button>
 
         {/* Message Input */}
-        <div className="flex-1 relative flex flex-col overflow-hidden">
+        <div className="flex-1 relative flex flex-col min-h-0">
           <Textarea
             ref={textareaRef}
             value={message}
@@ -309,7 +309,7 @@ return (
             onKeyDown={handleKeyDown}
             placeholder={isRecording ? "Recording voice note..." : "Type your message..."}
             disabled={disabled || isRecording}
-            className="h-full min-h-[2.5rem] resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base overflow-y-auto"
+            className="flex-1 min-h-0 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent text-sm md:text-base overflow-y-auto"
             rows={1}
           />
           
