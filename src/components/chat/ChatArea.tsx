@@ -9,6 +9,7 @@ import { getWorkflowByName } from "@/config/workflows.config";
 import { toast } from "@/hooks/use-toast";
 import { getActiveInstance } from "@/config/supabase-instances";
 import { MessageSquare } from "lucide-react";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 interface ChatAreaProps {
   workflow: string;
@@ -184,56 +185,62 @@ export const ChatArea = ({ workflow, chatSession, onUpdateChat, onWorkflowChange
   }
 
 return (
-    <div className="flex flex-col h-full">
+    <ResizablePanelGroup direction="vertical" className="h-full">
       {/* Messages Area */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 px-4 md:px-6 py-4">
-        <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto">
-          {messages.length === 0 && (
-            <div className="flex justify-start">
-              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[95%] md:max-w-[85%] lg:max-w-[80%]">
-                <p className="text-sm whitespace-pre-wrap break-words">
-                  {workflowConfig?.message || "Hello! I'm your AI assistant. How can I help you today?"}
-                </p>
-              </div>
-            </div>
-          )}
-          {messages.map((message, index) => {
-            // Get media for this message based on mediaIds
-            const messageMedia = message.mediaIds ? 
-              (chatSession?.media || []).filter(media => 
-                message.mediaIds?.includes((media as any).id)
-              ) : [];
-            // First assistant message is the initial workflow message
-            const isInitial = index === 0 && message.role === "assistant";
-            return (
-              <ChatMessage 
-                key={message.id} 
-                message={message} 
-                media={messageMedia}
-                isInitialMessage={isInitial}
-              />
-            );
-          })}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[95%] md:max-w-[85%] lg:max-w-[80%] animate-pulse">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+      <ResizablePanel defaultSize={75} minSize={30}>
+        <ScrollArea ref={scrollAreaRef} className="h-full px-4 md:px-6 py-4">
+          <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto">
+            {messages.length === 0 && (
+              <div className="flex justify-start">
+                <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[95%] md:max-w-[85%] lg:max-w-[80%]">
+                  <p className="text-sm whitespace-pre-wrap break-words">
+                    {workflowConfig?.message || "Hello! I'm your AI assistant. How can I help you today?"}
+                  </p>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+            )}
+            {messages.map((message, index) => {
+              // Get media for this message based on mediaIds
+              const messageMedia = message.mediaIds ? 
+                (chatSession?.media || []).filter(media => 
+                  message.mediaIds?.includes((media as any).id)
+                ) : [];
+              // First assistant message is the initial workflow message
+              const isInitial = index === 0 && message.role === "assistant";
+              return (
+                <ChatMessage 
+                  key={message.id} 
+                  message={message} 
+                  media={messageMedia}
+                  isInitialMessage={isInitial}
+                />
+              );
+            })}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-chat-assistant rounded-md p-3 md:p-4 max-w-[95%] md:max-w-[85%] lg:max-w-[80%] animate-pulse">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </ResizablePanel>
+
+      <ResizableHandle withHandle />
 
       {/* Input Area */}
-      <div className="border-t border-border bg-card p-4 md:p-6">
-        <div className="max-w-4xl mx-auto">
-          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} chatId={chatSession.id} />
+      <ResizablePanel defaultSize={25} minSize={15} maxSize={50}>
+        <div className="h-full border-t border-border bg-card p-4 md:p-6 flex items-center">
+          <div className="max-w-4xl mx-auto w-full">
+            <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} chatId={chatSession.id} />
+          </div>
         </div>
-      </div>
-    </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 };
