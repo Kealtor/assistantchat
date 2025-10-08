@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Circle, ArrowRight, Flame, Loader2 } from "lucide-react";
+import { ArrowRight, Flame, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { habitService, Habit, HabitEntry } from "@/services/habitService";
@@ -15,7 +15,7 @@ interface HabitsSnapshotProps {
 }
 
 interface HabitWithStatus extends Habit {
-  completed: boolean;
+  currentRating: number;
   streak: number;
   progress: number;
 }
@@ -87,43 +87,46 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
 
     return {
       ...habit,
-      completed: todayEntry ? todayEntry.rating > 0 : false,
+      currentRating: todayEntry ? todayEntry.rating : 0,
       streak,
       progress: Math.round(progress)
     };
   };
 
-  const handleToggleHabit = async (habitId: string, e: React.MouseEvent) => {
+  const handleRatingClick = async (habitId: string, rating: number) => {
     if (isEditMode || !user) return;
-    e.stopPropagation();
-
-    const habit = habits.find(h => h.id === habitId);
-    if (!habit) return;
 
     try {
-      if (habit.completed) {
-        // Mark as incomplete by deleting entry
+      if (rating === 0) {
+        // Delete entry if rating is 0
         await habitService.deleteHabitEntry(habitId, today);
       } else {
-        // Mark as complete with rating of 5
+        // Create or update entry with the selected rating
         await habitService.upsertHabitEntry({
           habit_id: habitId,
           user_id: user.id,
           entry_date: today,
-          rating: 5
+          rating
         });
       }
 
       // Reload data to update UI
       await loadHabitsData();
     } catch (error) {
-      console.error("Error toggling habit:", error);
+      console.error("Error updating habit rating:", error);
       toast({
         title: "Error",
         description: "Failed to update habit. Please try again.",
         variant: "destructive"
       });
     }
+  };
+
+  const getRatingColor = (rating: number): string => {
+    if (rating === 0) return "bg-muted hover:bg-muted-foreground/20";
+    if (rating <= 2) return "bg-destructive";
+    if (rating <= 3) return "bg-orange-500";
+    return "bg-primary";
   };
 
   if (loading) {
@@ -163,41 +166,39 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
           </p>
         ) : (
           habits.map((habit) => (
-          <div key={habit.id} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 flex-1">
-                <button
-                  onClick={(e) => handleToggleHabit(habit.id, e)}
-                  className="flex-shrink-0"
-                >
-                  {habit.completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
-                  )}
-                </button>
-                
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "font-medium truncate",
-                    habit.completed && "line-through text-muted-foreground"
-                  )}>
-                    {habit.name}
-                  </p>
-                </div>
+          <div key={habit.id} className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate text-sm">
+                  {habit.name}
+                </p>
               </div>
               
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Flame className="w-3 h-3" />
-                  <span>{habit.streak}</span>
-                </div>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
+                <Flame className="w-3 h-3" />
+                <span>{habit.streak}</span>
               </div>
             </div>
-            
-            <div className="ml-8">
-              <Progress value={habit.progress} className="h-1.5" />
+
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4, 5].map((rating) => (
+                <button
+                  key={rating}
+                  onClick={() => handleRatingClick(habit.id, habit.currentRating === rating ? 0 : rating)}
+                  disabled={isEditMode}
+                  className={cn(
+                    "flex-1 h-8 rounded transition-all",
+                    habit.currentRating >= rating 
+                      ? getRatingColor(habit.currentRating)
+                      : "bg-muted hover:bg-muted-foreground/20",
+                    isEditMode && "cursor-not-allowed opacity-50"
+                  )}
+                  aria-label={`Rate ${rating}`}
+                />
+              ))}
             </div>
+            
+            <Progress value={habit.progress} className="h-1.5" />
           </div>
           ))
         )}
