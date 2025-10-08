@@ -166,39 +166,37 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
           </p>
         ) : (
           habits.map((habit) => (
-          <div key={habit.id} className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate text-sm">
-                  {habit.name}
-                </p>
+          <div key={habit.id} className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate text-sm">
+                {habit.name}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <button
+                    key={rating}
+                    onClick={() => handleRatingClick(habit.id, habit.currentRating === rating ? 0 : rating)}
+                    disabled={isEditMode}
+                    className={cn(
+                      "w-6 h-6 rounded transition-all",
+                      habit.currentRating >= rating 
+                        ? getRatingColor(habit.currentRating)
+                        : "bg-muted hover:bg-muted-foreground/20",
+                      isEditMode && "cursor-not-allowed opacity-50"
+                    )}
+                    aria-label={`Rate ${rating}`}
+                  />
+                ))}
               </div>
               
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Flame className="w-3 h-3" />
                 <span>{habit.streak}</span>
               </div>
             </div>
-
-            <div className="flex items-center gap-2">
-              {[1, 2, 3, 4, 5].map((rating) => (
-                <button
-                  key={rating}
-                  onClick={() => handleRatingClick(habit.id, habit.currentRating === rating ? 0 : rating)}
-                  disabled={isEditMode}
-                  className={cn(
-                    "flex-1 h-8 rounded transition-all",
-                    habit.currentRating >= rating 
-                      ? getRatingColor(habit.currentRating)
-                      : "bg-muted hover:bg-muted-foreground/20",
-                    isEditMode && "cursor-not-allowed opacity-50"
-                  )}
-                  aria-label={`Rate ${rating}`}
-                />
-              ))}
-            </div>
-            
-            <Progress value={habit.progress} className="h-1.5" />
           </div>
           ))
         )}
