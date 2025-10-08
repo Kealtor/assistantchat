@@ -141,7 +141,6 @@ export const DashboardArea = ({
             />
             
             <HabitsSnapshot 
-              habits={dashboardData.topHabits}
               onViewAll={() => onNavigate("habits")}
             />
             
@@ -184,7 +183,6 @@ export const DashboardArea = ({
             />
             
             <HabitsSnapshot 
-              habits={dashboardData.topHabits}
               onViewAll={() => onNavigate("habits")}
             />
             

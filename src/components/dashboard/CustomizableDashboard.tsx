@@ -246,7 +246,6 @@ export const CustomizableDashboard = ({
         return (
           <div className="h-full">
             <HabitsSnapshot
-              habits={dashboardData.topHabits}
               onViewAll={() => onNavigate("habits")}
               isEditMode={isEditMode}
             />
