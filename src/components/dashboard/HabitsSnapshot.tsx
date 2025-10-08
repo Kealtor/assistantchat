@@ -124,9 +124,11 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
 
   const getRatingColor = (rating: number): string => {
     if (rating === 0) return "bg-muted hover:bg-muted-foreground/20";
-    if (rating <= 2) return "bg-destructive";
-    if (rating <= 3) return "bg-orange-500";
-    return "bg-primary";
+    if (rating === 1) return "bg-red-500";
+    if (rating === 2) return "bg-orange-500";
+    if (rating === 3) return "bg-yellow-500";
+    if (rating === 4) return "bg-lime-500";
+    return "bg-green-600";
   };
 
   if (loading) {
@@ -168,7 +170,7 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
           habits.map((habit) => (
           <div key={habit.id} className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate text-sm">
+              <p className="font-medium truncate text-base">
                 {habit.name}
               </p>
             </div>
@@ -181,7 +183,7 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
                     onClick={() => handleRatingClick(habit.id, habit.currentRating === rating ? 0 : rating)}
                     disabled={isEditMode}
                     className={cn(
-                      "w-6 h-6 rounded transition-all",
+                      "w-7 h-7 rounded transition-all",
                       habit.currentRating >= rating 
                         ? getRatingColor(habit.currentRating)
                         : "bg-muted hover:bg-muted-foreground/20",
@@ -192,8 +194,8 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
                 ))}
               </div>
               
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Flame className="w-3 h-3" />
+              <div className="flex items-center gap-1 text-xs text-muted-foreground ml-1">
+                <Flame className="w-3.5 h-3.5" />
                 <span>{habit.streak}</span>
               </div>
             </div>
