@@ -5,6 +5,7 @@ import { HeroCard } from "./HeroCard";
 import { QuickReflectionWidget } from "./QuickReflectionWidget";
 import { HabitsSnapshot } from "./HabitsSnapshot";
 import { RecentJournalWidget } from "./RecentJournalWidget";
+import { RoadmapCard } from "./RoadmapCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ViewMode } from "@/types/navigation";
@@ -148,6 +149,8 @@ export const DashboardArea = ({
               snippet={dashboardData.recentJournalSnippet}
               onTap={() => onNavigate("journal")}
             />
+            
+            <RoadmapCard />
           </div>
         </div>
       </div>
@@ -191,8 +194,7 @@ export const DashboardArea = ({
               onTap={() => onNavigate("journal")}
             />
             
-            {/* Empty slot for visual balance or future widget */}
-            <div className="hidden md:block"></div>
+            <RoadmapCard />
           </div>
 
           {/* Quick Access - Full Width Bottom */}
