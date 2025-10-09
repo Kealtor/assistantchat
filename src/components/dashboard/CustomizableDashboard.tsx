@@ -20,6 +20,7 @@ import { HabitsSnapshot } from "./HabitsSnapshot";
 import { RecentJournalWidget } from "./RecentJournalWidget";
 import { QuickstartArea } from "../chat/QuickstartArea";
 import { QuickAccessButtons } from "./QuickAccessButtons";
+import { RoadmapCard } from "./RoadmapCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -277,6 +278,12 @@ export const CustomizableDashboard = ({
                 isEditMode={isEditMode}
               />
             </div>
+          </div>
+        );
+      case 'roadmap':
+        return (
+          <div className="h-full">
+            <RoadmapCard isEditMode={isEditMode} />
           </div>
         );
       default:

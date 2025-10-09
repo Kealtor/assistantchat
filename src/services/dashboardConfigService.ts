@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface DashboardWidget {
   id: string;
-  type: 'hero' | 'reflection' | 'habits' | 'journal' | 'quickstart';
+  type: 'hero' | 'reflection' | 'habits' | 'journal' | 'quickstart' | 'roadmap';
   x: number;
   y: number;
   w: number;
@@ -76,6 +76,18 @@ export const defaultLayout: DashboardLayout = {
       h: 6,
       minW: 1,
       minH: 4,
+      maxW: 2,
+      maxH: 20
+    },
+    {
+      id: 'roadmap',
+      type: 'roadmap',
+      x: 0,
+      y: 16,
+      w: 2,
+      h: 8,
+      minW: 1,
+      minH: 6,
       maxW: 2,
       maxH: 20
     }
