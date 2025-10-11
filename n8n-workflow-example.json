@@ -1,0 +1,172 @@
+{
+  "name": "Daily Dashboard Card Updates",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily at 6 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate dynamic content based on date\nconst today = new Date();\nconst dayOfWeek = today.toLocaleDateString('en-US', { weekday: 'long' });\n\n// Morning motivational messages\nconst messages = [\n  `Happy ${dayOfWeek}! You've got this.`,\n  \"Every day is a fresh start. Make it count.\",\n  \"Your consistency is building something powerful.\",\n  \"Small steps today, big changes tomorrow.\"\n];\n\nconst randomMessage = messages[Math.floor(Math.random() * messages.length)];\n\n// Build the bulk update payload\nconst payload = {\n  userId: \"USER_UUID_REPLACE_ME\",\n  updates: [\n    {\n      cardType: \"hero\",\n      content: {\n        message: randomMessage,\n        updatedAt: today.toISOString()\n      }\n    },\n    {\n      cardType: \"reflection\",\n      content: {\n        preview: \"What are you grateful for today?\",\n        questions: [\n          \"What made you smile today?\",\n          \"What progress did you make?\"\n        ]\n      }\n    }\n  ]\n};\n\nreturn { payload };"
+      },
+      "id": "prepare-data",
+      "name": "Prepare Update Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://paodisbyfnmiljjognxl.supabase.co/functions/v1/bulk-update-cards",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $now.format('yyyy-MM-dd-HHmm') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {
+          "retry": {
+            "maxTries": 3,
+            "waitBetweenTries": 1000
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "update-cards-http",
+      "name": "Update Dashboard Cards",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [650, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "check-success",
+      "name": "Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "message": "✅ Dashboard cards updated successfully!\\nProcessed: {{ $json.processed }}\\nFailed: {{ $json.failed }}"
+      },
+      "id": "log-success",
+      "name": "Log Success",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "message": "❌ Dashboard update failed!\\nError: {{ $json.error || 'Unknown error' }}"
+      },
+      "id": "log-error",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    }
+  ],
+  "connections": {
+    "Daily at 6 AM": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update Data": {
+      "main": [
+        [
+          {
+            "node": "Update Dashboard Cards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Dashboard Cards": {
+      "main": [
+        [
+          {
+            "node": "Check Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Success": {
+      "main": [
+        [
+          {
+            "node": "Log Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-10-11T00:00:00.000Z",
+  "versionId": "1"
+}
