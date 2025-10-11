@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { cardContentService, CardType } from "./cardContentService";
 
 export interface DashboardData {
   heroMessage: string;
@@ -15,16 +16,23 @@ export interface DashboardData {
 
 export const dashboardService = {
   /**
-   * Fetches dashboard data from the webhook
+   * Fetches dashboard data - now from dynamic card content
    */
   async fetchDashboardData(userId: string): Promise<DashboardData> {
     try {
-      // For now, we'll create a mock response that would come from the webhook
-      // In production, this would call the actual webhook URL
-      const mockData: DashboardData = {
-        heroMessage: "Yesterday you stayed consistent with your reading habit – great job. Let's build on that today and make it another win!",
-        reflectionPreview: "What's one thought you want to capture today?",
-        topHabits: [
+      // Fetch dynamic card content
+      const allContent = await cardContentService.getAllCardContent();
+      
+      // Build dashboard data from card content or use defaults
+      const heroContent = allContent.find(c => c.card_type === 'hero');
+      const reflectionContent = allContent.find(c => c.card_type === 'reflection');
+      const habitsContent = allContent.find(c => c.card_type === 'habits');
+      const journalContent = allContent.find(c => c.card_type === 'journal');
+
+      const dashboardData: DashboardData = {
+        heroMessage: heroContent?.content?.message || "Yesterday you stayed consistent with your reading habit – great job. Let's build on that today and make it another win!",
+        reflectionPreview: reflectionContent?.content?.preview || "What's one thought you want to capture today?",
+        topHabits: habitsContent?.content?.topHabits || [
           {
             id: "1",
             name: "Morning Exercise",
@@ -47,13 +55,10 @@ export const dashboardService = {
             progress: 65
           }
         ],
-        recentJournalSnippet: "Today I felt grateful for the small moments that brought me joy..."
+        recentJournalSnippet: journalContent?.content?.snippet || "Today I felt grateful for the small moments that brought me joy..."
       };
-
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
       
-      return mockData;
+      return dashboardData;
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       throw error;

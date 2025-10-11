@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      card_content: {
+        Row: {
+          card_type: Database["public"]["Enums"]["card_type"]
+          content: Json
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_type: Database["public"]["Enums"]["card_type"]
+          content?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_type?: Database["public"]["Enums"]["card_type"]
+          content?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      card_update_logs: {
+        Row: {
+          card_content_id: string
+          created_at: string
+          id: string
+          idempotency_key: string | null
+          request_data: Json | null
+          update_source: string
+          updated_by: string | null
+        }
+        Insert: {
+          card_content_id: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string | null
+          request_data?: Json | null
+          update_source: string
+          updated_by?: string | null
+        }
+        Update: {
+          card_content_id?: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string | null
+          request_data?: Json | null
+          update_source?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_update_logs_card_content_id_fkey"
+            columns: ["card_content_id"]
+            isOneToOne: false
+            referencedRelation: "card_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chats: {
         Row: {
           chat_type: string
@@ -261,7 +326,13 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      card_type:
+        | "hero"
+        | "reflection"
+        | "habits"
+        | "journal"
+        | "quickstart"
+        | "roadmap"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -388,6 +459,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      card_type: [
+        "hero",
+        "reflection",
+        "habits",
+        "journal",
+        "quickstart",
+        "roadmap",
+      ],
+    },
   },
 } as const

@@ -1,1 +1,10 @@
 project_id = "paodisbyfnmiljjognxl"
+
+[functions.update-card]
+verify_jwt = false
+
+[functions.bulk-update-cards]
+verify_jwt = false
+
+[functions.get-card]
+verify_jwt = false
