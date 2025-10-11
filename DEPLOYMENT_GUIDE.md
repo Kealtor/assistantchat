@@ -7,11 +7,79 @@ Already completed! The following tables are created:
 - `card_content` - Stores dynamic card content per user
 - `card_update_logs` - Audit trail of all updates
 
-### 2. Edge Functions Deployment ✅
+### 2. Edge Functions Deployment
+
+#### Option A: Automatic Deployment (Lovable)
 Edge functions are automatically deployed with Lovable:
 - `/update-card` - Update single card
 - `/bulk-update-cards` - Update multiple cards
 - `/get-card` - Retrieve card content
+
+#### Option B: Manual Deployment (Your Own Supabase Instance)
+
+**Prerequisites:**
+- Supabase CLI installed: `npm install -g supabase`
+- Supabase account and project created
+
+**Step 1: Install Supabase CLI**
+```bash
+npm install -g supabase
+```
+
+**Step 2: Link to Your Supabase Project**
+```bash
+# Login to Supabase
+supabase login
+
+# Link your local project to your Supabase instance
+supabase link --project-ref YOUR_PROJECT_REF
+
+# Find your project ref at: https://supabase.com/dashboard/project/YOUR_PROJECT_REF/settings/general
+```
+
+**Step 3: Deploy Edge Functions**
+```bash
+# Deploy all functions at once
+supabase functions deploy update-card
+supabase functions deploy bulk-update-cards
+supabase functions deploy get-card
+
+# Or deploy all in one command
+supabase functions deploy
+```
+
+**Step 4: Set Environment Secrets**
+```bash
+# The functions need access to Supabase credentials
+# These are automatically available in Supabase-hosted functions:
+# - SUPABASE_URL
+# - SUPABASE_ANON_KEY  
+# - SUPABASE_SERVICE_ROLE_KEY
+
+# If you need to set custom secrets for other integrations:
+supabase secrets set MY_SECRET_KEY=your_value_here
+
+# List all secrets
+supabase secrets list
+```
+
+**Step 5: Verify Deployment**
+```bash
+# Check function logs
+supabase functions logs update-card
+
+# Test the endpoint
+curl https://YOUR_PROJECT_REF.supabase.co/functions/v1/update-card \
+  -H "Authorization: Bearer YOUR_ANON_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"cardType": "hero", "content": {"message": "Test"}}'
+```
+
+**Important Notes:**
+- Edge functions use Deno runtime, not Node.js
+- Functions are deployed to `https://YOUR_PROJECT_REF.supabase.co/functions/v1/FUNCTION_NAME`
+- The `supabase/config.toml` file contains function configuration
+- RLS policies must be properly configured in your database
 
 ### 3. Get Your Service Role Key
 
