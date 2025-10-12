@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { cardContentService, CardType } from "./cardContentService";
+import { journalService } from "./journalService";
 
 export interface DashboardData {
   heroMessage: string;
@@ -29,6 +30,13 @@ export const dashboardService = {
       const habitsContent = allContent.find(c => c.card_type === 'habits');
       const journalContent = allContent.find(c => c.card_type === 'journal');
 
+      // Fetch actual journal entries
+      const journalEntries = await journalService.getUserEntries(userId);
+      const lastEntry = journalEntries[0]; // Most recent entry
+      const journalSnippet = lastEntry?.content 
+        ? lastEntry.content.slice(0, 150) + (lastEntry.content.length > 150 ? '...' : '')
+        : "No journal entries yet. Start writing to see your latest entry here.";
+
       const dashboardData: DashboardData = {
         heroMessage: heroContent?.content?.message || "Yesterday you stayed consistent with your reading habit – great job. Let's build on that today and make it another win!",
         reflectionPreview: reflectionContent?.content?.preview || "What's one thought you want to capture today?",
@@ -55,7 +63,7 @@ export const dashboardService = {
             progress: 65
           }
         ],
-        recentJournalSnippet: journalContent?.content?.snippet || "Today I felt grateful for the small moments that brought me joy..."
+        recentJournalSnippet: journalSnippet
       };
       
       return dashboardData;
