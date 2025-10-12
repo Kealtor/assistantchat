@@ -18,9 +18,9 @@ export const RecentJournalWidget = ({ snippet, onTap, isEditMode = false }: Rece
           <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
             <BookOpen className="w-6 h-6 text-muted-foreground" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex flex-col">
             <h3 className="font-medium mb-2 text-lg">Recent Journal Entry</h3>
-            <p className="text-muted-foreground line-clamp-4 leading-relaxed">
+            <p className="text-muted-foreground line-clamp-[8] leading-relaxed flex-1">
               {snippet}
             </p>
           </div>

@@ -34,8 +34,7 @@ export const dashboardService = {
       const journalEntries = await journalService.getUserEntries(userId);
       const lastEntry = journalEntries[0]; // Most recent entry
       const journalSnippet = lastEntry?.content 
-        ? lastEntry.content.slice(0, 150) + (lastEntry.content.length > 150 ? '...' : '')
-        : "No journal entries yet. Start writing to see your latest entry here.";
+        || "No journal entries yet. Start writing to see your latest entry here.";
 
       const dashboardData: DashboardData = {
         heroMessage: heroContent?.content?.message || "Yesterday you stayed consistent with your reading habit – great job. Let's build on that today and make it another win!",
