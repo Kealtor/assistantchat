@@ -379,56 +379,60 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
             )}
           >
             <div className="flex-1 overflow-y-auto">
-              <div className="mb-4">
-                <div className="flex items-center gap-2 text-primary mb-2">
-                  <Target className="w-5 h-5" />
-                  <h3 className="font-semibold text-base">{selectedMilestone.text}</h3>
-                </div>
-              </div>
-
               <div className="space-y-2" role="list" aria-label="Sub-milestones">
                 {selectedMilestone.subMilestones.map((sub, index) => (
                   <div
                     key={sub.id}
                     role="listitem"
-                    className="flex items-start gap-3 p-2.5 rounded-lg border bg-card"
+                    className="flex items-center gap-3 p-3 rounded-lg border bg-card transition-all cursor-pointer hover:bg-accent/50"
+                    onClick={() => toggleSubMilestone(selectedMilestoneId!, sub.id)}
                   >
-                    <Checkbox
-                      checked={sub.completed}
-                      onCheckedChange={() => toggleSubMilestone(selectedMilestoneId!, sub.id)}
-                      className="mt-0.5"
-                      aria-label={`Mark ${sub.text} as ${sub.completed ? 'incomplete' : 'complete'}`}
-                    />
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm flex-shrink-0">
+                      {sub.completed ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
 
-                    {editingId === sub.id ? (
-                      <Input
-                        ref={inputRef}
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onBlur={saveEdit}
-                        onKeyDown={handleKeyDown}
-                        className="flex-1 h-8"
-                        aria-label={`Edit sub-milestone ${index + 1}`}
-                      />
-                    ) : (
-                      <span
-                        className={cn(
-                          "flex-1 text-sm",
-                          sub.completed && "line-through text-muted-foreground"
-                        )}
-                        onClick={() => !isEditMode && startEdit(sub.id, sub.text)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !isEditMode) {
-                            startEdit(sub.id, sub.text);
-                          }
-                        }}
-                        tabIndex={isEditMode ? -1 : 0}
-                        role="button"
-                        aria-label={`Sub-milestone ${index + 1}: ${sub.text}. Press Enter to edit.`}
-                      >
-                        {sub.text}
-                      </span>
-                    )}
+                    <div className="flex-1">
+                      {editingId === sub.id ? (
+                        <Input
+                          ref={inputRef}
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={saveEdit}
+                          onKeyDown={handleKeyDown}
+                          className="h-8"
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Edit sub-milestone ${index + 1}`}
+                        />
+                      ) : (
+                        <span
+                          className={cn(
+                            "font-medium text-sm",
+                            sub.completed && "line-through text-muted-foreground"
+                          )}
+                          onClick={(e) => {
+                            if (!isEditMode) {
+                              e.stopPropagation();
+                              startEdit(sub.id, sub.text);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !isEditMode) {
+                              e.stopPropagation();
+                              startEdit(sub.id, sub.text);
+                            }
+                          }}
+                          tabIndex={isEditMode ? -1 : 0}
+                          role="button"
+                          aria-label={`Sub-milestone ${index + 1}: ${sub.text}. Press Enter to edit.`}
+                        >
+                          {sub.text}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
