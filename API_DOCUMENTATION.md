@@ -451,15 +451,55 @@ SELECT * FROM card_update_logs ORDER BY created_at DESC LIMIT 10;
 }
 ```
 
-### Reflection Card
+**Example API Request:**
+```bash
+curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
+  -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "5d59e0a7-ae64-4e04-8a14-85a39c1eae3f",
+    "cardType": "hero",
+    "content": {
+      "message": "You completed 8 out of 10 habits today! Amazing consistency.",
+      "subtitle": "Your 14-day streak is growing strong",
+      "cta": {
+        "text": "View Progress",
+        "link": "/habits"
+      }
+    }
+  }'
+```
+
+### Reflection Card (Quick Reflection Widget)
 ```json
 {
   "preview": "Reflection prompt or preview text",
   "questions": [
     "What are you grateful for today?",
     "What did you learn?"
-  ]
+  ],
+  "prompt": "Take a moment to reflect on your day"
 }
+```
+
+**Example API Request:**
+```bash
+curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
+  -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "5d59e0a7-ae64-4e04-8a14-85a39c1eae3f",
+    "cardType": "reflection",
+    "content": {
+      "preview": "Reflect on your wins today",
+      "prompt": "What made today special?",
+      "questions": [
+        "What are you most proud of today?",
+        "What lesson did you learn?",
+        "How did you show up for yourself?"
+      ]
+    }
+  }'
 ```
 
 ### Habits Card
@@ -490,14 +530,127 @@ SELECT * FROM card_update_logs ORDER BY created_at DESC LIMIT 10;
 ### Roadmap Card
 ```json
 {
+  "title": "Your Growth Journey",
+  "description": "Track your progress on key goals",
   "milestones": [
     {
+      "id": "milestone-1",
       "title": "Complete 30-day challenge",
+      "description": "Build consistent daily habits",
       "progress": 67,
+      "status": "in_progress",
       "dueDate": "2025-11-10"
+    },
+    {
+      "id": "milestone-2",
+      "title": "Master morning routine",
+      "description": "Wake up at 6 AM for 21 days",
+      "progress": 100,
+      "status": "completed",
+      "completedDate": "2025-10-05"
     }
+  ],
+  "nextSteps": [
+    "Continue daily habit tracking",
+    "Review weekly progress"
   ]
 }
+```
+
+**Example API Request:**
+```bash
+curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
+  -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "5d59e0a7-ae64-4e04-8a14-85a39c1eae3f",
+    "cardType": "roadmap",
+    "content": {
+      "title": "2025 Personal Development Goals",
+      "description": "Your journey to becoming your best self",
+      "milestones": [
+        {
+          "id": "q1-fitness",
+          "title": "Achieve fitness baseline",
+          "description": "Exercise 5x per week consistently",
+          "progress": 45,
+          "status": "in_progress",
+          "dueDate": "2025-12-31"
+        },
+        {
+          "id": "q1-mindfulness",
+          "title": "Daily meditation practice",
+          "description": "Meditate for 10 minutes daily",
+          "progress": 80,
+          "status": "in_progress",
+          "dueDate": "2025-11-15"
+        }
+      ],
+      "nextSteps": [
+        "Complete this week'\''s workout plan",
+        "Schedule Sunday review session",
+        "Update Q2 goals"
+      ]
+    }
+  }'
+```
+
+### Bulk Update Example (All Three Cards)
+```bash
+curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/bulk-update-cards \
+  -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: weekly-update-2025-10-12" \
+  -d '{
+    "userId": "5d59e0a7-ae64-4e04-8a14-85a39c1eae3f",
+    "updates": [
+      {
+        "cardType": "hero",
+        "content": {
+          "message": "Fantastic week! You'\''ve completed 85% of your habits.",
+          "subtitle": "Keep the momentum going strong",
+          "cta": {
+            "text": "See Details",
+            "link": "/habits"
+          }
+        }
+      },
+      {
+        "cardType": "reflection",
+        "content": {
+          "preview": "Weekly reflection time",
+          "prompt": "What were your biggest wins this week?",
+          "questions": [
+            "What are you most proud of this week?",
+            "What challenge did you overcome?",
+            "What will you improve next week?"
+          ]
+        }
+      },
+      {
+        "cardType": "roadmap",
+        "content": {
+          "title": "Q4 2025 Goals",
+          "description": "Your path to personal excellence",
+          "milestones": [
+            {
+              "id": "habit-mastery",
+              "title": "100-day habit streak",
+              "description": "Maintain all core habits for 100 days",
+              "progress": 72,
+              "status": "in_progress",
+              "dueDate": "2025-12-25"
+            }
+          ],
+          "nextSteps": [
+            "Review today'\''s progress",
+            "Plan tomorrow'\''s activities"
+          ]
+        }
+      }
+    ]
+  }'
+```
 ```
 
 ---
