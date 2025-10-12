@@ -14,7 +14,7 @@ export const RecentJournalWidget = ({ snippet, onTap, isEditMode = false }: Rece
       onClick={isEditMode ? undefined : onTap}
     >
       <CardContent className="p-6 flex-1 flex flex-col overflow-hidden">
-        <div className="flex items-start gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
             <BookOpen className="w-6 h-6 text-muted-foreground" />
           </div>
