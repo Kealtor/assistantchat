@@ -324,7 +324,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
               selectedMilestoneId ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none absolute"
             )}
           >
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4 justify-end">
               <Button
                 variant="ghost"
                 size="sm"
