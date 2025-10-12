@@ -63,34 +63,58 @@ export const cardContentService = {
   },
 
   /**
-   * Update card content via Edge Function (supports user JWT)
+   * Update card content via direct database access (RLS protected)
    */
-  async updateCard(request: UpdateCardRequest, idempotencyKey?: string): Promise<CardContent> {
+  async updateCard(request: UpdateCardRequest): Promise<CardContent> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user } } = await supabase.auth.getUser();
       
-      if (!session) {
+      if (!user) {
         throw new Error('Not authenticated');
       }
 
-      const headers: Record<string, string> = {
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
-      };
+      // Check if card exists
+      const { data: existing } = await supabase
+        .from('card_content')
+        .select('id')
+        .eq('card_type', request.cardType)
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (idempotencyKey) {
-        headers['Idempotency-Key'] = idempotencyKey;
+      let result;
+      
+      if (existing) {
+        // Update existing card
+        const { data, error } = await supabase
+          .from('card_content')
+          .update({
+            content: request.content,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id)
+          .eq('user_id', user.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = data;
+      } else {
+        // Insert new card
+        const { data, error } = await supabase
+          .from('card_content')
+          .insert({
+            card_type: request.cardType,
+            user_id: user.id,
+            content: request.content
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = data;
       }
 
-      const { data, error } = await supabase.functions.invoke('update-card', {
-        body: request,
-        headers,
-      });
-
-      if (error) throw error;
-      if (!data.success) throw new Error(data.error || 'Update failed');
-
-      return data.data;
+      return result;
     } catch (error) {
       console.error('Error updating card:', error);
       throw error;
@@ -98,33 +122,40 @@ export const cardContentService = {
   },
 
   /**
-   * Bulk update multiple cards via Edge Function
+   * Bulk update multiple cards via direct database access (RLS protected)
    */
-  async bulkUpdateCards(request: BulkUpdateRequest, idempotencyKey?: string) {
+  async bulkUpdateCards(request: BulkUpdateRequest) {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user } } = await supabase.auth.getUser();
       
-      if (!session) {
+      if (!user) {
         throw new Error('Not authenticated');
       }
 
-      const headers: Record<string, string> = {
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
+      const results = await Promise.allSettled(
+        request.updates.map(update => 
+          this.updateCard({ ...update, userId: user.id })
+        )
+      );
+
+      const processed = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+      const errors = results
+        .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+        .map(r => r.reason.message);
+
+      return {
+        success: failed === 0,
+        processed,
+        failed,
+        results: results.map((r, i) => ({
+          cardType: request.updates[i].cardType,
+          success: r.status === 'fulfilled',
+          data: r.status === 'fulfilled' ? r.value : null,
+          error: r.status === 'rejected' ? r.reason.message : null
+        })),
+        errors
       };
-
-      if (idempotencyKey) {
-        headers['Idempotency-Key'] = idempotencyKey;
-      }
-
-      const { data, error } = await supabase.functions.invoke('bulk-update-cards', {
-        body: request,
-        headers,
-      });
-
-      if (error) throw error;
-
-      return data;
     } catch (error) {
       console.error('Error bulk updating cards:', error);
       throw error;
