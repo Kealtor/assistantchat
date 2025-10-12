@@ -91,83 +91,113 @@ For n8n automation, you need the Supabase service role key:
    - Header Name: `Authorization`
    - Header Value: `Bearer YOUR_SERVICE_ROLE_KEY`
 
-### 4. Test the API
+### 4. Test the API with cURL
 
-#### Option A: Test from Browser Console (Logged-in User)
+**Prerequisites:**
+- Your Supabase service role key (from project settings)
+- A valid user UUID from your database
 
-```javascript
-// 1. Get your session token
-const { data: { session } } = await supabase.auth.getSession();
-console.log('Token:', session.access_token);
-
-// 2. Test update
-const response = await fetch('https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${session.access_token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    cardType: 'hero',
-    content: {
-      message: 'Test message from browser console!'
-    }
-  })
-});
-
-const result = await response.json();
-console.log('Result:', result);
-
-// 3. Verify update
-const card = await supabase
-  .from('card_content')
-  .select('*')
-  .eq('card_type', 'hero')
-  .single();
-console.log('Card content:', card.data);
+#### Get Your User ID
+```sql
+-- Run this in Supabase SQL Editor to get user IDs
+SELECT id, email FROM auth.users LIMIT 10;
 ```
 
-#### Option B: Test with cURL (Service Role)
-
+#### Test Single Card Update
 ```bash
-# Replace YOUR_SERVICE_ROLE_KEY with actual key
-SERVICE_KEY="YOUR_SERVICE_ROLE_KEY"
-USER_ID="YOUR_USER_UUID"
+# Set your credentials
+export SERVICE_KEY="your_service_role_key_here"
+export USER_ID="your_user_uuid_here"
 
-# Test single update
+# Update a single card
 curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
   -H "Authorization: Bearer $SERVICE_KEY" \
   -H "Content-Type: application/json" \
-  -d "{
-    \"userId\": \"$USER_ID\",
-    \"cardType\": \"hero\",
-    \"content\": {
-      \"message\": \"Test from cURL!\"
+  -d '{
+    "userId": "'"$USER_ID"'",
+    "cardType": "hero",
+    "content": {
+      "message": "Testing hero card update from cURL!"
     }
-  }"
+  }'
+```
 
-# Test bulk update
+#### Test Bulk Card Update
+```bash
+# Update multiple cards at once with idempotency
 curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/bulk-update-cards \
   -H "Authorization: Bearer $SERVICE_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: test-$(date +%s)" \
-  -d "{
-    \"userId\": \"$USER_ID\",
-    \"updates\": [
+  -d '{
+    "userId": "'"$USER_ID"'",
+    "updates": [
       {
-        \"cardType\": \"hero\",
-        \"content\": {\"message\": \"Bulk test message 1\"}
+        "cardType": "hero",
+        "content": {"message": "Bulk update test 1"}
       },
       {
-        \"cardType\": \"reflection\",
-        \"content\": {\"preview\": \"Bulk test preview 2\"}
+        "cardType": "reflection",
+        "content": {"preview": "Bulk update test 2"}
+      },
+      {
+        "cardType": "habits",
+        "content": {"summary": "Bulk update test 3"}
       }
     ]
-  }"
+  }'
+```
 
-# Get card content
+#### Test Get Card Content
+```bash
+# Retrieve specific card content
 curl -X GET "https://paodisbyfnmiljjognxl.supabase.co/functions/v1/get-card?cardType=hero&userId=$USER_ID" \
   -H "Authorization: Bearer $SERVICE_KEY"
+```
+
+#### Expected Responses
+
+**Successful Update:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "user_id": "user-uuid",
+    "card_type": "hero",
+    "content": {"message": "Testing hero card update from cURL!"},
+    "created_at": "2025-01-01T00:00:00.000Z",
+    "updated_at": "2025-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Successful Bulk Update:**
+```json
+{
+  "success": true,
+  "processed": 3,
+  "failed": 0,
+  "results": [
+    {"cardType": "hero", "success": true, "data": {...}},
+    {"cardType": "reflection", "success": true, "data": {...}},
+    {"cardType": "habits", "success": true, "data": {...}}
+  ],
+  "errors": []
+}
+```
+
+**Get Card Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "card_type": "hero",
+    "content": {"message": "Testing hero card update from cURL!"},
+    "updated_at": "2025-01-01T00:00:00.000Z"
+  }
+}
 ```
 
 ### 5. Set Up n8n Workflow
