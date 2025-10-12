@@ -473,12 +473,8 @@ curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
 ### Reflection Card (Quick Reflection Widget)
 ```json
 {
-  "preview": "Reflection prompt or preview text",
-  "questions": [
-    "What are you grateful for today?",
-    "What did you learn?"
-  ],
-  "prompt": "Take a moment to reflect on your day"
+  "title": "Quick Reflection",
+  "subtitle": "What are you grateful for today?"
 }
 ```
 
@@ -491,13 +487,8 @@ curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
     "userId": "5d59e0a7-ae64-4e04-8a14-85a39c1eae3f",
     "cardType": "reflection",
     "content": {
-      "preview": "Reflect on your wins today",
-      "prompt": "What made today special?",
-      "questions": [
-        "What are you most proud of today?",
-        "What lesson did you learn?",
-        "How did you show up for yourself?"
-      ]
+      "title": "Daily Reflection",
+      "subtitle": "What made you smile today?"
     }
   }'
 ```
@@ -717,13 +708,8 @@ curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/bulk-update-c
       {
         "cardType": "reflection",
         "content": {
-          "preview": "Weekly reflection time",
-          "prompt": "What were your biggest wins this week?",
-          "questions": [
-            "What are you most proud of this week?",
-            "What challenge did you overcome?",
-            "What will you improve next week?"
-          ]
+          "title": "Weekly Reflection",
+          "subtitle": "What were your biggest wins this week?"
         }
       },
       {
