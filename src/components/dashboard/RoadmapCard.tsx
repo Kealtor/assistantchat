@@ -255,17 +255,20 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
       role="region"
       aria-label="Roadmap planner"
     >
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5" />
-            {selectedMilestoneId && selectedMilestone ? selectedMilestone.text : "Roadmap"}
+      <CardHeader className="min-h-[88px]">
+        <CardTitle className="flex items-center justify-between gap-2 h-10">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <MapPin className="w-5 h-5 flex-shrink-0" />
+            <span className="truncate">
+              {selectedMilestoneId && selectedMilestone ? selectedMilestone.text : "Roadmap"}
+            </span>
           </div>
           {selectedMilestoneId && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleBack}
+              className="flex-shrink-0"
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   handleBack();
