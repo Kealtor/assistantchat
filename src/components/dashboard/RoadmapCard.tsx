@@ -255,13 +255,13 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
       role="region"
       aria-label="Roadmap planner"
     >
-      <CardHeader className="min-h-[88px]">
-        <CardTitle className="flex items-center justify-between gap-2 h-10">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <MapPin className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">
+      <CardHeader className="px-6 pt-6 pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <MapPin className="w-5 h-5 flex-shrink-0 text-muted-foreground" />
+            <h3 className="text-base font-semibold truncate">
               {selectedMilestoneId && selectedMilestone ? selectedMilestone.text : "Roadmap"}
-            </span>
+            </h3>
           </div>
           {selectedMilestoneId && (
             <Button
@@ -280,10 +280,10 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
               Back
             </Button>
           )}
-        </CardTitle>
+        </div>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-hidden p-4 pt-0">
+      <CardContent className="flex-1 overflow-hidden px-6 pb-6 pt-0">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground text-sm">Loading roadmap...</p>

@@ -134,8 +134,8 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
   if (loading) {
     return (
       <Card className="h-full flex flex-col">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Today's Habits</CardTitle>
+        <CardHeader className="pb-3 px-6 pt-6">
+          <CardTitle className="text-base font-semibold">Today's Habits</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -146,9 +146,9 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 px-6 pt-6">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Today's Habits</CardTitle>
+          <CardTitle className="text-base font-semibold">Today's Habits</CardTitle>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -161,16 +161,16 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4 flex-1 overflow-auto">
+      <CardContent className="space-y-4 flex-1 overflow-auto px-6 pb-6">
         {habits.length === 0 ? (
-          <p className="text-center text-muted-foreground py-4">
+          <p className="text-center text-sm text-muted-foreground py-4">
             No habits yet. Visit the Habits tab to create some!
           </p>
         ) : (
           habits.map((habit) => (
           <div key={habit.id} className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate text-base">
+              <p className="text-sm font-medium truncate">
                 {habit.name}
               </p>
             </div>
