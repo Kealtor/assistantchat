@@ -135,7 +135,7 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
     return (
       <Card className="h-full flex flex-col">
         <CardHeader className="pb-3 px-6 pt-6">
-          <CardTitle className="text-base font-semibold">Today's Habits</CardTitle>
+          <CardTitle className="text-lg font-semibold">Today's Habits</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -148,7 +148,7 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-3 px-6 pt-6">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold">Today's Habits</CardTitle>
+          <CardTitle className="text-lg font-semibold">Today's Habits</CardTitle>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -163,14 +163,14 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
       </CardHeader>
       <CardContent className="space-y-4 flex-1 overflow-auto px-6 pb-6">
         {habits.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground py-4">
+          <p className="text-center text-base text-muted-foreground py-4">
             No habits yet. Visit the Habits tab to create some!
           </p>
         ) : (
           habits.map((habit) => (
           <div key={habit.id} className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">
+              <p className="text-base font-medium truncate">
                 {habit.name}
               </p>
             </div>
@@ -194,8 +194,8 @@ export const HabitsSnapshot = ({ onViewAll, isEditMode = false }: HabitsSnapshot
                 ))}
               </div>
               
-              <div className="flex items-center gap-1 text-xs text-muted-foreground ml-1">
-                <Flame className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1 text-sm text-muted-foreground ml-1">
+                <Flame className="w-4 h-4" />
                 <span>{habit.streak}</span>
               </div>
             </div>

@@ -259,7 +259,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <MapPin className="w-5 h-5 flex-shrink-0 text-muted-foreground" />
-            <h3 className="text-base font-semibold truncate">
+            <h3 className="text-lg font-semibold truncate">
               {selectedMilestoneId && selectedMilestone ? selectedMilestone.text : "Roadmap"}
             </h3>
           </div>
@@ -338,7 +338,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                     ) : (
                       <>
                         <span
-                          className="font-medium text-sm truncate"
+                          className="font-medium text-base truncate"
                           onClick={(e) => {
                             if (!isEditMode) {
                               e.stopPropagation();
@@ -357,7 +357,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                         >
                           {milestone.text}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-sm text-muted-foreground">
                           {progress.completed}/{progress.total} completed
                         </span>
                       </>
@@ -413,7 +413,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                       ) : (
                         <span
                           className={cn(
-                            "font-medium text-sm",
+                            "font-medium text-base",
                             sub.completed && "line-through text-muted-foreground"
                           )}
                           onClick={(e) => {

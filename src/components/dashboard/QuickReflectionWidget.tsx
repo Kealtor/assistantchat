@@ -58,8 +58,8 @@ export const QuickReflectionWidget = ({ placeholder, onTap, onRefresh, isRefresh
           <div className="flex items-center gap-3 w-full animate-pulse">
             <div className="w-10 h-10 rounded-lg bg-muted" />
             <div className="flex-1 space-y-2">
-              <div className="h-5 bg-muted rounded w-1/3" />
-              <div className="h-4 bg-muted rounded w-2/3" />
+              <div className="h-6 bg-muted rounded w-1/3" />
+              <div className="h-5 bg-muted rounded w-2/3" />
             </div>
           </div>
         </CardContent>
@@ -78,8 +78,8 @@ export const QuickReflectionWidget = ({ placeholder, onTap, onRefresh, isRefresh
             <PenTool className="w-5 h-5 text-muted-foreground" />
           </div>
           <div className="flex-1">
-            <h3 className="text-base font-semibold mb-1">{content.title}</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-lg font-semibold mb-1">{content.title}</h3>
+            <p className="text-base text-muted-foreground">
               {content.subtitle}
             </p>
           </div>
