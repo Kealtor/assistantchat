@@ -26,14 +26,18 @@ serve(async (req) => {
     }
 
     const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.includes('service_role')) {
-      throw new Error('Service role key required');
-    }
+    //if (!authHeader || !authHeader.includes('service_role')) {
+    //  throw new Error('Service role key required');
+    //}
 
     // Initialize Supabase client with service role key
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
+    
+    if (authHeader !== `Bearer ${supabaseServiceKey}`) {
+      throw new Error('Invalid service role key');
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch card content
