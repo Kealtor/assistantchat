@@ -30,46 +30,24 @@ serve(async (req) => {
     const authHeader = req.headers.get('authorization');
     const idempotencyKey = req.headers.get('idempotency-key');
     
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
+    if (!authHeader || !authHeader.includes('service_role')) {
+      throw new Error('Service role key required');
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role key
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = authHeader.includes('service_role') 
-      ? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-      : Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false
-      },
-      global: {
-        headers: { Authorization: authHeader }
-      }
-    });
-
-    // Get user from JWT
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    // Determine if this is a service request
-    const isServiceRequest = authHeader.includes('service_role');
-    
-    if (!isServiceRequest && authError) {
-      console.error('Auth error:', authError);
-      throw new Error('Unauthorized');
-    }
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse request body
     const body = await req.json();
     validateUpdateCardRequest(body);
 
     const { cardType, content, userId } = body;
-    const targetUserId = isServiceRequest ? (userId || user?.id) : user?.id;
 
-    if (!targetUserId) {
-      throw new Error('Cannot determine target user');
+    if (!userId) {
+      throw new Error('userId is required');
     }
 
     // Check idempotency
@@ -93,7 +71,7 @@ serve(async (req) => {
     const { data: cardData, error: upsertError } = await supabase
       .from('card_content')
       .upsert({
-        user_id: targetUserId,
+        user_id: userId,
         card_type: cardType,
         content: content
       }, {
@@ -110,13 +88,13 @@ serve(async (req) => {
     // Log the update
     await supabase.from('card_update_logs').insert({
       card_content_id: cardData.id,
-      updated_by: user?.id || null,
-      update_source: isServiceRequest ? 'service' : 'user',
+      updated_by: null,
+      update_source: 'service',
       idempotency_key: idempotencyKey,
       request_data: { cardType, content }
     });
 
-    console.log(`Successfully updated ${cardType} card for user ${targetUserId}`);
+    console.log(`Successfully updated ${cardType} card for user ${userId}`);
 
     return new Response(
       JSON.stringify({
@@ -133,8 +111,8 @@ serve(async (req) => {
     console.error('Error in update-card function:', error);
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const statusCode = errorMessage.includes('Unauthorized') ? 401 
-                     : errorMessage.includes('Invalid') ? 400 
+    const statusCode = errorMessage.includes('Service role') ? 401 
+                     : errorMessage.includes('Invalid') || errorMessage.includes('required') ? 400 
                      : 500;
 
     return new Response(

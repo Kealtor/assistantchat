@@ -21,47 +21,26 @@ serve(async (req) => {
       throw new Error('Missing cardType parameter');
     }
 
+    if (!userId) {
+      throw new Error('Missing userId parameter');
+    }
+
     const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
+    if (!authHeader || !authHeader.includes('service_role')) {
+      throw new Error('Service role key required');
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role key
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = authHeader.includes('service_role') 
-      ? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-      : Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false
-      },
-      global: {
-        headers: { Authorization: authHeader }
-      }
-    });
-
-    // Get user from JWT
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    const isServiceRequest = authHeader.includes('service_role');
-    
-    if (!isServiceRequest && authError) {
-      console.error('Auth error:', authError);
-      throw new Error('Unauthorized');
-    }
-
-    const targetUserId = isServiceRequest ? (userId || user?.id) : user?.id;
-
-    if (!targetUserId) {
-      throw new Error('Cannot determine target user');
-    }
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch card content
     const { data: cardData, error: fetchError } = await supabase
       .from('card_content')
       .select('*')
-      .eq('user_id', targetUserId)
+      .eq('user_id', userId)
       .eq('card_type', cardType)
       .single();
 
@@ -99,8 +78,8 @@ serve(async (req) => {
     console.error('Error in get-card function:', error);
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const statusCode = errorMessage.includes('Unauthorized') ? 401 
-                     : errorMessage.includes('Missing') ? 400 
+    const statusCode = errorMessage.includes('Service role') ? 401 
+                     : errorMessage.includes('Missing') || errorMessage.includes('required') ? 400 
                      : 500;
 
     return new Response(
