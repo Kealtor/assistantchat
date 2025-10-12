@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronRight, ArrowLeft, MapPin, Target } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronRight, ArrowLeft, MapPin, Target, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { cardContentService } from "@/services/cardContentService";
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 interface SubMilestone {
   id: string;
   text: string;
+  completed: boolean;
 }
 
 interface Milestone {
@@ -35,55 +37,55 @@ const DEFAULT_ROADMAP: RoadmapData = {
       id: "m1",
       text: "Launch MVP",
       subMilestones: [
-        { id: "s1-1", text: "Define core features" },
-        { id: "s1-2", text: "Build prototype" },
-        { id: "s1-3", text: "User testing" },
-        { id: "s1-4", text: "Refine UI/UX" },
-        { id: "s1-5", text: "Deploy to production" },
+        { id: "s1-1", text: "Define core features", completed: false },
+        { id: "s1-2", text: "Build prototype", completed: false },
+        { id: "s1-3", text: "User testing", completed: false },
+        { id: "s1-4", text: "Refine UI/UX", completed: false },
+        { id: "s1-5", text: "Deploy to production", completed: false },
       ],
     },
     {
       id: "m2",
       text: "Achieve Product-Market Fit",
       subMilestones: [
-        { id: "s2-1", text: "Collect user feedback" },
-        { id: "s2-2", text: "Iterate on features" },
-        { id: "s2-3", text: "Identify key metrics" },
-        { id: "s2-4", text: "Optimize conversion" },
-        { id: "s2-5", text: "Reach 1000 active users" },
+        { id: "s2-1", text: "Collect user feedback", completed: false },
+        { id: "s2-2", text: "Iterate on features", completed: false },
+        { id: "s2-3", text: "Identify key metrics", completed: false },
+        { id: "s2-4", text: "Optimize conversion", completed: false },
+        { id: "s2-5", text: "Reach 1000 active users", completed: false },
       ],
     },
     {
       id: "m3",
       text: "Scale Operations",
       subMilestones: [
-        { id: "s3-1", text: "Automate workflows" },
-        { id: "s3-2", text: "Expand team" },
-        { id: "s3-3", text: "Implement analytics" },
-        { id: "s3-4", text: "Optimize infrastructure" },
-        { id: "s3-5", text: "Launch referral program" },
+        { id: "s3-1", text: "Automate workflows", completed: false },
+        { id: "s3-2", text: "Expand team", completed: false },
+        { id: "s3-3", text: "Implement analytics", completed: false },
+        { id: "s3-4", text: "Optimize infrastructure", completed: false },
+        { id: "s3-5", text: "Launch referral program", completed: false },
       ],
     },
     {
       id: "m4",
       text: "Expand Market Reach",
       subMilestones: [
-        { id: "s4-1", text: "Research new markets" },
-        { id: "s4-2", text: "Localize product" },
-        { id: "s4-3", text: "Partner with influencers" },
-        { id: "s4-4", text: "Launch marketing campaign" },
-        { id: "s4-5", text: "Enter 3 new regions" },
+        { id: "s4-1", text: "Research new markets", completed: false },
+        { id: "s4-2", text: "Localize product", completed: false },
+        { id: "s4-3", text: "Partner with influencers", completed: false },
+        { id: "s4-4", text: "Launch marketing campaign", completed: false },
+        { id: "s4-5", text: "Enter 3 new regions", completed: false },
       ],
     },
     {
       id: "m5",
       text: "Achieve Sustainability",
       subMilestones: [
-        { id: "s5-1", text: "Reach profitability" },
-        { id: "s5-2", text: "Establish brand presence" },
-        { id: "s5-3", text: "Build community" },
-        { id: "s5-4", text: "Secure strategic partnerships" },
-        { id: "s5-5", text: "Plan long-term vision" },
+        { id: "s5-1", text: "Reach profitability", completed: false },
+        { id: "s5-2", text: "Establish brand presence", completed: false },
+        { id: "s5-3", text: "Build community", completed: false },
+        { id: "s5-4", text: "Secure strategic partnerships", completed: false },
+        { id: "s5-5", text: "Plan long-term vision", completed: false },
       ],
     },
   ],
@@ -227,6 +229,26 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
     setSelectedMilestoneId(null);
   };
 
+  // Toggle sub-milestone completion
+  const toggleSubMilestone = (milestoneId: string, subId: string) => {
+    const newData = { ...roadmapData };
+    const milestone = newData.milestones.find(m => m.id === milestoneId);
+    if (milestone) {
+      const sub = milestone.subMilestones.find(s => s.id === subId);
+      if (sub) {
+        sub.completed = !sub.completed;
+        notifyChange(newData);
+      }
+    }
+  };
+
+  // Calculate milestone progress
+  const getMilestoneProgress = (milestone: Milestone) => {
+    const completed = milestone.subMilestones.filter(s => s.completed).length;
+    const total = milestone.subMilestones.length;
+    return { completed, total, isComplete: completed === total };
+  };
+
   return (
     <Card 
       className="h-full flex flex-col overflow-hidden"
@@ -273,64 +295,78 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
           )}
         >
           <div className="space-y-2" role="list" aria-label="Milestones">
-            {roadmapData.milestones.map((milestone, index) => (
-              <div
-                key={milestone.id}
-                role="listitem"
-                className={cn(
-                  "flex items-center gap-3 p-3 rounded-lg border bg-card transition-all",
-                  !isEditMode && "cursor-pointer hover:bg-accent/50 active:scale-[0.99]"
-                )}
-                onClick={() => handleMilestoneClick(milestone.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isEditMode) {
-                    handleMilestoneClick(milestone.id);
-                  }
-                }}
-                tabIndex={isEditMode ? -1 : 0}
-              >
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm flex-shrink-0">
-                  {index + 1}
-                </div>
-                
-                {editingId === milestone.id ? (
-                  <Input
-                    ref={inputRef}
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={saveEdit}
-                    onKeyDown={handleKeyDown}
-                    className="flex-1 h-8"
-                    aria-label={`Edit milestone ${index + 1}`}
-                  />
-                ) : (
-                  <span
-                    className="flex-1 font-medium text-sm truncate"
-                    onClick={(e) => {
-                      if (!isEditMode) {
-                        e.stopPropagation();
-                        startEdit(milestone.id, milestone.text);
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !isEditMode) {
-                        e.stopPropagation();
-                        startEdit(milestone.id, milestone.text);
-                      }
-                    }}
-                    tabIndex={isEditMode ? -1 : 0}
-                    role="button"
-                    aria-label={`Milestone ${index + 1}: ${milestone.text}. Press Enter to edit or expand.`}
-                  >
-                    {milestone.text}
-                  </span>
-                )}
+            {roadmapData.milestones.map((milestone, index) => {
+              const progress = getMilestoneProgress(milestone);
+              return (
+                <div
+                  key={milestone.id}
+                  role="listitem"
+                  className={cn(
+                    "flex items-center gap-3 p-3 rounded-lg border bg-card transition-all",
+                    !isEditMode && "cursor-pointer hover:bg-accent/50 active:scale-[0.99]"
+                  )}
+                  onClick={() => handleMilestoneClick(milestone.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !isEditMode) {
+                      handleMilestoneClick(milestone.id);
+                    }
+                  }}
+                  tabIndex={isEditMode ? -1 : 0}
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm flex-shrink-0">
+                    {progress.isComplete ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      index + 1
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col gap-1">
+                    {editingId === milestone.id ? (
+                      <Input
+                        ref={inputRef}
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={saveEdit}
+                        onKeyDown={handleKeyDown}
+                        className="h-8"
+                        aria-label={`Edit milestone ${index + 1}`}
+                      />
+                    ) : (
+                      <>
+                        <span
+                          className="font-medium text-sm truncate"
+                          onClick={(e) => {
+                            if (!isEditMode) {
+                              e.stopPropagation();
+                              startEdit(milestone.id, milestone.text);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !isEditMode) {
+                              e.stopPropagation();
+                              startEdit(milestone.id, milestone.text);
+                            }
+                          }}
+                          tabIndex={isEditMode ? -1 : 0}
+                          role="button"
+                          aria-label={`Milestone ${index + 1}: ${milestone.text}. Press Enter to edit or expand.`}
+                        >
+                          {milestone.text}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {progress.completed}/{progress.total} completed
+                        </span>
+                      </>
+                    )}
+                  </div>
 
-                {!isEditMode && editingId !== milestone.id && (
-                  <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                )}
-              </div>
-            ))}
+                  {!isEditMode && editingId !== milestone.id && (
+                    <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -357,9 +393,12 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                     role="listitem"
                     className="flex items-start gap-3 p-2.5 rounded-lg border bg-card"
                   >
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-muted-foreground font-medium text-xs flex-shrink-0 mt-0.5">
-                      {index + 1}
-                    </div>
+                    <Checkbox
+                      checked={sub.completed}
+                      onCheckedChange={() => toggleSubMilestone(selectedMilestoneId!, sub.id)}
+                      className="mt-0.5"
+                      aria-label={`Mark ${sub.text} as ${sub.completed ? 'incomplete' : 'complete'}`}
+                    />
 
                     {editingId === sub.id ? (
                       <Input
@@ -373,7 +412,10 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                       />
                     ) : (
                       <span
-                        className="flex-1 text-sm"
+                        className={cn(
+                          "flex-1 text-sm",
+                          sub.completed && "line-through text-muted-foreground"
+                        )}
                         onClick={() => !isEditMode && startEdit(sub.id, sub.text)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !isEditMode) {
