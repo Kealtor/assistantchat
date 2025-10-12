@@ -33,6 +33,7 @@ export const DashboardArea = ({
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshingHero, setRefreshingHero] = useState(false);
+  const [refreshingReflection, setRefreshingReflection] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -78,6 +79,28 @@ export const DashboardArea = ({
       });
     } finally {
       setRefreshingHero(false);
+    }
+  };
+
+  const handleRefreshReflection = async () => {
+    if (!user) return;
+    
+    try {
+      setRefreshingReflection(true);
+      await loadDashboardData();
+      
+      toast({
+        title: "Reflection refreshed",
+        description: "Your reflection content has been updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Refresh failed",
+        description: "Could not refresh reflection. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setRefreshingReflection(false);
     }
   };
 
@@ -139,6 +162,8 @@ export const DashboardArea = ({
             <QuickReflectionWidget 
               placeholder={dashboardData.reflectionPreview}
               onTap={() => onNavigate("journal")}
+              onRefresh={handleRefreshReflection}
+              isRefreshing={refreshingReflection}
             />
             
             <HabitsSnapshot 
@@ -183,6 +208,8 @@ export const DashboardArea = ({
             <QuickReflectionWidget 
               placeholder={dashboardData.reflectionPreview}
               onTap={() => onNavigate("journal")}
+              onRefresh={handleRefreshReflection}
+              isRefreshing={refreshingReflection}
             />
             
             <HabitsSnapshot 

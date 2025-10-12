@@ -1,11 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { PenTool } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PenTool, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cardContentService } from "@/services/cardContentService";
+import { cn } from "@/lib/utils";
 
 interface QuickReflectionWidgetProps {
   placeholder: string;
   onTap: () => void;
+  onRefresh: () => void;
+  isRefreshing: boolean;
   isEditMode?: boolean;
 }
 
@@ -14,7 +18,7 @@ interface ReflectionContent {
   subtitle: string;
 }
 
-export const QuickReflectionWidget = ({ placeholder, onTap, isEditMode = false }: QuickReflectionWidgetProps) => {
+export const QuickReflectionWidget = ({ placeholder, onTap, onRefresh, isRefreshing, isEditMode = false }: QuickReflectionWidgetProps) => {
   const [content, setContent] = useState<ReflectionContent>({
     title: "Quick Reflection",
     subtitle: placeholder
@@ -68,8 +72,8 @@ export const QuickReflectionWidget = ({ placeholder, onTap, isEditMode = false }
       className={`h-full transition-all flex flex-col overflow-hidden ${!isEditMode ? 'cursor-pointer hover:shadow-md hover:bg-accent/50 active:scale-[0.99]' : ''}`}
       onClick={isEditMode ? undefined : onTap}
     >
-      <CardContent className="p-4 flex-1 flex items-center">
-        <div className="flex items-center gap-3 w-full">
+      <CardContent className="p-4 flex-1 flex items-center relative">
+        <div className="flex items-center gap-3 w-full pr-8">
           <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
             <PenTool className="w-5 h-5 text-muted-foreground" />
           </div>
@@ -80,6 +84,24 @@ export const QuickReflectionWidget = ({ placeholder, onTap, isEditMode = false }
             </p>
           </div>
         </div>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRefresh();
+          }}
+          disabled={isRefreshing}
+          className="absolute top-4 right-4"
+        >
+          <RefreshCw 
+            className={cn(
+              "w-4 h-4", 
+              isRefreshing && "animate-spin"
+            )} 
+          />
+        </Button>
       </CardContent>
     </Card>
   );

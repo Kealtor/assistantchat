@@ -47,6 +47,7 @@ export const CustomizableDashboard = ({
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshingHero, setRefreshingHero] = useState(false);
+  const [refreshingReflection, setRefreshingReflection] = useState(false);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [allowedWorkflows, setAllowedWorkflows] = useState(getUIWorkflows());
 
@@ -119,6 +120,19 @@ export const CustomizableDashboard = ({
       console.error('Error refreshing hero message:', error);
     } finally {
       setRefreshingHero(false);
+    }
+  };
+
+  const handleRefreshReflection = async () => {
+    if (!user) return;
+    
+    try {
+      setRefreshingReflection(true);
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error refreshing reflection:', error);
+    } finally {
+      setRefreshingReflection(false);
     }
   };
 
@@ -239,6 +253,8 @@ export const CustomizableDashboard = ({
             <QuickReflectionWidget
               placeholder={dashboardData.reflectionPreview}
               onTap={() => onNavigate("journal")}
+              onRefresh={handleRefreshReflection}
+              isRefreshing={refreshingReflection}
               isEditMode={isEditMode}
             />
           </div>
