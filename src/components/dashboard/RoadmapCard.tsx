@@ -234,9 +234,27 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
       aria-label="Roadmap planner"
     >
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="w-5 h-5" />
-          Roadmap
+        <CardTitle className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Roadmap
+          </div>
+          {selectedMilestoneId && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBack}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  handleBack();
+                }
+              }}
+              aria-label="Back to all milestones"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Back
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
 
@@ -324,23 +342,6 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
               selectedMilestoneId ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none absolute"
             )}
           >
-            <div className="flex items-center gap-2 mb-4 justify-end">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBack}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    handleBack();
-                  }
-                }}
-                aria-label="Back to all milestones"
-              >
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Back
-              </Button>
-            </div>
-
             <div className="flex-1 overflow-y-auto">
               <div className="mb-4">
                 <div className="flex items-center gap-2 text-primary mb-2">
