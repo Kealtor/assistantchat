@@ -4,6 +4,8 @@ import { PenTool, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cardContentService } from "@/services/cardContentService";
 import { cn } from "@/lib/utils";
+import { webhookService } from "@/services/webhookService";
+import { useAuth } from "@/hooks/useAuth";
 
 interface QuickReflectionWidgetProps {
   placeholder: string;
@@ -19,11 +21,31 @@ interface ReflectionContent {
 }
 
 export const QuickReflectionWidget = ({ placeholder, onTap, onRefresh, isRefreshing, isEditMode = false }: QuickReflectionWidgetProps) => {
+  const { user } = useAuth();
   const [content, setContent] = useState<ReflectionContent>({
     title: "Quick Reflection",
     subtitle: placeholder
   });
   const [isLoading, setIsLoading] = useState(true);
+
+  const handleRefresh = async () => {
+    // Trigger webhook if configured
+    if (user) {
+      try {
+        await webhookService.trigger('daily_reflection_webhook', {
+          userId: user.id,
+          cardType: 'daily_reflection',
+          timestamp: new Date().toISOString(),
+          currentContent: content
+        });
+      } catch (error) {
+        console.error('Webhook trigger failed:', error);
+      }
+    }
+    
+    // Call the original refresh handler
+    onRefresh();
+  };
 
   useEffect(() => {
     const loadContent = async () => {
@@ -90,7 +112,7 @@ export const QuickReflectionWidget = ({ placeholder, onTap, onRefresh, isRefresh
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            onRefresh();
+            handleRefresh();
           }}
           disabled={isRefreshing}
           className="absolute top-4 right-4"

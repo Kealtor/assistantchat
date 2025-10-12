@@ -2,6 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { webhookService } from "@/services/webhookService";
+import { useAuth } from "@/hooks/useAuth";
 
 interface HeroCardProps {
   message: string;
@@ -10,6 +12,27 @@ interface HeroCardProps {
 }
 
 export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) => {
+  const { user } = useAuth();
+
+  const handleRefresh = async () => {
+    // Trigger webhook if configured
+    if (user) {
+      try {
+        await webhookService.trigger('daily_inspiration_webhook', {
+          userId: user.id,
+          cardType: 'daily_inspiration',
+          timestamp: new Date().toISOString(),
+          currentContent: { message }
+        });
+      } catch (error) {
+        console.error('Webhook trigger failed:', error);
+      }
+    }
+    
+    // Call the original refresh handler
+    onRefresh();
+  };
+
   return (
     <Card className="h-full bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-lg flex flex-col overflow-hidden">
       <CardContent className="p-6 relative flex-1 flex items-center">
@@ -28,7 +51,7 @@ export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) =>
         <Button
           variant="ghost"
           size="sm"
-          onClick={onRefresh}
+          onClick={handleRefresh}
           disabled={isRefreshing}
           className="absolute top-4 right-4 text-primary hover:bg-primary/10"
         >
