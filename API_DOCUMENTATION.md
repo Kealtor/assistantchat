@@ -528,36 +528,71 @@ curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
 ```
 
 ### Roadmap Card
+The Roadmap Card displays 5 main milestones, each with 5 sub-milestones. All text fields are editable via API.
+
 ```json
 {
-  "title": "Your Growth Journey",
-  "description": "Track your progress on key goals",
   "milestones": [
     {
-      "id": "milestone-1",
-      "title": "Complete 30-day challenge",
-      "description": "Build consistent daily habits",
-      "progress": 67,
-      "status": "in_progress",
-      "dueDate": "2025-11-10"
+      "id": "m1",
+      "text": "Launch MVP",
+      "subMilestones": [
+        { "id": "s1-1", "text": "Define core features" },
+        { "id": "s1-2", "text": "Build prototype" },
+        { "id": "s1-3", "text": "User testing" },
+        { "id": "s1-4", "text": "Refine UI/UX" },
+        { "id": "s1-5", "text": "Deploy to production" }
+      ]
     },
     {
-      "id": "milestone-2",
-      "title": "Master morning routine",
-      "description": "Wake up at 6 AM for 21 days",
-      "progress": 100,
-      "status": "completed",
-      "completedDate": "2025-10-05"
+      "id": "m2",
+      "text": "Achieve Product-Market Fit",
+      "subMilestones": [
+        { "id": "s2-1", "text": "Collect user feedback" },
+        { "id": "s2-2", "text": "Iterate on features" },
+        { "id": "s2-3", "text": "Identify key metrics" },
+        { "id": "s2-4", "text": "Optimize conversion" },
+        { "id": "s2-5", "text": "Reach 1000 active users" }
+      ]
+    },
+    {
+      "id": "m3",
+      "text": "Scale Operations",
+      "subMilestones": [
+        { "id": "s3-1", "text": "Automate workflows" },
+        { "id": "s3-2", "text": "Expand team" },
+        { "id": "s3-3", "text": "Implement analytics" },
+        { "id": "s3-4", "text": "Optimize infrastructure" },
+        { "id": "s3-5", "text": "Launch referral program" }
+      ]
+    },
+    {
+      "id": "m4",
+      "text": "Expand Market Reach",
+      "subMilestones": [
+        { "id": "s4-1", "text": "Research new markets" },
+        { "id": "s4-2", "text": "Localize product" },
+        { "id": "s4-3", "text": "Partner with influencers" },
+        { "id": "s4-4", "text": "Launch marketing campaign" },
+        { "id": "s4-5", "text": "Enter 3 new regions" }
+      ]
+    },
+    {
+      "id": "m5",
+      "text": "Achieve Sustainability",
+      "subMilestones": [
+        { "id": "s5-1", "text": "Reach profitability" },
+        { "id": "s5-2", "text": "Establish brand presence" },
+        { "id": "s5-3", "text": "Build community" },
+        { "id": "s5-4", "text": "Secure strategic partnerships" },
+        { "id": "s5-5", "text": "Plan long-term vision" }
+      ]
     }
-  ],
-  "nextSteps": [
-    "Continue daily habit tracking",
-    "Review weekly progress"
   ]
 }
 ```
 
-**Example API Request:**
+**Example API Request - Update All 5 Milestones:**
 ```bash
 curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
   -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
@@ -566,34 +601,98 @@ curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
     "userId": "5d59e0a7-ae64-4e04-8a14-85a39c1eae3f",
     "cardType": "roadmap",
     "content": {
-      "title": "2025 Personal Development Goals",
-      "description": "Your journey to becoming your best self",
       "milestones": [
         {
-          "id": "q1-fitness",
-          "title": "Achieve fitness baseline",
-          "description": "Exercise 5x per week consistently",
-          "progress": 45,
-          "status": "in_progress",
-          "dueDate": "2025-12-31"
+          "id": "m1",
+          "text": "Build Fitness Foundation",
+          "subMilestones": [
+            { "id": "s1-1", "text": "Complete health assessment" },
+            { "id": "s1-2", "text": "Create workout schedule" },
+            { "id": "s1-3", "text": "Join gym or set up home gym" },
+            { "id": "s1-4", "text": "Learn proper form" },
+            { "id": "s1-5", "text": "Complete first 30 days" }
+          ]
         },
         {
-          "id": "q1-mindfulness",
-          "title": "Daily meditation practice",
-          "description": "Meditate for 10 minutes daily",
-          "progress": 80,
-          "status": "in_progress",
-          "dueDate": "2025-11-15"
+          "id": "m2",
+          "text": "Develop Consistent Habits",
+          "subMilestones": [
+            { "id": "s2-1", "text": "Exercise 3x per week" },
+            { "id": "s2-2", "text": "Track nutrition daily" },
+            { "id": "s2-3", "text": "Sleep 7-8 hours nightly" },
+            { "id": "s2-4", "text": "Practice mindfulness" },
+            { "id": "s2-5", "text": "Maintain 60-day streak" }
+          ]
+        },
+        {
+          "id": "m3",
+          "text": "Increase Strength & Endurance",
+          "subMilestones": [
+            { "id": "s3-1", "text": "Run 5K without stopping" },
+            { "id": "s3-2", "text": "Double initial strength baseline" },
+            { "id": "s3-3", "text": "Master 10 key exercises" },
+            { "id": "s3-4", "text": "Reduce body fat by 5%" },
+            { "id": "s3-5", "text": "Complete 90-day milestone" }
+          ]
+        },
+        {
+          "id": "m4",
+          "text": "Achieve Peak Performance",
+          "subMilestones": [
+            { "id": "s4-1", "text": "Run 10K race" },
+            { "id": "s4-2", "text": "Reach target weight" },
+            { "id": "s4-3", "text": "Master advanced techniques" },
+            { "id": "s4-4", "text": "Optimize nutrition plan" },
+            { "id": "s4-5", "text": "Complete 6-month transformation" }
+          ]
+        },
+        {
+          "id": "m5",
+          "text": "Sustain Long-Term Wellness",
+          "subMilestones": [
+            { "id": "s5-1", "text": "Maintain ideal fitness level" },
+            { "id": "s5-2", "text": "Inspire others to start" },
+            { "id": "s5-3", "text": "Set new challenge goals" },
+            { "id": "s5-4", "text": "Build supportive community" },
+            { "id": "s5-5", "text": "Celebrate 1-year anniversary" }
+          ]
         }
-      ],
-      "nextSteps": [
-        "Complete this week'\''s workout plan",
-        "Schedule Sunday review session",
-        "Update Q2 goals"
       ]
     }
   }'
 ```
+
+**Example - Update Single Milestone with Sub-milestones:**
+```bash
+curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/update-card \
+  -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "5d59e0a7-ae64-4e04-8a14-85a39c1eae3f",
+    "cardType": "roadmap",
+    "content": {
+      "milestones": [
+        {
+          "id": "m1",
+          "text": "Q1 2025 Goals",
+          "subMilestones": [
+            { "id": "s1-1", "text": "Complete morning routine 21 days" },
+            { "id": "s1-2", "text": "Read 3 personal development books" },
+            { "id": "s1-3", "text": "Meditate daily for 30 days" },
+            { "id": "s1-4", "text": "Journal 5x per week" },
+            { "id": "s1-5", "text": "Attend 2 networking events" }
+          ]
+        }
+      ]
+    }
+  }'
+```
+
+**Important Notes:**
+- Always include all 5 milestones when updating the roadmap
+- Each milestone must have exactly 5 sub-milestones
+- IDs should remain consistent (m1-m5 for milestones, s1-1 to s5-5 for sub-milestones)
+- Only the `text` field is displayed and editable in the UI
 
 ### Bulk Update Example (All Three Cards)
 ```bash
@@ -630,21 +729,62 @@ curl -X POST https://paodisbyfnmiljjognxl.supabase.co/functions/v1/bulk-update-c
       {
         "cardType": "roadmap",
         "content": {
-          "title": "Q4 2025 Goals",
-          "description": "Your path to personal excellence",
           "milestones": [
             {
-              "id": "habit-mastery",
-              "title": "100-day habit streak",
-              "description": "Maintain all core habits for 100 days",
-              "progress": 72,
-              "status": "in_progress",
-              "dueDate": "2025-12-25"
+              "id": "m1",
+              "text": "Complete Q4 Sprint",
+              "subMilestones": [
+                { "id": "s1-1", "text": "Finalize project requirements" },
+                { "id": "s1-2", "text": "Complete development phase" },
+                { "id": "s1-3", "text": "Run quality assurance" },
+                { "id": "s1-4", "text": "Deploy to production" },
+                { "id": "s1-5", "text": "Gather user feedback" }
+              ]
+            },
+            {
+              "id": "m2",
+              "text": "Build Healthy Habits",
+              "subMilestones": [
+                { "id": "s2-1", "text": "Morning workout 5x/week" },
+                { "id": "s2-2", "text": "Meal prep Sundays" },
+                { "id": "s2-3", "text": "8 hours sleep nightly" },
+                { "id": "s2-4", "text": "Daily meditation" },
+                { "id": "s2-5", "text": "Track progress weekly" }
+              ]
+            },
+            {
+              "id": "m3",
+              "text": "Professional Growth",
+              "subMilestones": [
+                { "id": "s3-1", "text": "Complete certification course" },
+                { "id": "s3-2", "text": "Attend 2 industry conferences" },
+                { "id": "s3-3", "text": "Network with 10 professionals" },
+                { "id": "s3-4", "text": "Publish 3 articles" },
+                { "id": "s3-5", "text": "Mentor junior colleague" }
+              ]
+            },
+            {
+              "id": "m4",
+              "text": "Financial Wellness",
+              "subMilestones": [
+                { "id": "s4-1", "text": "Create monthly budget" },
+                { "id": "s4-2", "text": "Save 20% of income" },
+                { "id": "s4-3", "text": "Pay off credit card debt" },
+                { "id": "s4-4", "text": "Start investment portfolio" },
+                { "id": "s4-5", "text": "Build 6-month emergency fund" }
+              ]
+            },
+            {
+              "id": "m5",
+              "text": "Personal Fulfillment",
+              "subMilestones": [
+                { "id": "s5-1", "text": "Read 12 books this year" },
+                { "id": "s5-2", "text": "Learn new skill/hobby" },
+                { "id": "s5-3", "text": "Volunteer monthly" },
+                { "id": "s5-4", "text": "Quality time with family" },
+                { "id": "s5-5", "text": "Plan dream vacation" }
+              ]
             }
-          ],
-          "nextSteps": [
-            "Review today'\''s progress",
-            "Plan tomorrow'\''s activities"
           ]
         }
       }

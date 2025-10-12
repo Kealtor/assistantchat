@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronRight, ArrowLeft, MapPin, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { cardContentService } from "@/services/cardContentService";
+import { useToast } from "@/hooks/use-toast";
 
 // Types
 interface SubMilestone {
@@ -92,9 +94,38 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
   const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const selectedMilestone = roadmapData.milestones.find(m => m.id === selectedMilestoneId);
+
+  // Fetch initial content and subscribe to updates
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const content = await cardContentService.getCardContent('roadmap');
+        if (content?.content?.milestones) {
+          setRoadmapData(content.content as RoadmapData);
+        }
+      } catch (error) {
+        console.error('Error fetching roadmap content:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContent();
+
+    // Subscribe to real-time updates
+    const unsubscribe = cardContentService.subscribeToCardUpdates('roadmap', (payload) => {
+      if (payload.new?.content?.milestones) {
+        setRoadmapData(payload.new.content as RoadmapData);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   // Focus input when editing starts
   useEffect(() => {
@@ -105,9 +136,24 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
   }, [editingId]);
 
   // Handle data changes
-  const notifyChange = (newData: RoadmapData) => {
+  const notifyChange = async (newData: RoadmapData) => {
     setRoadmapData(newData);
     onChange?.(newData);
+    
+    // Save to API
+    try {
+      await cardContentService.updateCard({
+        cardType: 'roadmap',
+        content: newData
+      });
+    } catch (error) {
+      console.error('Error updating roadmap:', error);
+      toast({
+        title: "Update failed",
+        description: "Could not save roadmap changes. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Start editing
@@ -195,8 +241,14 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
       </CardHeader>
 
       <CardContent className="flex-1 overflow-hidden p-4 pt-0">
-        {/* Main roadmap view */}
-        <div
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground text-sm">Loading roadmap...</p>
+          </div>
+        ) : (
+          <>
+            {/* Main roadmap view */}
+            <div
           className={cn(
             "transition-all duration-300 ease-in-out h-full",
             selectedMilestoneId ? "opacity-0 scale-95 pointer-events-none absolute" : "opacity-100 scale-100"
@@ -339,6 +391,8 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
               </div>
             </div>
           </div>
+        )}
+          </>
         )}
       </CardContent>
     </Card>
