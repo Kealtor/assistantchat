@@ -244,60 +244,60 @@ export const ChatLayout = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               variant="default"
               size="sm"
               onClick={() => navigateTo("dashboard")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <Home className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Dashboard</span>
+              <Home className="h-5 w-5 mr-2" />
+              Dashboard
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateTo("chat")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <MessageSquare className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Chat</span>
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Chat
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateTo("journal")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <BookOpen className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Journal</span>
+              <BookOpen className="h-5 w-5 mr-2" />
+              Journal
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateTo("habits")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <Target className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Habits</span>
+              <Target className="h-5 w-5 mr-2" />
+              Habits
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateTo("user")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <User className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">User</span>
+              <User className="h-5 w-5 mr-2" />
+              User
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleSignOut}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <LogOut className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Sign Out</span>
+              <LogOut className="h-5 w-5 mr-2" />
+              Sign Out
             </Button>
           </div>
         </header>
@@ -352,60 +352,60 @@ export const ChatLayout = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateTo("dashboard")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <Home className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Dashboard</span>
+              <Home className="h-5 w-5 mr-2" />
+              Dashboard
             </Button>
             <Button
               variant={currentView === "chat" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("chat")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <MessageSquare className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Chat</span>
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Chat
             </Button>
             <Button
               variant={currentView === "journal" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("journal")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <BookOpen className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Journal</span>
+              <BookOpen className="h-5 w-5 mr-2" />
+              Journal
             </Button>
             <Button
               variant={currentView === "habits" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("habits")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <Target className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Habits</span>
+              <Target className="h-5 w-5 mr-2" />
+              Habits
             </Button>
             <Button
               variant={currentView === "user" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("user")}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <User className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">User</span>
+              <User className="h-5 w-5 mr-2" />
+              User
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleSignOut}
-              className="h-9"
+              className="h-10 px-3"
             >
-              <LogOut className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Sign Out</span>
+              <LogOut className="h-5 w-5 mr-2" />
+              Sign Out
             </Button>
           </div>
         </header>
