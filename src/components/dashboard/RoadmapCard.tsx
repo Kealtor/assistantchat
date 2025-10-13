@@ -7,6 +7,7 @@ import { ChevronRight, ArrowLeft, MapPin, Target, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { cardContentService } from "@/services/cardContentService";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Types
 interface SubMilestone {
@@ -99,6 +100,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
   const [isLoading, setIsLoading] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const selectedMilestone = roadmapData.milestones.find(m => m.id === selectedMilestoneId);
 
@@ -255,11 +257,11 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
       role="region"
       aria-label="Roadmap planner"
     >
-      <CardHeader className="px-6 pt-6 pb-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <MapPin className="w-5 h-5 flex-shrink-0 text-muted-foreground" />
-            <h3 className="text-lg font-semibold truncate">
+      <CardHeader className={cn("pt-6 pb-3", isMobile ? "px-3" : "px-6")}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <MapPin className={cn("flex-shrink-0 text-muted-foreground", isMobile ? "w-4 h-4" : "w-5 h-5")} />
+            <h3 className={cn("font-semibold truncate", isMobile ? "text-base" : "text-lg")}>
               {selectedMilestoneId && selectedMilestone ? selectedMilestone.text : "Roadmap"}
             </h3>
           </div>
@@ -268,7 +270,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
               variant="ghost"
               size="sm"
               onClick={handleBack}
-              className="flex-shrink-0"
+              className={cn("flex-shrink-0", isMobile && "px-2")}
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   handleBack();
@@ -276,14 +278,14 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
               }}
               aria-label="Back to all milestones"
             >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Back
+              <ArrowLeft className="w-4 h-4" />
+              {!isMobile && <span className="ml-1">Back</span>}
             </Button>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-hidden px-6 pb-6 pt-0">
+      <CardContent className={cn("flex-1 overflow-hidden pb-6 pt-0", isMobile ? "px-3" : "px-6")}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground text-sm">Loading roadmap...</p>
@@ -316,7 +318,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                   }}
                   tabIndex={isEditMode ? -1 : 0}
                 >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm flex-shrink-0">
+                  <div className={cn("flex items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm flex-shrink-0", isMobile ? "w-7 h-7" : "w-8 h-8")}>
                     {progress.isComplete ? (
                       <Check className="w-4 h-4" />
                     ) : (
@@ -324,7 +326,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                     )}
                   </div>
                   
-                  <div className="flex-1 flex flex-col gap-1">
+                  <div className="flex-1 flex flex-col gap-1 min-w-0">
                     {editingId === milestone.id ? (
                       <Input
                         ref={inputRef}
@@ -338,7 +340,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                     ) : (
                       <>
                         <span
-                          className="font-medium text-base truncate"
+                          className={cn("font-medium truncate", isMobile ? "text-sm" : "text-base")}
                           onClick={(e) => {
                             if (!isEditMode) {
                               e.stopPropagation();
@@ -357,15 +359,17 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                         >
                           {milestone.text}
                         </span>
-                        <span className="text-sm text-muted-foreground">
-                          {progress.completed}/{progress.total} completed
-                        </span>
+                        {!isMobile && (
+                          <span className="text-sm text-muted-foreground">
+                            {progress.completed}/{progress.total} completed
+                          </span>
+                        )}
                       </>
                     )}
                   </div>
 
                   {!isEditMode && editingId !== milestone.id && (
-                    <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                    <ChevronRight className={cn("text-muted-foreground flex-shrink-0", isMobile ? "w-4 h-4" : "w-5 h-5")} />
                   )}
                 </div>
               );
@@ -387,10 +391,10 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                   <div
                     key={sub.id}
                     role="listitem"
-                    className="flex items-center gap-3 p-3 rounded-lg border bg-card transition-all cursor-pointer hover:bg-accent/50"
+                    className={cn("flex items-center rounded-lg border bg-card transition-all cursor-pointer hover:bg-accent/50", isMobile ? "gap-2 p-2" : "gap-3 p-3")}
                     onClick={() => toggleSubMilestone(selectedMilestoneId!, sub.id)}
                   >
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm flex-shrink-0">
+                    <div className={cn("flex items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm flex-shrink-0", isMobile ? "w-7 h-7" : "w-8 h-8")}>
                       {sub.completed ? (
                         <Check className="w-4 h-4" />
                       ) : (
@@ -398,7 +402,7 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                       )}
                     </div>
 
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       {editingId === sub.id ? (
                         <Input
                           ref={inputRef}
@@ -413,7 +417,8 @@ export const RoadmapCard = ({ isEditMode = false, onChange }: RoadmapCardProps) 
                       ) : (
                         <span
                           className={cn(
-                            "font-medium text-base",
+                            "font-medium break-words",
+                            isMobile ? "text-sm" : "text-base",
                             sub.completed && "line-through text-muted-foreground"
                           )}
                           onClick={(e) => {
