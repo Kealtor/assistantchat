@@ -233,26 +233,26 @@ export const ChatLayout = () => {
     return (
       <div className="h-screen bg-background font-inter">
         {/* Dashboard Header */}
-        <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-3 md:hidden lg:flex">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-medium">
+        <header className="h-16 border-b border-border bg-card px-3 md:px-6 flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-3 hidden lg:flex min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-medium shrink-0">
               🏠
             </div>
-            <div>
-              <h1 className="font-semibold text-lg">Dashboard</h1>
-              <p className="text-muted-foreground text-sm">Your daily reflection space</p>
+            <div className="min-w-0">
+              <h1 className="font-semibold text-lg truncate">Dashboard</h1>
+              <p className="text-muted-foreground text-sm truncate">Your daily reflection space</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-1 md:gap-2 flex-wrap">
             <Button
               variant="default"
               size="sm"
               onClick={() => navigateTo("dashboard")}
               className="h-9"
             >
-              <Home className="h-4 w-4 mr-2" />
-              Dashboard
+              <Home className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Dashboard</span>
             </Button>
             <Button
               variant="ghost"
@@ -260,8 +260,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("chat")}
               className="h-9"
             >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Chat
+              <MessageSquare className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Chat</span>
             </Button>
             <Button
               variant="ghost"
@@ -269,8 +269,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("journal")}
               className="h-9"
             >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Journal
+              <BookOpen className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Journal</span>
             </Button>
             <Button
               variant="ghost"
@@ -278,8 +278,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("habits")}
               className="h-9"
             >
-              <Target className="h-4 w-4 mr-2" />
-              Habits
+              <Target className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Habits</span>
             </Button>
             <Button
               variant="ghost"
@@ -287,8 +287,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("user")}
               className="h-9"
             >
-              <User className="h-4 w-4 mr-2" />
-              User
+              <User className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">User</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -296,8 +296,8 @@ export const ChatLayout = () => {
               onClick={handleSignOut}
               className="h-9"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
+              <LogOut className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Sign Out</span>
             </Button>
           </div>
         </header>
@@ -341,26 +341,26 @@ export const ChatLayout = () => {
       {/* Desktop Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Desktop Header */}
-        <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-3 md:hidden lg:flex">
-            <div className={`w-8 h-8 rounded-lg ${currentWorkflow?.color} flex items-center justify-center text-white text-sm font-medium`}>
+        <header className="h-16 border-b border-border bg-card px-3 md:px-6 flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-3 hidden lg:flex min-w-0">
+            <div className={`w-8 h-8 rounded-lg ${currentWorkflow?.color} flex items-center justify-center text-white text-sm font-medium shrink-0`}>
               {currentWorkflow?.emoji}
             </div>
-            <div>
-              <h1 className="font-semibold text-lg">{currentWorkflow?.name}</h1>
-              <p className="text-muted-foreground text-sm">{currentWorkflow?.description}</p>
+            <div className="min-w-0">
+              <h1 className="font-semibold text-lg truncate">{currentWorkflow?.name}</h1>
+              <p className="text-muted-foreground text-sm truncate">{currentWorkflow?.description}</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-1 md:gap-2 flex-wrap">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateTo("dashboard")}
               className="h-9"
             >
-              <Home className="h-4 w-4 mr-2" />
-              Dashboard
+              <Home className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Dashboard</span>
             </Button>
             <Button
               variant={currentView === "chat" ? "default" : "ghost"}
@@ -368,8 +368,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("chat")}
               className="h-9"
             >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Chat
+              <MessageSquare className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Chat</span>
             </Button>
             <Button
               variant={currentView === "journal" ? "default" : "ghost"}
@@ -377,8 +377,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("journal")}
               className="h-9"
             >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Journal
+              <BookOpen className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Journal</span>
             </Button>
             <Button
               variant={currentView === "habits" ? "default" : "ghost"}
@@ -386,8 +386,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("habits")}
               className="h-9"
             >
-              <Target className="h-4 w-4 mr-2" />
-              Habits
+              <Target className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Habits</span>
             </Button>
             <Button
               variant={currentView === "user" ? "default" : "ghost"}
@@ -395,8 +395,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("user")}
               className="h-9"
             >
-              <User className="h-4 w-4 mr-2" />
-              User
+              <User className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">User</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -404,8 +404,8 @@ export const ChatLayout = () => {
               onClick={handleSignOut}
               className="h-9"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
+              <LogOut className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Sign Out</span>
             </Button>
           </div>
         </header>
