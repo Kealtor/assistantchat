@@ -359,8 +359,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("dashboard")}
               className="h-10 px-3"
             >
-              <Home className="h-5 w-5 mr-2" />
-              Dashboard
+              <Home className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
+              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Dashboard</span>
             </Button>
             <Button
               variant={currentView === "chat" ? "default" : "ghost"}
@@ -368,8 +368,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("chat")}
               className="h-10 px-3"
             >
-              <MessageSquare className="h-5 w-5 mr-2" />
-              Chat
+              <MessageSquare className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
+              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Chat</span>
             </Button>
             <Button
               variant={currentView === "journal" ? "default" : "ghost"}
@@ -377,8 +377,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("journal")}
               className="h-10 px-3"
             >
-              <BookOpen className="h-5 w-5 mr-2" />
-              Journal
+              <BookOpen className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
+              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Journal</span>
             </Button>
             <Button
               variant={currentView === "habits" ? "default" : "ghost"}
@@ -386,8 +386,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("habits")}
               className="h-10 px-3"
             >
-              <Target className="h-5 w-5 mr-2" />
-              Habits
+              <Target className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
+              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Habits</span>
             </Button>
             <Button
               variant={currentView === "user" ? "default" : "ghost"}
@@ -395,8 +395,8 @@ export const ChatLayout = () => {
               onClick={() => navigateTo("user")}
               className="h-10 px-3"
             >
-              <User className="h-5 w-5 mr-2" />
-              User
+              <User className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
+              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>User</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -404,8 +404,8 @@ export const ChatLayout = () => {
               onClick={handleSignOut}
               className="h-10 px-3"
             >
-              <LogOut className="h-5 w-5 mr-2" />
-              Sign Out
+              <LogOut className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
+              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Sign Out</span>
             </Button>
           </div>
         </header>
