@@ -163,59 +163,6 @@ export const ChatSidebar = ({
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
-
-        {/* Workflows */}
-        <div className="space-y-2 mb-4">
-          {allowedWorkflows.map((workflow) => (
-            <Button
-              key={workflow.id}
-              variant={activeWorkflow === workflow.id ? "default" : "ghost"}
-              size="sm"
-              onClick={() => onWorkflowChange(workflow.id)}
-              className="w-full h-10 p-0 text-lg"
-            >
-              {workflow.emoji}
-            </Button>
-          ))}
-        </div>
-
-        <Separator className="mb-4" />
-
-        {/* View Toggle */}
-        <div className="space-y-2">
-          <Button
-            variant={currentView === "chat" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onViewChange("chat")}
-            className="w-full h-10 p-0"
-          >
-            <MessageSquare className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={currentView === "journal" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onViewChange("journal")}
-            className="w-full h-10 p-0"
-          >
-            <BookOpen className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={currentView === "habits" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onViewChange("habits")}
-            className="w-full h-10 p-0"
-          >
-            <Target className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={currentView === "user" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onViewChange("user")}
-            className="w-full h-10 p-0"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
     );
   }
