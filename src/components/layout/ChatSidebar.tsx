@@ -163,6 +163,22 @@ export const ChatSidebar = ({
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
+
+        {/* Workflows */}
+        <div className="space-y-2 mb-4">
+          {allowedWorkflows.map((workflow) => (
+            <Button
+              key={workflow.id}
+              variant={activeWorkflow === workflow.id ? "default" : "ghost"}
+              size="sm"
+              onClick={() => onWorkflowChange(workflow.id)}
+              className="w-full h-10 p-0 text-lg"
+              title={workflow.name}
+            >
+              {workflow.emoji}
+            </Button>
+          ))}
+        </div>
       </div>
     );
   }
