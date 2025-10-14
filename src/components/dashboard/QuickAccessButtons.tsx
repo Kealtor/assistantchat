@@ -58,7 +58,7 @@ export const QuickAccessButtons = ({
             <span className="text-lg" role="img" aria-hidden="true">
               {workflow.emoji}
             </span>
-            <span className="text-xs font-medium line-clamp-2 text-left leading-tight">
+            <span className="text-xs font-medium line-clamp-2 text-right leading-tight">
               {workflow.name}
             </span>
           </Button>
