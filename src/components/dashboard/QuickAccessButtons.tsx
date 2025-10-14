@@ -46,7 +46,7 @@ export const QuickAccessButtons = ({
             type="button"
             variant={effectiveWorkflow === workflow.id ? "default" : "outline"}
             size="lg"
-            className={`h-auto min-h-12 w-full flex flex-row items-center justify-start gap-2 py-2 px-3 transition-all touch-manipulation relative z-10 ${
+            className={`h-auto min-h-12 w-full flex flex-row items-center justify-end gap-2 py-2 px-3 transition-all touch-manipulation relative z-10 ${
               effectiveWorkflow === workflow.id 
                 ? 'ring-2 ring-primary ring-offset-2' 
                 : 'hover:bg-accent'
