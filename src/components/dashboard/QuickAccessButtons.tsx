@@ -39,7 +39,7 @@ export const QuickAccessButtons = ({
   return (
     <div className="flex flex-col gap-4 touch-auto relative z-10">
       {/* Workflow Buttons Grid */}
-      <div className="grid grid-cols-3 2xl:grid-cols-3 gap-3 relative z-10">
+      <div className="grid grid-cols-3 2xl:grid-cols-3 gap-3 relative z-10 justify-items-end">
         {allowedWorkflows.map((workflow) => (
           <Button
             key={workflow.id}
