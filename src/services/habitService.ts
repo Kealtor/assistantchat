@@ -9,6 +9,7 @@ export interface Habit {
   position: number;
   acceptance_criteria?: string;
   notes?: string;
+  show_details?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -31,6 +32,7 @@ export interface CreateHabitData {
   position: number;
   acceptance_criteria?: string;
   notes?: string;
+  show_details?: boolean;
   user_id: string;
 }
 
@@ -41,6 +43,7 @@ export interface UpdateHabitData {
   position?: number;
   acceptance_criteria?: string;
   notes?: string;
+  show_details?: boolean;
 }
 
 export interface CreateHabitEntryData {

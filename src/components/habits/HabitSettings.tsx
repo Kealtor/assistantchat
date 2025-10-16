@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Edit, Plus, X } from "lucide-react";
 import { Habit } from "@/services/habitService";
 import { toast } from "sonner";
@@ -42,7 +43,8 @@ export const HabitSettings = ({
     color: '', 
     icon: '', 
     acceptance_criteria: '', 
-    notes: '' 
+    notes: '',
+    show_details: true
   });
 
   const handleEditStart = (habit: Habit) => {
@@ -52,7 +54,8 @@ export const HabitSettings = ({
       color: habit.color,
       icon: habit.icon,
       acceptance_criteria: habit.acceptance_criteria || '',
-      notes: habit.notes || ''
+      notes: habit.notes || '',
+      show_details: habit.show_details !== false
     });
   };
 
@@ -67,7 +70,8 @@ export const HabitSettings = ({
       color: editForm.color,
       icon: editForm.icon,
       acceptance_criteria: editForm.acceptance_criteria.trim() || null,
-      notes: editForm.notes.trim() || null
+      notes: editForm.notes.trim() || null,
+      show_details: editForm.show_details
     });
     
     setEditingHabit(null);
@@ -76,7 +80,7 @@ export const HabitSettings = ({
 
   const handleEditCancel = () => {
     setEditingHabit(null);
-    setEditForm({ name: '', color: '', icon: '', acceptance_criteria: '', notes: '' });
+    setEditForm({ name: '', color: '', icon: '', acceptance_criteria: '', notes: '', show_details: true });
   };
 
   const handleCreateStart = () => {
@@ -86,7 +90,8 @@ export const HabitSettings = ({
       color: DEFAULT_COLORS[0],
       icon: DEFAULT_ICONS[0],
       acceptance_criteria: '',
-      notes: ''
+      notes: '',
+      show_details: true
     });
   };
 
@@ -109,17 +114,18 @@ export const HabitSettings = ({
       icon: editForm.icon,
       position: nextPosition,
       acceptance_criteria: editForm.acceptance_criteria.trim() || null,
-      notes: editForm.notes.trim() || null
+      notes: editForm.notes.trim() || null,
+      show_details: editForm.show_details
     });
     
     setCreatingHabit(false);
-    setEditForm({ name: '', color: '', icon: '', acceptance_criteria: '', notes: '' });
+    setEditForm({ name: '', color: '', icon: '', acceptance_criteria: '', notes: '', show_details: true });
     toast.success("Habit created successfully");
   };
 
   const handleCreateCancel = () => {
     setCreatingHabit(false);
-    setEditForm({ name: '', color: '', icon: '', acceptance_criteria: '', notes: '' });
+    setEditForm({ name: '', color: '', icon: '', acceptance_criteria: '', notes: '', show_details: true });
   };
 
   const handleDelete = (habitId: string) => {
@@ -209,6 +215,17 @@ export const HabitSettings = ({
                       placeholder="Additional notes or reminders"
                       rows={2}
                     />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`show-details-${habit.id}`}
+                      checked={editForm.show_details}
+                      onCheckedChange={(checked) => setEditForm({ ...editForm, show_details: checked === true })}
+                    />
+                    <Label htmlFor={`show-details-${habit.id}`} className="text-sm font-normal cursor-pointer">
+                      Show acceptance criteria and notes in tracker
+                    </Label>
                   </div>
                   
                   <div className="flex gap-2">
@@ -333,6 +350,17 @@ export const HabitSettings = ({
                 placeholder="Additional notes or reminders"
                 rows={2}
               />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="show-details-new"
+                checked={editForm.show_details}
+                onCheckedChange={(checked) => setEditForm({ ...editForm, show_details: checked === true })}
+              />
+              <Label htmlFor="show-details-new" className="text-sm font-normal cursor-pointer">
+                Show acceptance criteria and notes in tracker
+              </Label>
             </div>
             
             <div className="flex gap-2">

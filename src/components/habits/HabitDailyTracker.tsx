@@ -149,52 +149,54 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                     ))}
                   </div>
 
-                  {/* Mobile: Notes block */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm font-medium text-muted-foreground">Notes</div>
-                      {editingNotes !== habit.id && (
-                        <button
-                          onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
-                          className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
-                        >
-                          <Edit3 className="h-3 w-3" />
-                        </button>
+                  {/* Mobile: Notes block - Only show if show_details is true */}
+                  {habit.show_details !== false && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-medium text-muted-foreground">Notes</div>
+                        {editingNotes !== habit.id && (
+                          <button
+                            onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
+                            className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
+                          >
+                            <Edit3 className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                      
+                      {editingNotes === habit.id ? (
+                        <div className="space-y-2">
+                          <Textarea
+                            value={tempNotes}
+                            onChange={(e) => setTempNotes(e.target.value)}
+                            className="min-h-[60px] text-sm"
+                            placeholder="Additional notes or reminders"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleNotesSave(habit.id)}
+                              className="p-1 hover:bg-green-100 rounded text-green-600 hover:text-green-700"
+                            >
+                              <Check className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={handleNotesCancel}
+                              className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-700"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
+                             onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
+                          <div className="text-sm whitespace-pre-wrap">
+                            {getTodayNotes(habit.id) || "Click to add notes for today..."}
+                          </div>
+                        </div>
                       )}
                     </div>
-                    
-                    {editingNotes === habit.id ? (
-                      <div className="space-y-2">
-                        <Textarea
-                          value={tempNotes}
-                          onChange={(e) => setTempNotes(e.target.value)}
-                          className="min-h-[60px] text-sm"
-                          placeholder="Additional notes or reminders"
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleNotesSave(habit.id)}
-                            className="p-1 hover:bg-green-100 rounded text-green-600 hover:text-green-700"
-                          >
-                            <Check className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={handleNotesCancel}
-                            className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-700"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
-                           onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
-                        <div className="text-sm whitespace-pre-wrap">
-                          {getTodayNotes(habit.id) || "Click to add notes for today..."}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  )}
 
                   {/* Mobile: Progress bar */}
                   <div className="space-y-2">
@@ -252,65 +254,67 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                   </div>
                 </div>
 
-                {/* Desktop: Acceptance Criteria and Notes side by side */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Acceptance Criteria */}
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Acceptance Criteria</div>
-                    <div className="p-3 rounded-md bg-muted/50 border border-border min-h-[60px]">
-                      <div className="text-sm whitespace-pre-wrap">
-                        {habit.acceptance_criteria || "No acceptance criteria set"}
+                {/* Desktop: Acceptance Criteria and Notes side by side - Only show if show_details is true */}
+                {habit.show_details !== false && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Acceptance Criteria */}
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium text-muted-foreground">Acceptance Criteria</div>
+                      <div className="p-3 rounded-md bg-muted/50 border border-border min-h-[60px]">
+                        <div className="text-sm whitespace-pre-wrap">
+                          {habit.acceptance_criteria || "No acceptance criteria set"}
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  {/* Notes - Editable */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm font-medium text-muted-foreground">Notes</div>
-                    {editingNotes !== habit.id && (
-                      <button
-                        onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
-                        className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
-                      >
-                        <Edit3 className="h-3 w-3" />
-                      </button>
-                    )}
                     </div>
                     
-                    {editingNotes === habit.id ? (
-                      <div className="space-y-2">
-                        <Textarea
-                          value={tempNotes}
-                          onChange={(e) => setTempNotes(e.target.value)}
-                          className="min-h-[60px] text-sm"
-                          placeholder="Additional notes or reminders"
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleNotesSave(habit.id)}
-                            className="p-1 hover:bg-green-100 rounded text-green-600 hover:text-green-700"
-                          >
-                            <Check className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={handleNotesCancel}
-                            className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-700"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
+                    {/* Notes - Editable */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-medium text-muted-foreground">Notes</div>
+                      {editingNotes !== habit.id && (
+                        <button
+                          onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}
+                          className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground"
+                        >
+                          <Edit3 className="h-3 w-3" />
+                        </button>
+                      )}
                       </div>
-                    ) : (
-                      <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
-                           onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
-                        <div className="text-sm whitespace-pre-wrap">
-                          {getTodayNotes(habit.id) || "Click to add notes for today..."}
+                      
+                      {editingNotes === habit.id ? (
+                        <div className="space-y-2">
+                          <Textarea
+                            value={tempNotes}
+                            onChange={(e) => setTempNotes(e.target.value)}
+                            className="min-h-[60px] text-sm"
+                            placeholder="Additional notes or reminders"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleNotesSave(habit.id)}
+                              className="p-1 hover:bg-green-100 rounded text-green-600 hover:text-green-700"
+                            >
+                              <Check className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={handleNotesCancel}
+                              className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-700"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="p-3 rounded-md bg-secondary/50 border border-border min-h-[60px] cursor-pointer hover:bg-secondary/70 transition-colors"
+                             onClick={() => handleNotesEdit(habit.id, getTodayNotes(habit.id))}>
+                          <div className="text-sm whitespace-pre-wrap">
+                            {getTodayNotes(habit.id) || "Click to add notes for today..."}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Desktop: Progress bar */}
                 <div className="space-y-2">
