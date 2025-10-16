@@ -357,55 +357,55 @@ export const ChatLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigateTo("dashboard")}
-              className="h-10 px-3"
+              className="h-10 px-2 md:px-3"
             >
-              <Home className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
-              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Dashboard</span>
+              <Home className="h-5 w-5" />
+              <span className="ml-2 hidden xl:inline">Dashboard</span>
             </Button>
             <Button
               variant={currentView === "chat" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("chat")}
-              className="h-10 px-3"
+              className="h-10 px-2 md:px-3"
             >
-              <MessageSquare className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
-              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Chat</span>
+              <MessageSquare className="h-5 w-5" />
+              <span className="ml-2 hidden xl:inline">Chat</span>
             </Button>
             <Button
               variant={currentView === "journal" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("journal")}
-              className="h-10 px-3"
+              className="h-10 px-2 md:px-3"
             >
-              <BookOpen className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
-              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Journal</span>
+              <BookOpen className="h-5 w-5" />
+              <span className="ml-2 hidden xl:inline">Journal</span>
             </Button>
             <Button
               variant={currentView === "habits" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("habits")}
-              className="h-10 px-3"
+              className="h-10 px-2 md:px-3"
             >
-              <Target className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
-              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Habits</span>
+              <Target className="h-5 w-5" />
+              <span className="ml-2 hidden xl:inline">Habits</span>
             </Button>
             <Button
               variant={currentView === "user" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigateTo("user")}
-              className="h-10 px-3"
+              className="h-10 px-2 md:px-3"
             >
-              <User className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
-              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>User</span>
+              <User className="h-5 w-5" />
+              <span className="ml-2 hidden xl:inline">User</span>
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleSignOut}
-              className="h-10 px-3"
+              className="h-10 px-2 md:px-3"
             >
-              <LogOut className={`h-5 w-5 ${!sidebarCollapsed ? '' : 'mr-2'}`} />
-              <span className={!sidebarCollapsed ? 'hidden lg:inline' : ''}>Sign Out</span>
+              <LogOut className="h-5 w-5" />
+              <span className="ml-2 hidden xl:inline">Sign Out</span>
             </Button>
           </div>
         </header>
