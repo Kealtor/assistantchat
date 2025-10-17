@@ -220,22 +220,22 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
 
             // Desktop layout - keep current design mostly intact
             return (
-              <div key={habit.id} className="space-y-3 p-3 md:p-4 rounded-lg border border-border bg-card/50">
+              <div key={habit.id} className="space-y-4 p-4 rounded-lg border border-border bg-card/50">
                 {/* Desktop: Header with habit name, rating buttons, and streak data */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 md:gap-4">
-                    <span className="text-xl md:text-2xl">{habit.icon}</span>
-                    <h3 className="text-lg md:text-2xl font-semibold truncate">{habit.name}</h3>
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{habit.icon}</span>
+                    <h3 className="text-2xl font-semibold">{habit.name}</h3>
                     
                     {/* Rating buttons right next to habit name */}
-                    <div className="flex items-center gap-1.5 md:gap-2">
-                      <span className="text-xs md:text-sm font-medium mr-1 md:mr-2">Today:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium mr-2">Today:</span>
                       {[1, 2, 3, 4, 5].map((rating) => (
                         <button
                           key={rating}
                           onClick={() => handleRatingClick(habit.id, rating)}
                           className={cn(
-                            "w-7 h-7 md:w-8 md:h-8 rounded-full border-2 text-xs md:text-sm font-medium transition-all hover:scale-110",
+                            "w-8 h-8 rounded-full border-2 text-sm font-medium transition-all hover:scale-110",
                             currentRating === rating
                               ? `${getRatingColor(rating)} border-ring text-white`
                               : "border-border bg-background hover:border-ring"
@@ -248,15 +248,15 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                   </div>
                   
                   {/* Streak data on far right */}
-                  <div className="flex gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground">
-                    <span>🔥 {streak}d</span>
-                    <span>📊 {average.toFixed(1)}</span>
+                  <div className="flex gap-4 text-sm text-muted-foreground">
+                    <span>🔥 {streak} days</span>
+                    <span>📊 {average.toFixed(1)}/5 avg</span>
                   </div>
                 </div>
 
                 {/* Desktop: Acceptance Criteria and Notes side by side - Only show if show_details is true */}
                 {habit.show_details !== false && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Acceptance Criteria */}
                     <div className="space-y-2">
                       <div className="text-sm font-medium text-muted-foreground">Acceptance Criteria</div>
