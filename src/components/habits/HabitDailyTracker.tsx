@@ -222,12 +222,22 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
             return (
               <div key={habit.id} className="space-y-4 p-4 rounded-lg border border-border bg-card/50">
                 {/* Desktop: Header with habit name, rating buttons, and streak data */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{habit.icon}</span>
-                    <h3 className="text-2xl font-semibold">{habit.name}</h3>
+                <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+                  <div className="flex items-center justify-between lg:flex-1">
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl">{habit.icon}</span>
+                      <h3 className="text-2xl font-semibold">{habit.name}</h3>
+                    </div>
                     
-                    {/* Rating buttons right next to habit name */}
+                    {/* Streak data - shown on right on tablet, moves with rating on desktop */}
+                    <div className="flex gap-4 text-sm text-muted-foreground lg:hidden">
+                      <span>🔥 {streak} days</span>
+                      <span>📊 {average.toFixed(1)}/5 avg</span>
+                    </div>
+                  </div>
+                  
+                  {/* Rating buttons - drops to new line on tablet, inline on desktop */}
+                  <div className="flex items-center gap-2 lg:gap-4">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium mr-2">Today:</span>
                       {[1, 2, 3, 4, 5].map((rating) => (
@@ -245,12 +255,12 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
                         </button>
                       ))}
                     </div>
-                  </div>
-                  
-                  {/* Streak data on far right */}
-                  <div className="flex gap-4 text-sm text-muted-foreground">
-                    <span>🔥 {streak} days</span>
-                    <span>📊 {average.toFixed(1)}/5 avg</span>
+                    
+                    {/* Streak data on desktop */}
+                    <div className="hidden lg:flex gap-4 text-sm text-muted-foreground">
+                      <span>🔥 {streak} days</span>
+                      <span>📊 {average.toFixed(1)}/5 avg</span>
+                    </div>
                   </div>
                 </div>
 
