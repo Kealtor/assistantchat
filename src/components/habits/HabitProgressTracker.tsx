@@ -59,14 +59,14 @@ export const HabitProgressTracker = ({ habits, entries, currentDate }: HabitProg
                   "grid gap-1 items-center",
                   isMobile ? "grid-cols-8" : ""
                 )}
-                style={!isMobile ? { gridTemplateColumns: '200px repeat(14, 1fr)' } : {}}
+                style={!isMobile ? { gridTemplateColumns: '150px repeat(14, minmax(24px, 1fr))' } : {}}
               >
                 <div className={cn(
-                  "flex items-center gap-3 pr-4",
-                  isMobile ? "col-span-8 mb-2" : "w-48"
+                  "flex items-center gap-2 pr-2 overflow-hidden",
+                  isMobile ? "col-span-8 mb-2" : "w-36"
                 )}>
-                  <span className="text-xl">{habit.icon}</span>
-                  {!isMobile && <span className="text-sm font-medium">{habit.name}</span>}
+                  <span className="text-lg flex-shrink-0">{habit.icon}</span>
+                  {!isMobile && <span className="text-xs font-medium truncate">{habit.name}</span>}
                   {isMobile && <span className="text-sm font-medium">{habit.name}</span>}
                 </div>
                 
@@ -126,7 +126,7 @@ export const HabitProgressTracker = ({ habits, entries, currentDate }: HabitProg
                   const cellContent = (
                     <div
                       className={cn(
-                        "h-8 w-full rounded border border-border transition-colors aspect-square hover:scale-105 hover:shadow-md cursor-pointer",
+                        "h-6 w-full rounded border border-border transition-colors aspect-square hover:scale-105 hover:shadow-md cursor-pointer",
                         getRatingColor(rating),
                         isSameDay(day, baseDate) && "ring-2 ring-primary ring-offset-1"
                       )}

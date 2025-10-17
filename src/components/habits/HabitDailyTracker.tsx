@@ -256,7 +256,7 @@ export const HabitDailyTracker = ({ habits, entries, onRatingUpdate, onHabitUpda
 
                 {/* Desktop: Acceptance Criteria and Notes side by side - Only show if show_details is true */}
                 {habit.show_details !== false && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Acceptance Criteria */}
                     <div className="space-y-2">
                       <div className="text-sm font-medium text-muted-foreground">Acceptance Criteria</div>
