@@ -14,8 +14,13 @@ interface HabitProgressTrackerProps {
 
 export const HabitProgressTracker = ({ habits, entries, currentDate }: HabitProgressTrackerProps) => {
   const isMobile = useIsMobile();
-  // Generate days based on device: 7 for mobile, 14 for desktop
-  const daysCount = isMobile ? 7 : 14;
+  // Generate days based on device: 7 for mobile, 10 for tablet, 14 for desktop
+  const getColumnCount = () => {
+    if (isMobile) return 7;
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) return 10;
+    return 14;
+  };
+  const daysCount = getColumnCount();
   const baseDate = currentDate || new Date();
   const days = Array.from({ length: daysCount }, (_, i) => subDays(baseDate, i));
   
@@ -59,14 +64,18 @@ export const HabitProgressTracker = ({ habits, entries, currentDate }: HabitProg
                   "grid gap-1 items-center",
                   isMobile ? "grid-cols-8" : ""
                 )}
-                style={!isMobile ? { gridTemplateColumns: '150px repeat(14, minmax(24px, 1fr))' } : {}}
+                style={!isMobile ? { 
+                  gridTemplateColumns: daysCount === 10 
+                    ? '120px repeat(10, minmax(20px, 1fr))' 
+                    : '150px repeat(14, minmax(24px, 1fr))' 
+                } : {}}
               >
                 <div className={cn(
-                  "flex items-center gap-2 pr-2 overflow-hidden",
-                  isMobile ? "col-span-8 mb-2" : "w-36"
+                  "flex items-center gap-1.5 pr-2 overflow-hidden",
+                  isMobile ? "col-span-8 mb-2" : daysCount === 10 ? "w-28" : "w-36"
                 )}>
-                  <span className="text-lg flex-shrink-0">{habit.icon}</span>
-                  {!isMobile && <span className="text-xs font-medium truncate">{habit.name}</span>}
+                  <span className={cn("flex-shrink-0", daysCount === 10 ? "text-base" : "text-lg")}>{habit.icon}</span>
+                  {!isMobile && <span className={cn("font-medium truncate", daysCount === 10 ? "text-[11px]" : "text-xs")}>{habit.name}</span>}
                   {isMobile && <span className="text-sm font-medium">{habit.name}</span>}
                 </div>
                 
@@ -126,7 +135,8 @@ export const HabitProgressTracker = ({ habits, entries, currentDate }: HabitProg
                   const cellContent = (
                     <div
                       className={cn(
-                        "h-6 w-full rounded border border-border transition-colors aspect-square hover:scale-105 hover:shadow-md cursor-pointer",
+                        "w-full rounded border border-border transition-colors aspect-square hover:scale-105 hover:shadow-md cursor-pointer",
+                        daysCount === 10 ? "h-5" : "h-6",
                         getRatingColor(rating),
                         isSameDay(day, baseDate) && "ring-2 ring-primary ring-offset-1"
                       )}
