@@ -4,15 +4,22 @@ import { RefreshCw, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { webhookService } from "@/services/webhookService";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
+import { cardContentService } from "@/services/cardContentService";
 
 interface HeroCardProps {
-  message: string;
   onRefresh: () => void;
   isRefreshing: boolean;
 }
 
-export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) => {
+interface HeroContent {
+  message: string;
+}
+
+export const HeroCard = ({ onRefresh, isRefreshing }: HeroCardProps) => {
   const { user } = useAuth();
+  const [message, setMessage] = useState("Yesterday you stayed consistent with your reading habit – great job. Let's build on that today and make it another win!");
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleRefresh = async () => {
     // Trigger webhook if configured
@@ -32,6 +39,53 @@ export const HeroCard = ({ message, onRefresh, isRefreshing }: HeroCardProps) =>
     // Call the original refresh handler
     onRefresh();
   };
+
+  useEffect(() => {
+    const loadContent = async () => {
+      try {
+        const data = await cardContentService.getCardContent('hero');
+        if (data?.content) {
+          const heroContent = data.content as HeroContent;
+          setMessage(heroContent.message);
+        }
+      } catch (error) {
+        console.error('Error loading hero content:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadContent();
+
+    // Subscribe to real-time updates
+    const unsubscribe = cardContentService.subscribeToCardUpdates('hero', (payload) => {
+      if (payload.new?.content) {
+        const heroContent = payload.new.content as HeroContent;
+        setMessage(heroContent.message);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Card className="h-full bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-lg flex flex-col overflow-hidden">
+        <CardContent className="p-6 relative flex-1 flex items-center">
+          <div className="w-full animate-pulse">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-primary/20" />
+              <div className="h-6 bg-primary/20 rounded w-1/3" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-5 bg-muted rounded w-full" />
+              <div className="h-5 bg-muted rounded w-5/6" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="h-full bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-lg flex flex-col overflow-hidden">

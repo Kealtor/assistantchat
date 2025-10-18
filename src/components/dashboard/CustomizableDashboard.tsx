@@ -241,7 +241,6 @@ export const CustomizableDashboard = ({
         return (
           <div className="h-full">
             <HeroCard
-              message={dashboardData.heroMessage}
               onRefresh={handleRefreshHero}
               isRefreshing={refreshingHero}
             />

@@ -154,7 +154,6 @@ export const DashboardArea = ({
           {/* Dashboard Widgets */}
           <div className="space-y-4">
             <HeroCard 
-              message={dashboardData.heroMessage}
               onRefresh={handleRefreshHero}
               isRefreshing={refreshingHero}
             />
@@ -197,7 +196,6 @@ export const DashboardArea = ({
           {/* Hero Card - Full Width */}
           <div className="w-full">
             <HeroCard 
-              message={dashboardData.heroMessage}
               onRefresh={handleRefreshHero}
               isRefreshing={refreshingHero}
             />
